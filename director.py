@@ -278,7 +278,9 @@ class MentlController:
             log("controller exited; restarting")
             self.start()
         try:
-            self.proc.stdin.write(json.dumps(r, separators=(",", ":")) + "\n")
+            # The scope trace is for the page; the controller decides from the numbers.
+            line = {k: v for k, v in r.items() if k != "scope"}
+            self.proc.stdin.write(json.dumps(line, separators=(",", ":")) + "\n")
             self.proc.stdin.flush()
             line = self.q.get(timeout=2.0)
             if line is None:

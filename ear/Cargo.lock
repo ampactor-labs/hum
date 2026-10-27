@@ -21,6 +21,7 @@ dependencies = [
  "hound",
  "sonido-analysis",
  "sonido-core",
+ "sonido-effects",
 ]
 
 [[package]]
@@ -143,6 +144,15 @@ source = "git+https://github.com/ampactor-labs/sonido?branch=claude%2Fserene-fer
 dependencies = [
  "libm",
  "serde",
+]
+
+[[package]]
+name = "sonido-effects"
+version = "0.1.0"
+source = "git+https://github.com/ampactor-labs/sonido?branch=claude%2Fserene-fermat-5408rg#c65961508d5a056bcd88f63b3000318f3ff06952"
+dependencies = [
+ "libm",
+ "sonido-core",
 ]
 
 [[package]]

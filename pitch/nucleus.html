@@ -9,135 +9,92 @@
 <div class="deck">
 
 <section class="slide">
-  <div class="tag">Nucleus × Startup State · open call</div>
-  <h1>Tested and hoped on<small>control software for the physical world, and the language that proves it</small></h1>
-  <p class="lead">No mainstream language lets a team state "this loop never makes a host call, never allocates, never commands past this bound" and have the compiler prove it through every call.</p>
-  <p class="lead">So the software that steers a seven-ton flywheel is tested, reviewed and hoped on, walled behind a perimeter, and agents now write it.</p>
-  <div class="cols3" style="margin-top:30px">
-    <div class="card"><h3>Why now</h3><p>Coding agents write production control code this year.</p></div>
-    <div class="card"><h3>Why the grid</h3><p>Every new inverter is a software product under UL 1741 SB, and Utah's data centers are the load.</p></div>
-    <div class="card"><h3>Why here</h3><p>Torus is scaling a factory in Salt Lake; Hill AFB verifies flight software by review.</p></div>
-  </div>
-  <div class="foot"><span>Mentl · 1 / 5</span><span>the problem</span></div>
+  <div class="kick">Mentl · Nucleus × Startup State open call</div>
+  <h1>AI now helps write the software that runs machines. No mainstream language can prove what that software will never do.</h1>
+  <p class="lead">Batteries, flywheels and flight controls run on code that is tested, reviewed, and then trusted.</p>
+  <p class="lead"><b>Mentl is a programming language whose compiler proves it.</b></p>
+  <div class="foot"><span>The problem</span><span>1 / 5</span></div>
 </section>
 
 <section class="slide">
-  <h1>Mentl<small>a language whose compiler proves what a program can never do</small></h1>
+  <div class="kick">The hard tech</div>
+  <h1>Mentl proves what software can never do.</h1>
   <div class="two">
     <div>
-      <div class="cols3" style="grid-template-columns:1fr;gap:24px">
-        <div class="card"><h3>Never</h3><p>"Never makes a host call, never allocates, never exceeds this bound": proven through every call, or the program does not build. The audit names it: Real-time safe, Sandbox.</p></div>
-        <div class="card"><h3>Why</h3><p>Every fact carries its reason, walkable to the line that decided it. A dispatch explains itself, in words.</p></div>
-      </div>
+      <p class="lead">You write a promise into the code, such as "this never touches the internet" or "this never asks for more than 100 kW".</p>
+      <p class="lead">The compiler checks the promise through every function the code calls. <b>Break it, and the program won't build.</b></p>
+      <p class="note">Seven months and 2,600 commits since March. The compiler is written in Mentl and compiles itself. Open source.</p>
     </div>
-    <div>
-      <div class="pic"><img src="img/certificate-card.png" alt="What the controller can and cannot do, proven by the compiler: no network, no filesystem, no allocation while deciding, no command past the machine's rating"></div>
-      <p class="dim" style="margin-top:28px">Self-hosting: the pinned compiler reproduces itself byte for byte. One WebAssembly file. Open source. 2,600 commits since March 15; first light, the compiler compiling itself to a byte-identical fixed point, on July 10.</p>
-    </div>
+    <div class="pic"><img src="img/card-refused.png" alt="The compiler refusing a program that broke its promise not to reach the internet"></div>
   </div>
-  <div class="foot"><span>Mentl · 2 / 5</span><span>the hard tech</span></div>
+  <div class="foot"><span>The hard tech</span><span>2 / 5</span></div>
 </section>
 
 <section class="slide">
-  <h1>Built this week<small>beside what existed before</small></h1>
-  <div class="two" style="flex:0 0 auto">
-    <div class="card"><h3>Before kickoff</h3><ul>
-      <li>Mentl: the compiler, the proofs, the course, the Wasatch piece made of Salt Lake's readings; 2,610 commits since March 15</li>
-      <li>sonido: 36 effects, the plugin, the browser editor, the analysis crate, the pedal platform; 461 commits since January 25</li>
-    </ul></div>
-    <div class="card"><h3>Since Monday 4 PM</h3><ul>
-      <li>The ear: grid frequency from a guitar, three ways, to the millihertz, on the analysis crate</li>
-      <li>The controller in Mentl, its proofs, its refusal twin, the learner</li>
-      <li>The page, the director, the data, the real event replayed, tomorrow's rush hour shown, the session recorded</li>
-      <li>The gate's verdicts on proposed code, PROVEN and REFUSED with the line; the ear in the pedal</li>
-    </ul></div>
+  <div class="kick">Show it working</div>
+  <h1>Built this week: software that hears the power grid.</h1>
+  <div class="two">
+    <ul class="plain">
+      <li><b>A guitar pickup hears the grid</b> in any room's wiring, to a thousandth of a hertz, measured by my audio library, sonido.</li>
+      <li><b>A model of a Torus Station decides</b> what to do in under a millisecond, with software written in Mentl.</li>
+      <li><b>That software is proven</b> unable to reach the internet while it decides.</li>
+    </ul>
+    <div class="pic"><img src="img/stage-trip.png" alt="The live screen while a replayed 2019 grid failure pulls the frequency down and the flywheel answers"></div>
   </div>
-  <div class="cols3" style="margin-top:36px;flex:1;min-height:0">
-    <div class="pic"><img src="img/heartbeat-event.png" alt=""></div>
-    <div class="pic"><img src="img/station-event.png" alt=""></div>
-    <div class="pic"><img src="img/certificate-card.png" alt=""></div>
-  </div>
-  <div class="foot"><span>Mentl · 3 / 5</span><span>./ledger.sh: hum 22 · sonido 3 · Mentl 9 commits since Monday 4 PM, Tuesday's print, each with its time</span></div>
+  <div class="foot"><span>Before Monday 4 PM: the language, 2,610 commits since March 15, and sonido, 461 commits since January 25. Since then: everything on this slide.</span><span>3 / 5</span></div>
 </section>
 
 <section class="slide">
-  <h1>Who needs it, in Utah</h1>
-  <div class="cols3" style="grid-template-columns:1fr 1fr">
-    <div class="card"><h3>Torus</h3><p>Their Station hears every cycle. Their security is a perimeter. The program beneath the dispatcher has never been provable, until now. The Torus judge is seeing this demo today.</p></div>
-    <div class="card"><h3>Hill AFB, 309th Software Engineering Group</h3><p>One of the Air Force's largest software organizations, maintaining flight software for the F-16, the F-35 and the missile fleet. Assurance evidence is a deliverable, and a tool that never passes a claim it cannot decide produces it.</p></div>
+  <div class="kick">Who needs it</div>
+  <h1>Who needs it in Utah</h1>
+  <div class="cards">
+    <div class="card"><h3>Torus · Salt Lake City</h3><p>Builds flywheel-and-battery Stations that steady the grid. The software inside each Station is the first place a proof pays. Torus's judge is seeing this demo today.</p></div>
+    <div class="card"><h3>Hill AFB · 309th Software Engineering Group</h3><p>Maintains flight software for the F-16, the F-35 and the missile fleet, where every claim about the software needs evidence.</p></div>
   </div>
-  <p class="lead" style="margin-top:40px">First conversation: Torus engineering, this month.<br><span class="muted">First hires: a controls engineer and a compiler engineer, Salt Lake City.</span></p>
-  <div class="foot"><span>Mentl · 4 / 5</span><span>Utah impact</span></div>
+  <p class="lead" style="margin-top:56px">First conversation: Torus engineering, this month.<br>First hires: a controls engineer and a compiler engineer, in Salt Lake City.</p>
+  <div class="foot"><span>Utah impact</span><span>4 / 5</span></div>
 </section>
 
 <section class="slide">
-  <h1>What $10,000 unlocks<small>ninety days, one site, two asks</small></h1>
-  <div class="split">
-    <div>
-      <div class="timeline">
-        <div class="m"><h3>Day 30</h3><p>The proven controller on inverter-class hardware on my bench. The company formed; SAM.gov, SBIR.gov and DSIP registrations filed on day one. [[status]]</p></div>
-        <div class="m"><h3>Day 60</h3><p>One Utah site hosting an ear on a Station-class inverter, the dispatch explained to its operator: Torus's if that door opens, another's if not. The SBIR topic chosen with Nucleus Grow.</p></div>
-        <div class="m"><h3>Day 90</h3><p>A pilot letter from the day-60 site. Ninety days of its decisions on the page. The Phase I draft ready for AFWERX's next window.</p></div>
-      </div>
-    </div>
-    <div class="card money">
-      <h3>The $10,000</h3>
-      $7,000 inverter-class hardware: a three-phase inverter platform and its DC supply<br>
-      $3,000 the proof gate hosted ninety days, $1,000 a month<br><br>
-      <span class="muted">What this room can give:</span><br>
-      one Utah operator who will host an ear; Torus, if you can open that door<br>
-      the 309th, through 47G
-    </div>
+  <div class="kick">What $10,000 unlocks</div>
+  <h1 class="small">$10,000 puts a proven controller on a real machine in Utah within ninety days.</h1>
+  <div class="rows">
+    <div class="row"><b>Day 30</b><span>Form the Utah company. Run the controller on a battery inverter on my bench.</span></div>
+    <div class="row"><b>Day 60</b><span>Run it beside a real battery at one Utah site.</span></div>
+    <div class="row"><b>Day 90</b><span>A pilot agreement with that site, and an SBIR proposal with Nucleus Grow.</span></div>
   </div>
-  <div class="foot"><span>Mentl · 5 / 5</span><span>path to reality</span></div>
+  <p class="money"><b>$7,000</b> for the inverter and battery bench. <b>$3,000</b> to form the company, register for federal grants and install at the site.</p>
+  <div class="asks"><b>Two asks.</b> A Utah operator who will host it. An introduction to Hill AFB's 309th.</div>
+  <div class="foot"><span>Path to reality</span><span>5 / 5</span></div>
 </section>
 
-<section class="slide appendix">
-  <div class="tag">Appendix</div>
-  <h1>The trusted base</h1>
-  <ul>
-    <li>The compiler is written in Mentl and the pinned binary reproduces itself byte for byte; that fixed point is the release.</li>
-    <li>The verifier is sound for what it decides and incomplete by design: effects and types are judged by check; a bound it cannot decide is listed as pending by audit and printed on every run.</li>
-    <li>One false proof is known and documented: a recursion deep enough to exhaust the stack traps although its function says it cannot.</li>
-    <li>Rust prevents memory bugs, not effects; Simulink and SCADE verify models and generate C. Neither states "never reaches the network" as an obligation through every callee, proves a function allocation-free, or derives a learning rule from the chain.</li>
-  </ul>
-  <div class="foot"><span>Mentl · appendix</span><span>soundness</span></div>
-</section>
-
-<section class="slide appendix">
-  <div class="tag">Appendix</div>
-  <h1>Running on a controller</h1>
-  <ul>
-    <li>The proof is at compile time. The artifact is one WebAssembly module importing WASI and nothing else.</li>
-    <li>It runs wherever wasmtime runs, which includes the Linux supervisors that sit beside inverters today; the demo's controller runs that way and answers each reading in under a millisecond.</li>
-    <li>A native backend is on the roadmap; the pedal in the demo runs the ear natively on a Cortex-M7 today.</li>
-    <li>The learner keeps learning inside a loop proven not to allocate: learning at the edge that cannot stall.</li>
-    <li>A running computation is a value: the compiler's own resume verb restores a persisted image and continues, so durability is construction, not infrastructure.</li>
-  </ul>
-  <div class="foot"><span>Mentl · appendix</span><span>the target</span></div>
-</section>
-
-<section class="slide appendix">
-  <div class="tag">Appendix</div>
-  <h1>The grid through a DSP library's lens</h1>
+<section class="slide">
+  <span class="tag">Backup</span>
+  <h1 class="small">What is proven, exactly</h1>
   <table>
-    <tr><th>In sonido</th><th>On the grid</th></tr>
-    <tr><td>Pitch detection (the tuner)</td><td>Frequency: 60 Hz is a B, 49 cents flat; the 2019 event is a key change to A♯</td></tr>
-    <tr><td>THD (the distortion analyzer)</td><td>Power quality: the wave's timbre says what is plugged in</td></tr>
-    <tr><td>A compressor</td><td>Droop control: threshold, ratio, ceiling, hold; the controller's fast band is exactly that curve</td></tr>
-    <tr><td>A noise gate</td><td>Islanding detection</td></tr>
-    <tr><td>Tuning to a reference, the beat going to zero</td><td>Reconnecting an island: a synchroscope is a tuner</td></tr>
-    <tr><td>The correlation meter</td><td>Two sites: the angle between them is the flow</td></tr>
-    <tr><td>LMS (the adaptive filter)</td><td>The learner, written twice: by hand in Rust, and derived by the compiler in Mentl</td></tr>
+    <tr><th>The controller's promise</th><th>Status</th></tr>
+    <tr><td>No network, file, clock or other host call while it decides</td><td class="yes">Proven by the compiler through every call</td></tr>
+    <tr><td>No memory allocated while it decides</td><td class="yes">Proven</td></tr>
+    <tr><td>The flywheel within 100 kW, the battery within 300 kW</td><td class="part">Clamped in code; the audit lists open claims in eight functions</td></tr>
+    <tr><td>It never crashes</td><td class="no">Not claimed; the compiler says it can</td></tr>
+    <tr><td>Its decisions are good</td><td class="no">Tested on recordings, not proven</td></tr>
   </table>
-  <div class="foot"><span>Mentl · appendix</span><span>crates/sonido-analysis · examples/grid/listen.mn</span></div>
+  <p class="note">The compiler is written in Mentl, and the pinned binary rebuilds itself byte for byte. A claim it cannot decide is listed as open, never passed as proven.</p>
+  <div class="foot"><span>mentl why examples/grid/station.mn decide WASI</span><span>Backup</span></div>
 </section>
 
-<section class="slide appendix">
-  <div class="tag">Appendix · simulated</div>
-  <h1>The mesh</h1>
-  <div class="pic" style="flex:1"><img src="img/mesh.png" alt=""></div>
-  <div class="foot"><span>Mentl · appendix</span><span>key M on the page</span></div>
+<section class="slide">
+  <span class="tag">Backup</span>
+  <h1 class="small">From the laptop to the pedal: the day-30 engineering</h1>
+  <table>
+    <tr><th>What stands in the way</th><th>Measured today</th><th>The fix</th></tr>
+    <tr><td>No WebAssembly engine on the pedal's chip</td><td>The controller is a 37 KB WebAssembly file</td><td>Embed an interpreter written in Rust, or compile the file to C</td></tr>
+    <tr><td>Built for threads</td><td>Shared memory and atomic instructions</td><td>A single-threaded build; the controller uses no threads</td></tr>
+    <tr><td>Memory</td><td>The reading loop keeps 8 KB per reading</td><td>A reading loop that allocates nothing</td></tr>
+    <tr><td>Speed</td><td>About 291,000 instructions per reading</td><td>Pass numbers instead of text</td></tr>
+  </table>
+  <p class="note">The decision itself already allocates nothing. The work is in the loop around it and in the engine on the chip.</p>
+  <div class="foot"><span>Daisy Seed: a 480 MHz Cortex-M7 with 64 MB of external memory</span><span>Backup</span></div>
 </section>
 
 </div>

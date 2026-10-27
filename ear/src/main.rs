@@ -1,6 +1,6 @@
-//! grid_ear: the HUM ear. Reads a mains hum, measures the grid's frequency
-//! three independent ways, and prints one line every 50 ms (the C1 contract
-//! in `CONTRACTS.md`).
+//! grid_ear: the HUM ear. It reads the mains hum that a guitar pickup or a
+//! bare cable picks up, measures the power grid's frequency from it, and
+//! prints one JSON line every 50 ms (the C1 format in `CONTRACTS.md`).
 //!
 //! Sources, one per run:
 //!   --stdin-f32            raw float32 mono samples on stdin (live capture)
@@ -20,19 +20,29 @@
 //!   --emit-wav <p>         every sample heard, as a 16-bit mono WAV
 //!   --source <label>       override the "source" field
 //!
-//! Three estimators: zero crossings on the loudest harmonic band (hz_fast over
-//! three cycles, hz over one second, from `sonido_core::grid::GridEar`), and the
-//! spectral peak of a two-second Hann window with quadratic interpolation
-//! (hz_stft), through sonido-analysis's FFT. THD is sonido-analysis's
-//! `ThdAnalyzer` on the same two seconds: the tool that reads a pedal's
-//! distortion reads the wall's. All three frequencies should agree to a few
-//! millihertz on a clean hum; the page shows them side by side.
+//! Every measurement comes from the sonido DSP library:
+//!
+//! - `sonido_core::grid::GridEar` times the zero crossings of the loudest
+//!   harmonic: `hz_fast` over three cycles, `hz` over one second, and the rate
+//!   of change.
+//! - sonido-analysis's FFT finds the spectral peak of a two-second window
+//!   (`hz_stft`), and its `ThdAnalyzer` measures the distortion (`thd`).
+//! - sonido-effects' tuner, the same kernel as the sonido tuner plugin, reads
+//!   the pitch with YIN (`tuner_hz`, `tuner_cents`). Its reference is set to
+//!   A4 = 427.65 Hz, which puts 60 Hz exactly on the note B1, so the needle
+//!   sits centered while the grid is in tune and swings flat when it sags.
+//!
+//! Each line also carries `scope`: the last three cycles of the input,
+//! starting at a rising zero crossing so a steady hum stands still on screen,
+//! as 96 values in thousandths of full scale.
 //!
 //!   cargo run --release -- --tone 60.050 --seconds 5
 //!   cargo run --release -- --replay ../data/event.csv --from 25 --seconds 95 --rate 8000 --emit-wav ../samples/event_gb.wav
 
 use sonido_analysis::{Fft, ThdAnalyzer, Window};
 use sonido_core::grid::GridEar;
+use sonido_core::kernel::DspKernel;
+use sonido_effects::{TunerKernel, TunerParams};
 use std::fs::{File, OpenOptions};
 use std::io::{self, BufWriter, Read, Write};
 use std::thread::sleep;
@@ -43,6 +53,44 @@ const STFT_SECONDS: usize = 2;
 const NFFT: usize = 1 << 18;
 const THD_NFFT: usize = 1 << 17;
 const STFT_EVERY_TICKS: usize = 10;
+/// The tuner's A4 reference: at 427.65 Hz the note B1 is exactly 60 Hz.
+const TUNER_REFERENCE_HZ: f32 = 427.65;
+/// Points in each line's scope trace, spread over three cycles of 60 Hz.
+const SCOPE_POINTS: usize = 96;
+
+/// The last three cycles of `ring`, starting at a rising zero crossing so a
+/// steady hum draws in the same place every time, resampled to
+/// `SCOPE_POINTS` values in thousandths of full scale. The crossing is found
+/// on a copy smoothed over a third of a cycle, so the harmonics do not add
+/// false crossings. Empty until a full window has been heard.
+fn scope(ring: &[f32], rate: f32) -> Vec<i32> {
+    let period = (rate / NOMINAL_HZ).round() as usize;
+    let width = 3 * period;
+    let smooth = (period / 3).max(1);
+    if ring.len() < width + period + smooth {
+        return Vec::new();
+    }
+    let region = &ring[ring.len() - width - period - smooth..];
+    let mean = region.iter().sum::<f32>() / region.len() as f32;
+    // A running box average: smoothed[i] covers region[i..i + smooth].
+    let mut acc: f32 = region[..smooth].iter().sum();
+    let mut previous = acc / smooth as f32 - mean;
+    let mut start = smooth;
+    for i in 1..=period {
+        acc += region[i + smooth - 1] - region[i - 1];
+        let current = acc / smooth as f32 - mean;
+        if previous <= 0.0 && current > 0.0 {
+            // The smoothed copy lags the raw signal by half the box.
+            start = i + smooth / 2;
+            break;
+        }
+        previous = current;
+    }
+    let window = &region[start..start + width];
+    (0..SCOPE_POINTS)
+        .map(|k| ((window[k * (width - 1) / (SCOPE_POINTS - 1)] - mean) * 1000.0).round() as i32)
+        .collect()
+}
 
 enum Mode {
     Tone(f32),
@@ -329,6 +377,8 @@ fn main() {
 
     let mut ear = GridEar::new(NOMINAL_HZ, rate);
     let mut spectral = Spectral::new(rate);
+    let mut tuner = TunerKernel::new(rate);
+    let mut tuner_params = TunerParams { reference_hz: TUNER_REFERENCE_HZ, ..TunerParams::default() };
     let stft_len = STFT_SECONDS * rate as usize;
     let mut ring: Vec<f32> = Vec::with_capacity(stft_len + block);
     let mut hum = Hum::new(rate);
@@ -436,6 +486,7 @@ fn main() {
 
         for &x in &chunk[..got] {
             let band_out = ear.process(x);
+            tuner.process_stereo(x, x, &tuner_params);
             if let Some(d) = decimated.as_mut() {
                 decim_count += 1;
                 if decim_count >= decim_factor {
@@ -457,6 +508,11 @@ fn main() {
 
         let reading = ear.tick();
         let harmonic = ear.harmonic();
+        tuner.update_diagnostics(&mut tuner_params);
+        // The tuner holds its last pitch through silence; report it only while
+        // the ear hears a hum.
+        let tuned = reading.filter(|_| tuner_params.detected_hz > 0.0);
+        let trace = scope(&ring, rate);
         if tick_index % STFT_EVERY_TICKS == 0 && ring.len() >= stft_len / 2 {
             last_spectral = reading.and_then(|_| spectral.read(&ring, harmonic));
         }
@@ -469,7 +525,7 @@ fn main() {
             -120.0
         });
         let line = format!(
-            "{{\"t\":{t:.3},\"hz_fast\":{},\"hz\":{},\"hz_stft\":{},\"rocof\":{},\"thd\":{},\"level_db\":{:.1},\"harmonic\":{},\"source\":\"{}\"}}",
+            "{{\"t\":{t:.3},\"hz_fast\":{},\"hz\":{},\"hz_stft\":{},\"rocof\":{},\"thd\":{},\"level_db\":{:.1},\"harmonic\":{},\"tuner_hz\":{},\"tuner_cents\":{},\"scope\":[{}],\"source\":\"{}\"}}",
             fmt_opt(reading.map(|r| r.hz_fast), 4),
             fmt_opt(reading.map(|r| r.hz), 4),
             fmt_opt(last_spectral.map(|(h, _)| h), 4),
@@ -477,6 +533,9 @@ fn main() {
             fmt_opt(last_spectral.map(|(_, d)| d), 1),
             level_db,
             harmonic,
+            fmt_opt(tuned.map(|_| tuner_params.detected_hz), 3),
+            fmt_opt(tuned.map(|_| tuner_params.cents), 1),
+            trace.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(","),
             source_label,
         );
         let _ = writeln!(out, "{line}");

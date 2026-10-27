@@ -3,14 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HUM · the grid, heard</title>
-<meta name="description" content="The grid's frequency heard live from a room's wiring, and a Torus Station answering in two bands.">
+<title>HUM</title>
+<meta name="description" content="The power grid's frequency, heard live through a guitar pickup, and a model of a Torus Station deciding what to do about it.">
 <style>
 @font-face {
   font-family: "Share Tech Mono";
   src: url("fonts/ShareTechMono.woff2") format("woff2");
   font-display: swap;
 }
+@font-face { font-family: "Inter"; src: url("fonts/Inter-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("fonts/Inter-SemiBold.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("fonts/Inter-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
 :root {
   --void: #07060E; --panel: #100E21; --panel-hi: #1B1836; --line: #2E2952; --dim: #242042;
   --ink: #F2EEFF; --ink-2: #ABA5CF; --ink-3: #7A74A3;
@@ -104,6 +107,65 @@ th { color: var(--ink-3); font-weight: normal; letter-spacing: 0.06em; }
 td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
 .help { position: fixed; left: 1.5rem; bottom: 0.5rem; font-size: 0.95rem; color: var(--ink-3); letter-spacing: 0.06em; opacity: 0.7; }
 @media (prefers-reduced-motion: reduce) { .chip .dot, .mode.flash { animation: none; } }
+/* THE STAGE: what the room sees. One 1920 by 1080 frame, scaled to the screen.
+   Colors are sonido's: green #3DFF9A, amber #FFC53D, violet #A27BFF, red #FF2D55. */
+#stage { position: fixed; inset: 0; background: var(--void); z-index: 5; overflow: hidden; font-family: var(--sans); color: var(--ink); }
+body.dash #stage { display: none; }
+body:not(.dash) .help { display: none; }
+#stageInner { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.st-top { position: absolute; left: 64px; right: 64px; top: 34px; height: 56px; display: flex; align-items: center; gap: 44px; }
+.st-brand { font-family: var(--mono); font-size: 30px; letter-spacing: 0.32em; color: var(--ink-2); }
+.st-chip { display: flex; align-items: center; gap: 14px; font-size: 26px; color: var(--ink-2); }
+.st-chip .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--ink-3); flex: none; }
+.st-chip b { color: var(--ink); font-weight: 600; letter-spacing: 0.08em; }
+.st-chip.live .dot { background: #3DFF9A; box-shadow: 0 0 14px #3DFF9A; animation: pulse 1.2s ease-in-out infinite; }
+.st-chip.replay .dot { background: #FFC53D; box-shadow: 0 0 14px #FFC53D; }
+.st-chip.cut .dot { background: #FF2D55; box-shadow: 0 0 14px #FF2D55; }
+.st-chip.rec .dot { background: transparent; border: 3px solid var(--ink-2); }
+.st-clock { margin-left: auto; font-size: 26px; font-weight: 600; letter-spacing: 0.06em; color: #A27BFF; border: 2px solid #A27BFF; border-radius: 12px; padding: 6px 18px; }
+.st-left { position: absolute; left: 64px; top: 112px; width: 1048px; height: 690px; }
+.st-hz { font-size: 168px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; height: 168px; white-space: nowrap; }
+.st-hz small { font-size: 56px; font-weight: 400; color: var(--ink-2); margin-left: 18px; letter-spacing: 0; }
+.st-hz.off { color: #FFC53D; }
+.st-hz.quiet { color: var(--ink-3); font-size: 120px; line-height: 168px; }
+.st-cap { font-size: 26px; color: var(--ink-2); margin: 14px 0 0 6px; }
+.st-tuner { position: absolute; left: 0; right: 0; top: 240px; bottom: 0; border-radius: 20px; overflow: hidden; border: 2px solid var(--line); background: var(--void); }
+.st-right { position: absolute; left: 1168px; top: 112px; width: 688px; height: 690px; display: flex; flex-direction: column; gap: 24px; }
+.st-title { font-size: 26px; color: var(--ink-2); height: 40px; } .st-title span { color: var(--ink-3); }
+.st-unit { flex: 1; display: grid; grid-template-columns: 150px 1fr; gap: 34px; align-items: center; padding: 26px 36px; border: 2px solid var(--line); border-radius: 28px; background: #0C0A19; transition: border-color .3s, background .3s; min-height: 0; }
+.st-unit svg { width: 150px; height: 150px; color: #3A3560; transition: color .3s; }
+.st-unit .name { font-size: 26px; color: var(--ink-2); }
+.st-unit .state { font-size: 46px; font-weight: 600; line-height: 1.12; margin: 6px 0 4px; }
+.st-unit .kw { font-size: 40px; font-weight: 600; line-height: 1.1; min-height: 44px; margin-bottom: 16px; font-variant-numeric: tabular-nums; }
+.st-unit.spin.on .kw { color: #FFC53D; } .st-unit.pulse.on .kw { color: #A27BFF; }
+.st-unit .charge { height: 10px; border-radius: 5px; background: #1B1836; overflow: hidden; }
+.st-unit .charge i { display: block; height: 100%; width: 0; background: var(--ink-3); transition: width .5s; }
+.st-unit .pct { font-size: 20px; color: var(--ink-3); margin-top: 10px; }
+.st-unit.spin.on { border-color: #FFC53D; background: rgba(255,197,61,0.07); }
+.st-unit.spin.on svg, .st-unit.spin.on .state { color: #FFC53D; } .st-unit.spin.on .charge i { background: #FFC53D; }
+.st-unit.spin.on svg .rotor { animation: rotor 0.5s linear infinite; }
+.st-unit.pulse.on { border-color: #A27BFF; background: rgba(162,123,255,0.08); }
+.st-unit.pulse.on svg, .st-unit.pulse.on .state { color: #A27BFF; } .st-unit.pulse.on .charge i { background: #A27BFF; }
+.st-unit svg .rotor { transform-origin: 75px 75px; }
+@keyframes rotor { to { transform: rotate(360deg); } }
+.st-head { position: absolute; left: 64px; right: 64px; top: 834px; font-size: 62px; font-weight: 600; line-height: 1.16; letter-spacing: -0.01em; }
+.st-head.cut { color: #FF6B86; }
+.st-note { position: absolute; left: 64px; right: 64px; bottom: 32px; font-size: 22px; color: var(--ink-3); }
+/* the plain cards: proven, refused, thank you */
+.ov2 { position: fixed; inset: 0; background: rgba(7,6,14,0.95); display: none; align-items: center; justify-content: center; z-index: 10; font-family: var(--sans); }
+.ov2.show { display: flex; }
+.scard { width: 80vw; border: 0.2vw solid #3DFF9A; border-radius: 2.2vw; padding: 4vw 5vw; background: #0B0A16; }
+.scard.no { border-color: #FF2D55; }
+.scard.plain { border-color: var(--line); }
+.scard .mark { font-size: 4.6vw; font-weight: 700; line-height: 1; color: #3DFF9A; }
+.scard.no .mark { color: #FF2D55; }
+.scard h1 { font-size: 4.4vw; font-weight: 700; letter-spacing: -0.02em; line-height: 1.06; margin: 1.6vw 0 1.4vw; }
+.scard p { font-size: 1.9vw; line-height: 1.38; color: var(--ink-2); margin: 0 0 0.8vw; max-width: 66vw; }
+.scard code { display: block; font-family: var(--mono); font-size: 2vw; color: var(--ink); background: #1A0C14; border: 0.15vw solid #FF2D55; border-radius: 1vw; padding: 1.2vw 1.8vw; margin: 1.4vw 0 1.6vw; }
+.scard pre { font-size: 0.9vw; max-height: 22vh; overflow: auto; }
+.scard .qrrow { display: flex; gap: 3.4vw; align-items: center; margin-top: 1vw; }
+.scard .qr { width: 17vw; height: 17vw; border-radius: 1vw; background: #fff; padding: 0.6vw; }
+.scard .url { font-family: var(--mono); color: var(--ink); font-size: 2.4vw; }
 </style>
 </head>
 <body>
@@ -205,7 +267,55 @@ $ mentl why examples/grid/station.mn decide WASI
   <div class="caption">Two Stations with GPS time see the <b>angle</b> between them, which is the flow on the line between them, and an event's wave arrives at one before the other. FNET has done this from wall outlets since 2004; a fleet that both sees and answers at 10C has not existed. <span class="sim">Simulated from the day's shape and the replayed event.</span></div>
 </div></div>
 
-<div class="help">H tomorrow's noon · E replay · I island · P certificate · R refusal · G gate · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
+<div id="stage"><div id="stageInner">
+  <div class="st-top">
+    <div class="st-brand">HUM</div>
+    <div class="st-chip" id="stChip"><span class="dot"></span><b id="stChipWord">WAITING</b><span id="stChipLabel">for a signal</span></div>
+    <div class="st-clock" id="stClock" style="display:none"></div>
+  </div>
+  <div class="st-left">
+    <div class="st-hz quiet" id="stHz">listening</div>
+    <div class="st-cap" id="stHzCap">the frequency of the whole Western grid, read in this room</div>
+    <div class="st-tuner"><canvas id="cTuner"></canvas></div>
+  </div>
+  <div class="st-right">
+    <div class="st-title">Torus Station <span>· a model</span></div>
+    <div class="st-unit spin" id="stSpin">
+      <svg viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="62" fill="none" stroke="currentColor" stroke-width="11"/><g class="rotor"><circle cx="75" cy="75" r="13" fill="currentColor"/><line x1="75" y1="75" x2="75" y2="24" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><line x1="75" y1="75" x2="119" y2="100" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><line x1="75" y1="75" x2="31" y2="100" stroke="currentColor" stroke-width="9" stroke-linecap="round"/></g></svg>
+      <div><div class="name">Flywheel · Spin</div><div class="state">Ready</div><div class="kw"></div><div class="charge"><i></i></div><div class="pct"></div></div>
+    </div>
+    <div class="st-unit pulse" id="stPulse">
+      <svg viewBox="0 0 150 150" aria-hidden="true"><rect x="57" y="6" width="36" height="14" rx="4" fill="currentColor"/><rect x="30" y="20" width="90" height="124" rx="16" fill="none" stroke="currentColor" stroke-width="10"/><rect class="level" x="44" y="34" width="62" height="96" rx="6" fill="currentColor" opacity="0.85"/></svg>
+      <div><div class="name">Battery · Pulse</div><div class="state">Holding</div><div class="kw"></div><div class="charge"><i></i></div><div class="pct"></div></div>
+    </div>
+  </div>
+  <div class="st-head" id="stHead">Listening for the grid.</div>
+  <div class="st-note" id="stNote">The Station is a model built from Torus's published figures. Simulated.</div>
+</div></div>
+
+<div class="ov2" id="ovProof"><div class="scard">
+  <div class="mark">✓ Proven</div>
+  <h1>This software can't reach the internet while it decides.</h1>
+  <p>Not a policy and not a code review: the compiler checks every function the decision calls. The decision can't touch a file or the clock either, and it never allocates memory while it decides.</p>
+  <pre id="proofRaw" hidden></pre>
+</div></div>
+
+<div class="ov2" id="ovRefused"><div class="scard no">
+  <div class="mark">✕ Refused</div>
+  <h1>One line broke the promise.</h1>
+  <code>let price = price_m("https://api.eia.gov/…")</code>
+  <p>This program promised it can't reach the internet while it decides. Add one line that reads a price online, and the compiler won't build it. Its error names the path the price took.</p>
+  <pre id="refusedRaw" hidden></pre>
+</div></div>
+
+<div class="ov2" id="ovThanks"><div class="scard plain">
+  <h1>Thank you, Torus.</h1>
+  <div class="qrrow"><img class="qr" src="pitch/img/qr-hum.png" alt="QR code for ampactor.dev/hum">
+    <div><p>Replay this demo on your phone.</p><p class="url">ampactor.dev/hum</p><p>sonofagoose@pm.me<br>github.com/ampactor-labs/hum</p></div>
+  </div>
+</div></div>
+
+<div class="help">D stage · H tomorrow's noon · E replay · I island · P proven · R refused · K thank you · A compiler text · G gate · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
 
 <script>
 (() => {
@@ -355,6 +465,7 @@ function onState() {
   // table ring
   recent.push(n); if (recent.length > 20) recent.shift();
   sound.update(n, state);
+  stageUpdate();
 }
 function hhmm(h) { const hh = Math.floor(h), mm = Math.round((h - hh) * 60); return String(hh).padStart(2, "0") + ":" + String(mm).padStart(2, "0"); }
 function hourLabel(h) { h = ((h % 24) + 24) % 24; const ap = h < 12 ? "am" : "pm"; const hh = h % 12 === 0 ? 12 : h % 12; return hh + " " + ap; }
@@ -563,8 +674,144 @@ function drawMesh() {
   if (phase > dA) { g.strokeStyle = alarm; g.beginPath(); g.arc(A[0], A[1], 12, 0, Math.PI * 2); g.stroke(); }
 }
 
+// ---------- the stage: what the room sees ----------
+// The left side is sonido's tuner, drawn the way sonido's plugin cabinet draws
+// it: a night sky over a perspective grid, the hum's own waveform, a cents arc
+// over the note. The ear runs sonido's tuner kernel with its A4 reference at
+// 427.65 Hz, so 60 Hz is exactly B1 and the needle sits centered while the
+// grid is in tune. The right side is the Station's two machines, and the
+// sentence at the bottom says what is happening in plain words.
+const SON = { void: "#07060E", accent: "#8CFF5A", partner: "#36E2FF", green: "#3DFF9A", ink: "#F2EEFF", dim: "#4A4572" };
+const TUNER_REF = 427.65;
+let stageOn = params.get("view") !== "dashboard";
+let stageScale = 1, scopeGain = 1, scopeSeen = null, gridPhase = 0, lastTuner = performance.now();
+function stageFit() {
+  stageScale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  $("stageInner").style.transform = "translate(" + (window.innerWidth - 1920 * stageScale) / 2 + "px," + (window.innerHeight - 1080 * stageScale) / 2 + "px) scale(" + stageScale + ")";
+}
+function setStage(on) { stageOn = on; document.body.classList.toggle("dash", !on); }
+const kw = w => Math.round(Math.abs(w || 0) / 1000);
+function noteName(hz) { const m = Math.round(69 + 12 * Math.log2(hz / TUNER_REF)); return NAMES[((m % 12) + 12) % 12] + (Math.floor(m / 12) - 1); }
+function clock12(h) { const hh = Math.floor(h), mm = Math.round((h - hh) * 60); return (hh % 12 === 0 ? 12 : hh % 12) + ":" + String(mm).padStart(2, "0") + (hh < 12 ? " AM" : " PM"); }
+function unit(id, on, word, watts, socM) {
+  const u = $(id); u.classList.toggle("on", on); u.querySelector(".state").textContent = word;
+  u.querySelector(".kw").textContent = watts == null ? "" : kw(watts) + "\u00a0kW";
+  const pct = socM == null ? null : Math.max(0, Math.min(100, socM / 10));
+  u.querySelector(".charge i").style.width = (pct || 0) + "%";
+  u.querySelector(".pct").textContent = pct == null ? "" : Math.round(pct) + "% charged";
+  const lv = u.querySelector(".level"); if (lv && pct != null) { lv.setAttribute("height", 96 * pct / 100); lv.setAttribute("y", 34 + 96 * (1 - pct / 100)); }
+}
+function stageUpdate() {
+  if (!state) return;
+  const n = state.now || {}, src = state.source || "", mode = n.mode || "GRID";
+  const heard = n.hz != null || n.hz_fast != null;
+  const replaying = src === "replay", cut = mode === "ISLAND" || src === "silence";
+  const chips = { live: ["live", "LIVE", "this room's wiring"], pedal: ["live", "LIVE", "through the pedal"], replay: ["replay", "REPLAY", "Great Britain, 9 August 2019, at our grid's pitch"], silence: ["cut", "THE HUM IS CUT", ""], wav: ["rec", "RECORDING", state.source_label || ""], recording: ["rec", "RECORDING", state.source_label || ""], sample: ["rec", "SAMPLE", state.source_label || ""] };
+  const [kind, word, label] = chips[src] || ["rec", src.toUpperCase(), state.source_label || ""];
+  $("stChip").className = "st-chip " + kind; $("stChipWord").textContent = word; $("stChipLabel").textContent = label;
+  const set = n.hour_set != null;
+  $("stClock").style.display = set ? "" : "none";
+  if (set) $("stClock").textContent = "TOMORROW · " + clock12(n.hour_set);
+  // The number: the one-second reading when calm, the fast one while the grid moves.
+  const fast = mode === "EVENT" || replaying || Math.abs(n.rocof || 0) > 0.02;
+  const hz = fast ? (n.hz_fast ?? n.hz) : (n.hz ?? n.hz_fast);
+  const el = $("stHz");
+  if (hz == null) { el.textContent = cut ? "no hum" : "listening"; el.className = "st-hz quiet"; }
+  else { el.innerHTML = hz.toFixed(3) + "<small>Hz</small>"; el.className = "st-hz" + (Math.abs(hz - NOMINAL) > DEADBAND ? " off" : ""); }
+  $("stHzCap").textContent = replaying ? "Great Britain's grid on 9 August 2019, replayed at our grid's pitch" : cut ? "the hum is gone from this room's wiring" : (src === "live" || src === "pedal") ? "the frequency of the whole Western grid, read in this room" : "the grid's frequency, from a recording";
+  // The Station's two machines.
+  const sw = n.spin_w || 0, pw = n.pulse_w || 0;
+  unit("stSpin", sw > 500, sw > 500 ? "Pushing" : "Ready", sw > 500 ? sw : null, n.spin_soc_m);
+  unit("stPulse", pw > 500, pw > 500 ? (mode === "RUSH" || mode === "ISLAND" ? "Running the building" : "Discharging") : pw < -500 ? "Charging" : "Holding", Math.abs(pw) > 500 ? pw : null, n.pulse_soc_m);
+  // The sentence.
+  const lat = state.latency_ms, quick = lat == null ? "" : lat < 1 ? " in under a millisecond" : " in " + Math.round(lat) + " milliseconds";
+  const dev = n.hz_fast != null ? n.hz_fast - NOMINAL : 0;
+  let head;
+  if (mode === "ISLAND") head = "The grid went dark. The building is still on.";
+  else if (!heard) head = cut ? "The hum is cut." : "Listening for the grid.";
+  else if (mode === "EVENT") head = replaying ? "A power plant just tripped. The flywheel answered" + quick + "." : "The grid is falling fast. The flywheel is pushing " + kw(sw) + "\u00a0kW.";
+  else if (mode === "RUSH") head = "Rush hour. The Station runs the building on its battery: " + kw(pw) + "\u00a0kW kept off a jammed grid.";
+  else if (sw > 500) head = "The grid is " + Math.round(Math.abs(dev) * 1000) + "\u00a0millihertz " + (dev < 0 ? "low" : "high") + ". The flywheel is pushing " + kw(sw) + "\u00a0kW.";
+  else if (replaying) head = "The grid is back in tune.";
+  else head = src === "live" || src === "pedal" ? "Every wire in this room hums the grid's note. Right now, it's in tune." : "The whole Western grid hums one note. Right now, it's in tune.";
+  $("stHead").textContent = head; $("stHead").classList.toggle("cut", mode === "ISLAND");
+  const notes = [];
+  if (replaying) notes.push("Frequency: National Grid ESO one-second data, 9 August 2019, transposed to 60 Hz.");
+  if (mode === "RUSH") notes.push("Rush hour: PacifiCorp East hourly demand, from EIA.");
+  notes.push("The Station is a model built from Torus's published figures. Simulated.");
+  $("stNote").textContent = notes.join(" ");
+  // The scope's gain, as the cabinet sets it: quick to shrink, slow to grow.
+  if (n.scope && n.scope.length && n.scope !== scopeSeen) {
+    scopeSeen = n.scope;
+    const peak = n.scope.reduce((m, v) => Math.max(m, Math.abs(v)), 0) / 1000;
+    const target = Math.min(8, Math.max(1, 0.85 / Math.max(peak, 1e-4)));
+    scopeGain += (target - scopeGain) * (target < scopeGain ? 0.5 : 0.1);
+  }
+}
+function stageSetup(c) {
+  const dpr = (window.devicePixelRatio || 1) * stageScale;
+  const w = c.clientWidth, h = c.clientHeight, bw = Math.round(w * dpr), bh = Math.round(h * dpr);
+  if (c.width !== bw || c.height !== bh) { c.width = bw; c.height = bh; }
+  const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); return [g, w, h];
+}
+function hash3(i) { const f = x => { const v = Math.sin(x) * 43758.5453; return v - Math.floor(v); }; return [f(i * 12.9898 + 1.3), f(i * 78.233 + 4.1), f(i * 39.425 + 7.7)]; }
+function poly(g, pts) { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); }
+function neon(g, pts, color, width) {
+  g.save(); g.lineJoin = "round"; g.lineCap = "round";
+  g.strokeStyle = rgba(color, 0.22); g.lineWidth = width * 4; g.shadowColor = color; g.shadowBlur = 16; poly(g, pts);
+  g.shadowBlur = 0; g.strokeStyle = color; g.lineWidth = width; poly(g, pts);
+  g.strokeStyle = "rgba(255,255,255,0.55)"; g.lineWidth = Math.max(1, width * 0.35); poly(g, pts); g.restore();
+}
+function plate(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); g.fill(); }
+function drawTuner(now) {
+  const [g, w, h] = stageSetup($("cTuner"));
+  const dt = Math.min(0.1, (now - lastTuner) / 1000); lastTuner = now;
+  const t = now / 1000, n = (state && state.now) || {};
+  const horizon = h * 0.62, cx = w / 2, mono = css("--mono");
+  g.fillStyle = SON.void; g.fillRect(0, 0, w, h);
+  // Sky: the void warming to the partner color at the horizon, and its stars.
+  let gr = g.createLinearGradient(0, 0, 0, horizon); gr.addColorStop(0, SON.void); gr.addColorStop(1, rgba(SON.partner, 0.22)); g.fillStyle = gr; g.fillRect(0, 0, w, horizon);
+  for (let i = 0; i < 42; i++) { const [a, b, c] = hash3(i); const tw = 0.35 + 0.65 * Math.abs(Math.sin(t * (0.6 + c * 2.2) + a * 40)); g.fillStyle = rgba(SON.ink, tw * 0.7); g.beginPath(); g.arc(a * w, b * horizon * 0.85, c > 0.85 ? 1.7 : 1.1, 0, Math.PI * 2); g.fill(); }
+  // Floor: a perspective grid rushing toward the viewer.
+  gr = g.createLinearGradient(0, horizon, 0, h); gr.addColorStop(0, rgba(SON.partner, 0.10)); gr.addColorStop(1, SON.void); g.fillStyle = gr; g.fillRect(0, horizon, w, h - horizon);
+  gridPhase = (gridPhase + dt * 0.25) % 1;
+  for (let i = 0; i < 9; i++) { const d = (i + gridPhase) / 9, y = horizon + (h - horizon) * d * d; g.strokeStyle = rgba(SON.accent, 0.75 * (0.25 + 0.75 * d)); g.lineWidth = 1 + d; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+  g.strokeStyle = rgba(SON.accent, 0.45); g.lineWidth = 1;
+  for (let k = -14; k <= 14; k++) { const s = k / 14; g.beginPath(); g.moveTo(cx + s * w * 0.08, horizon); g.lineTo(cx + s * w * 1.6, h); g.stroke(); }
+  neon(g, [[0, horizon], [w, horizon]], SON.partner, 1.5);
+  // Scope: the hum itself, three cycles, standing still while the grid is steady.
+  const mid = horizon * 0.52, amp = horizon * 0.42, sc = n.scope && n.scope.length > 1 ? n.scope : null;
+  if (sc) {
+    const pts = sc.map((v, i) => [14 + (w - 28) * i / (sc.length - 1), mid - Math.max(-1.2, Math.min(1.2, v / 1000 * scopeGain)) * amp]);
+    g.strokeStyle = rgba(SON.partner, 0.45); g.lineWidth = 1.4; poly(g, pts.map(([x, y]) => [x, y + 4]));
+    neon(g, pts, SON.accent, 2.4);
+  } else neon(g, [[14, mid], [w - 14, mid]], SON.dim, 1.2);
+  // The tuner: the note on a dark plate, a cents arc over it, the needle from below.
+  const hz = n.tuner_hz, cents = n.tuner_cents, locked = hz != null && cents != null;
+  const inTune = locked && Math.abs(cents) < 2, color = inTune ? SON.green : SON.accent;
+  const px = cx, py = horizon - 6, r = Math.min(horizon - 18, w * 0.32), span = 1.0;
+  const note = locked ? noteName(hz) : "--", size = Math.max(40, Math.min(132, horizon * 0.30));
+  const ny = py - r * 0.55;
+  g.font = size + "px " + mono; g.textAlign = "center"; g.textBaseline = "middle";
+  const tw = g.measureText(note).width;
+  g.fillStyle = rgba(SON.void, 0.85); plate(g, cx - Math.max(tw, size * 2.4) / 2 - 26, ny - size * 0.62, Math.max(tw, size * 2.4) + 52, size * 1.24 + size * 0.42, 10);
+  for (let i = -10; i <= 10; i++) {
+    const a = -Math.PI / 2 + i / 10 * span, len = i === 0 ? 26 : i % 5 === 0 ? 18 : 10, dx = Math.cos(a), dy = Math.sin(a);
+    g.strokeStyle = i === 0 ? SON.green : SON.dim; g.lineWidth = i === 0 ? 4 : 2;
+    g.beginPath(); g.moveTo(px + dx * r, py + dy * r); g.lineTo(px + dx * (r - len), py + dy * (r - len)); g.stroke();
+  }
+  if (locked) { const a = -Math.PI / 2 + Math.max(-1, Math.min(1, cents / 50)) * span, dx = Math.cos(a), dy = Math.sin(a); neon(g, [[px + dx * r * 0.35, py + dy * r * 0.35], [px + dx * (r - 4), py + dy * (r - 4)]], color, 4); }
+  g.save(); g.lineWidth = 3; g.strokeStyle = color; g.shadowColor = color; g.shadowBlur = 18; g.strokeText(note, cx, ny); g.restore();
+  g.font = Math.round(size * 0.26) + "px " + mono; g.fillStyle = SON.ink; g.textBaseline = "top";
+  g.fillText(locked ? (inTune ? "in tune" : Math.abs(cents).toFixed(1) + " cents " + (cents < 0 ? "flat" : "sharp")) : "no hum", cx, ny + size * 0.66);
+  // The label a sonido plugin wears, and the glass: scanlines and a vignette.
+  g.font = "20px " + mono; g.textAlign = "left"; g.textBaseline = "top"; g.fillStyle = "#7A74A3"; g.fillText("SONIDO · TUNER", 20, 16);
+  g.fillStyle = "rgba(0,0,0,0.13)"; for (let y = 0; y < h; y += 3) g.fillRect(0, y, w, 1);
+  const vg = g.createRadialGradient(cx, h / 2, Math.min(w, h) * 0.35, cx, h / 2, Math.max(w, h) * 0.75); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,0.45)"); g.fillStyle = vg; g.fillRect(0, 0, w, h);
+}
+
 function frame() {
-  drawHeart(); drawStation(); drawRush();
+  if (stageOn) drawTuner(performance.now()); else { drawHeart(); drawStation(); drawRush(); }
   if ($("ovMesh").classList.contains("show")) drawMesh();
   requestAnimationFrame(frame);
 }
@@ -603,7 +850,7 @@ function replay() { if (sessionFile) return; cmd("src=replay"); }
 function tomorrow() { if (sessionFile) return; hourOn = !hourOn; cmd(hourOn ? "hour=12.5" : "hour="); }
 function island() { if (sessionFile) return; islandOn = !islandOn; $("btnIsland").classList.toggle("on", islandOn); cmd(islandOn ? "src=silence" : "src=back"); }
 function reset() { closeAll(); hourOn = false; if (islandOn) island(); if (sound.on) sound.toggle(); if (!sessionFile) { cmd("src=back"); cmd("reset=1"); } document.body.classList.remove("bright"); }
-const overlays = ["ovCert", "ovRefuse", "ovGate", "ovTable", "ovMesh"];
+const overlays = ["ovCert", "ovRefuse", "ovGate", "ovTable", "ovMesh", "ovProof", "ovRefused", "ovThanks"];
 function closeAll() { overlays.forEach(id => $(id).classList.remove("show")); }
 function toggleOverlay(id) { const was = $(id).classList.contains("show"); closeAll(); if (!was) { $(id).classList.add("show"); if (id === "ovTable") fillTable(); if (id === "ovMesh") meshT0 = performance.now(); } }
 function fillTable() {
@@ -614,21 +861,28 @@ async function loadCaptures() {
   const get = async p => { try { const r = await fetch(p, { cache: "no-store" }); return r.ok ? await r.text() : null; } catch (e) { return null; } };
   const audit = await get("pitch/audit.txt"), why = await get("pitch/why.txt");
   $("certRaw").textContent = (audit ? "$ mentl audit examples/grid/station.mn\n" + audit : "mentl audit examples/grid/station.mn — capture pending") + (why ? "\n" + why : "");
-  const refusal = await get("pitch/refusal.txt"); if (refusal) $("refuseRaw").textContent = refusal;
+  const refusal = await get("pitch/refusal.txt"); if (refusal) { $("refuseRaw").textContent = refusal; $("refusedRaw").textContent = "$ mentl check examples/grid/station-leak.mn\n" + refusal; }
+  if (why) $("proofRaw").textContent = why.split("\n\n").filter(b => /Network|WASI|Alloc|Filesystem/.test(b)).join("\n\n");
   const gate = await get("pitch/gate.txt");
   if (gate) { $("gateRaw").innerHTML = gate.split("\n").map(l => { const e = l.replace(/&/g, "&amp;").replace(/</g, "&lt;"); return /^< PROVEN/.test(l) ? "<b>" + e + "</b>" : /^< REFUSED/.test(l) ? "<span class='hi'>" + e + "</span>" : e; }).join("\n"); }
 }
 document.addEventListener("keydown", e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key.toLowerCase();
+  if (e.shiftKey && k === "p") { toggleOverlay("ovCert"); return; }
+  if (e.shiftKey && k === "r") { toggleOverlay("ovRefuse"); return; }
   if (k === "escape") closeAll();
+  else if (k === "d") setStage(!stageOn);
+  else if (k === "k") toggleOverlay("ovThanks");
+  else if (k === "a" && $("ovProof").classList.contains("show")) $("proofRaw").hidden = !$("proofRaw").hidden;
+  else if (k === "a" && $("ovRefused").classList.contains("show")) $("refusedRaw").hidden = !$("refusedRaw").hidden;
   else if (k === "e") replay();
   else if (k === "i") island();
   else if (k === "h") tomorrow();
-  else if (k === "p") toggleOverlay("ovCert");
+  else if (k === "p") toggleOverlay("ovProof");
   else if (k === "a" && $("ovRefuse").classList.contains("show")) { const r = $("refuseRaw"); r.style.display = r.style.display === "none" ? "block" : "none"; }
   else if (k === "a") { $("certRaw").style.display = $("certRaw").style.display === "none" ? "block" : "none"; if (!$("ovCert").classList.contains("show")) toggleOverlay("ovCert"); }
-  else if (k === "r") toggleOverlay("ovRefuse");
+  else if (k === "r") toggleOverlay("ovRefused");
   else if (k === "g") toggleOverlay("ovGate");
   else if (k === "t") toggleOverlay("ovTable");
   else if (k === "m") toggleOverlay("ovMesh");
@@ -641,6 +895,7 @@ $("btnReplay").onclick = replay; $("btnIsland").onclick = island; $("btnSound").
 document.addEventListener("mousemove", () => { document.body.classList.add("cursor"); clearTimeout(window._cursorT); window._cursorT = setTimeout(() => document.body.classList.remove("cursor"), 2000); });
 
 loadCaptures();
+setStage(stageOn); stageFit(); window.addEventListener("resize", stageFit);
 if (sessionFile) startPlayback(sessionFile); else startLive();
 requestAnimationFrame(frame);
 })();

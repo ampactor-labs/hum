@@ -1,22 +1,34 @@
-# The sixty-second setup
+# The venue setup
 
-Before the judges sit down. Everything is already plugged in and running when they arrive.
+Do this before the judges sit down, so everything is running when they arrive.
 
-1. Power strip in. Laptop on power. Scarlett on its USB cable. Guitar cable in channel 1, INST lit, gain at the rehearsed mark (do not touch it again).
-2. `wpctl status` shows the Scarlett as the default source. If not: `wpctl set-default <id>`.
-3. From the demo directory: `./run.sh live`. The kiosk window opens. The chip reads `● LIVE guitar, this room` within five seconds and the number moves.
-4. If the chip reads WAITING after ten seconds: hold the pickup against the wall wart on the table. Still waiting: `./run.sh wav samples/hum_aernata.wav`, and the chip reads `▶ RECORDING`. The pitch does not change.
-5. Pedal on its USB cable with a guitar cable in it; the lights breathe. If they do not, the pedal stays on the table unpowered. Flashing it (once, Tuesday), from sonido's `crates/sonido-daisy` with the Seed in DFU mode (hold BOOT, tap RESET):
+1. **Record a fallback first.** On arrival, plug in the guitar and record one minute of the room's hum: `arecord -D pipewire -f S16_LE -r 48000 -c 1 -d 60 samples/hum_aernata.wav`.
+2. **Power.** Power strip in, laptop on power.
+3. **The ear: the pedal, or the Scarlett.**
+   - Pedal: guitar into the pedal's input, the pedal's USB cable into the laptop. The LEDs breathe with the grid. Run `./run.sh pedal`.
+   - Scarlett: guitar cable in channel 1, INST lit, gain at the rehearsed mark, then leave it alone. `wpctl status` must show the Scarlett as the default source; if not, `wpctl set-default <id>`. Run `./run.sh live`.
+4. **Check the stage.** The kiosk window opens on the stage. Within five seconds the chip reads LIVE and the number moves.
+5. **If it stays on WAITING.** Hold the pickup against a wall wart. If it still waits after ten seconds, run `./run.sh wav samples/hum_aernata.wav`. The chip then reads RECORDING, and the pitch does not change.
+6. **Sound.** A small speaker at a quarter volume, on the pedal's output through a small amp, or on the Scarlett's output with direct monitoring on. The room hears the hum.
+7. **Reset.** Press `0`. Hands off the keyboard until the first beat.
 
-   ```
-   cargo objcopy --example grid_pedal --release -- -O binary -R .sram1_bss firmware/grid_pedal.bin
-   dfu-util -a 0 -s 0x90040000:leave -D firmware/grid_pedal.bin
-   ```
+## The keys
 
-   Then `cat /dev/ttyACM0` shows one line every 50 ms, and `./run.sh pedal` reads them.
-6. Small speaker on the headphone out at a quarter volume: Bitwig's output, so the room hears the real hum. In Bitwig: track 1 the live input with the sonido tuner on it; track 2 `samples/event_gb.wav`, cued to its start, muted until the optional beat ("that is the pitch of a blackout").
-7. Press `0`. The page is in its opening state. Hands off the keyboard until the first beat.
+`H` tomorrow's noon, and back · `E` replay the 2019 event · `I` cut the hum, and bring it back · `P` proven · `R` refused · `K` thank you · `Esc` close a card · `D` the engineers' dashboard · `0` reset.
 
-Keys during the pitch: `H` tomorrow's noon (the clock set inside the rush hour; press again to return) · `E` replay event (eight seconds of calm, then the fall) · `I` island (press again to return) · `P` certificate · `A` the compiler's words · `R` refusal · `G` the gate · `T` table · `M` mesh · `S` the page's own tone (not used; the speaker carries the hum) · `B` bright room · `0` reset · `Esc` close.
+## The pedal
 
-Sway: workspace 1 is Bitwig with the tuner, workspace 2 is HUM, workspace 3 a terminal in the Mentl checkout for `mentl check examples/grid/station-leak.mn` in questions. `swayidle` is off: `pkill swayidle` before the demo. Do not disturb on. Nothing else open.
+Footswitch 1 replays the 2019 event. Footswitch 2 cuts the hum and brings it back. Toggle 1 down sets the clock to tomorrow's noon, and up returns it. The pedal types the same keys as the laptop, so the laptop keys always work as a backup.
+
+Flash it once, from sonido's `crates/sonido-daisy`, with the Seed in DFU mode (hold BOOT, tap RESET):
+
+```
+cargo objcopy --example grid_pedal --release -- -O binary -R .sram1_bss firmware/grid_pedal.bin
+dfu-util -a 0 -s 0x90040000:leave -D firmware/grid_pedal.bin
+```
+
+Then check it. `cat /dev/ttyACM0` shows one line every 50 ms, and pressing footswitch 1 in a text editor types `e`.
+
+## The screen
+
+Sway workspace 1 is HUM. Workspace 2 is a terminal in the Mentl checkout, for `mentl check examples/grid/station-leak.mn` if a judge asks to see the refusal live. Stop the screen from sleeping (`pkill swayidle`) and turn notifications off. Nothing else open.

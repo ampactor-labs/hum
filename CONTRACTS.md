@@ -7,7 +7,7 @@ Every process in the demo talks through one of these. They are frozen; a change 
 NDJSON, one line every 50 ms on the ear's stdout, floats:
 
 ```
-{"t":1761620000.50,"hz_fast":59.9810,"hz":59.9830,"hz_stft":59.9830,"rocof":-0.004,"thd":3.1,"level_db":-18.5,"harmonic":1,"source":"live"}
+{"t":1761620000.50,"hz_fast":59.9810,"hz":59.9830,"hz_stft":59.9830,"rocof":-0.004,"thd":3.1,"level_db":-18.5,"harmonic":1,"tuner_hz":59.983,"tuner_cents":-0.8,"scope":[-26,111,205,297,…],"source":"live"}
 ```
 
 - `t` unix seconds, float. Live: the wall clock at emission. File and synthetic sources: the start wall time plus the sample offset.
@@ -18,6 +18,8 @@ NDJSON, one line every 50 ms on the ear's stdout, floats:
 - `thd` percent, harmonics 2 to 10 over the fundamental, from the last two seconds.
 - `level_db` the tracked band's level in dBFS.
 - `harmonic` the band being tracked, 1, 2 or 3; every frequency above is already divided by it.
+- `tuner_hz` and `tuner_cents` the pitch from sonido's tuner kernel, the one in the sonido tuner plugin, with its A4 reference at 427.65 Hz so that 60 Hz is exactly the note B1. `tuner_cents` is the distance from B1: 0 while the grid is in tune, about −20 at 59.3 Hz. Both are `null` while the ear hears no hum.
+- `scope` the last three cycles of the input as 96 integers in thousandths of full scale, starting at a rising zero crossing so a steady hum draws in the same place every time. Empty until two seconds have been heard. The director does not pass it to the controller.
 - `source` one of `live`, `wav`, `replay`, `tone`, `silence`.
 
 Before the ear has locked (fewer than three cycles), `hz_fast`, `hz`, `hz_stft` and `rocof` are `null` and `level_db` is still real.
