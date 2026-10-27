@@ -75,11 +75,11 @@
     <tr><th>The controller's promise</th><th>Status</th></tr>
     <tr><td>No network, file, clock or other host call while it decides</td><td class="yes">Proven by the compiler through every call</td></tr>
     <tr><td>No memory allocated while it decides</td><td class="yes">Proven</td></tr>
-    <tr><td>The flywheel within 100 kW, the battery within 300 kW</td><td class="part">Clamped in code; the audit lists open claims in seven functions</td></tr>
+    <tr><td>The flywheel within 100 kW, the battery within 300 kW</td><td class="part">Clamped in code; some claims are still open</td></tr>
     <tr><td>It never crashes</td><td class="no">Not claimed; the compiler says it can</td></tr>
     <tr><td>Its decisions are good</td><td class="no">Tested on recordings, not proven</td></tr>
   </table>
-  <p class="note">The compiler is written in Mentl, and the pinned binary rebuilds itself byte for byte. A claim it cannot decide is listed as open, never passed as proven.</p>
+  <p class="note">The compiler is written in Mentl, and the pinned binary rebuilds itself byte for byte. The first two rows are checked through every call, and a copy that breaks one does not build.</p>
   <div class="foot"><span>mentl why examples/grid/station.mn decide WASI</span><span>Backup</span></div>
 </section>
 
