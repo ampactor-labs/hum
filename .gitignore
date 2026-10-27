@@ -1,0 +1,7 @@
+# Run-time files the director writes, and recordings too large for the tree.
+state.json
+live.ndjson
+decisions.ndjson
+sessions/
+*.wav
+!samples/*.wav
