@@ -21,21 +21,21 @@
   <h1>Mentl proves what software can never do.</h1>
   <div class="two">
     <div>
-      <p class="lead">You write a promise into the code, such as "this never touches the internet" or "this never asks for more than 100 kW".</p>
-      <p class="lead">The compiler checks the promise through every function the code calls. <b>Break it, and the program won't build.</b></p>
-      <p class="note">Built in Utah: seven months and 2,600 commits since March. The compiler is written in Mentl and compiles itself. Open source.</p>
+      <p class="lead">You write a rule into the code, such as "this never touches the internet" or "this never asks for more than 100 kW".</p>
+      <p class="lead">The compiler checks the rule through every function the code calls. <b>Break it, and the program won't build.</b></p>
+      <p class="note">Seven months and 2,600 commits since March. The compiler is written in Mentl and compiles itself. Open source.</p>
     </div>
-    <div class="pic"><img src="img/card-refused.png" alt="The compiler refusing a program that broke its promise not to reach the internet"></div>
+    <div class="pic"><img src="img/card-refused.png" alt="The compiler refusing a program that broke its rule against reaching the internet"></div>
   </div>
   <div class="foot"><span>The hard tech</span><span>2 / 5</span></div>
 </section>
 
 <section class="slide">
   <div class="kick">Show it working</div>
-  <h1>Built this week: software that hears the power grid.</h1>
+  <h1>Built this week: software that measures the power grid from a wall's wiring.</h1>
   <div class="two">
     <ul class="plain">
-      <li><b>A guitar pickup hears the grid</b> in any room's wiring, to a thousandth of a hertz, measured by my audio library, sonido.</li>
+      <li><b>A guitar pickup picks up the grid's hum</b> in any room, and my audio library, sonido, measures its frequency to a thousandth of a hertz.</li>
       <li><b>A model of a Torus Station decides</b> what to do, typically in under a millisecond, with software written in Mentl.</li>
       <li><b>That software is proven</b> unable to reach the internet while it decides.</li>
     </ul>
@@ -72,7 +72,7 @@
   <span class="tag">Backup</span>
   <h1 class="small">What is proven, exactly</h1>
   <table>
-    <tr><th>The controller's promise</th><th>Status</th></tr>
+    <tr><th>The controller's rule</th><th>Status</th></tr>
     <tr><td>No network, file, clock or other call outside the program while it decides</td><td class="yes">Proven by the compiler through every call</td></tr>
     <tr><td>No memory allocated while it decides</td><td class="yes">Proven</td></tr>
     <tr><td>The flywheel within 100 kW, the battery within 300 kW</td><td class="part">Clamped in code; some claims are still open</td></tr>

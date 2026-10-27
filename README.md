@@ -1,6 +1,6 @@
 # HUM
 
-HUM hears the power grid's frequency through a guitar pickup and shows a model of a Torus Station deciding what to do about it. The software that decides is written in Mentl, and Mentl's compiler proves that software can't reach the internet while it decides.
+HUM measures the power grid's frequency through a guitar pickup and shows a model of a Torus Station deciding what to do about it. The software that decides is written in Mentl, and Mentl's compiler proves that software can't reach the internet while it decides.
 
 Hard Tech Week 2026, Salt Lake City. Entered for the Torus bounty ("software that knows when the grid is jammed and stays out of traffic") and the Nucleus × Startup State open call. Every commit here is from the hackathon week. What existed before lives in [sonido](https://github.com/ampactor-labs/sonido) and [Mentl](https://github.com/ampactor-labs/mentl).
 

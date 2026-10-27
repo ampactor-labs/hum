@@ -264,13 +264,13 @@ $ mentl why examples/grid/station.mn decide WASI
 }</pre>
   <div class="path"><span class="node">decide</span><span class="arrow">→</span><span class="node">price_m</span><span class="arrow">→</span><span class="node">fetch_param</span><span class="arrow">→</span><span class="node">Network</span><span class="note">the path from the decision to the network, one call at a time</span></div>
   <pre id="refuseRaw" style="display:none">E_EffectMismatch: declared as decide; Network enters through `price_m` → through `fetch_param` → declared as fetch_param, an op of Network.</pre>
-  <div class="caption">The compiler refuses to build the program and names the line that broke the promise. The price belongs in the hour's plan, read before the fast decision runs. A lookup inside the decision is the bug. <span class="sim">Press A for the compiler's own words.</span></div>
+  <div class="caption">The compiler refuses to build the program and names the line that broke the rule. The price belongs in the hour's plan, read before the fast decision runs. A lookup inside the decision is the bug. <span class="sim">Press A for the compiler's own words.</span></div>
 </div></div>
 
 <div class="overlay" id="ovGate"><div class="card">
   <h2>Code proposed through the gate <span class="tag">mentl mcp</span></h2>
   <pre id="gateRaw">capture pending</pre>
-  <div class="caption">An agent that writes control code proposes it here. The gate answers PROVEN, or REFUSED with the line that broke a promise, and refused code is never built.</div>
+  <div class="caption">An agent that writes control code proposes it here. The gate answers PROVEN, or REFUSED with the line that broke a rule, and refused code is never built.</div>
 </div></div>
 
 <div class="overlay" id="ovTable"><div class="card">
@@ -319,9 +319,9 @@ $ mentl why examples/grid/station.mn decide WASI
 
 <div class="ov2" id="ovRefused"><div class="scard no">
   <div class="mark">✕ Refused</div>
-  <h1>One line broke the promise.</h1>
+  <h1>One line broke the rule.</h1>
   <code>let price = price_m("https://api.eia.gov/…")</code>
-  <p>This program promised it can't reach the internet while it decides. Add one line that reads a price online, and the compiler won't build it. Its error names the path the price took.</p>
+  <p>This decision is marked as never reaching the internet. Add one line that reads a price online, and the compiler won't build it. Its error names the path the price lookup took.</p>
   <pre id="refusedRaw" hidden></pre>
 </div></div>
 

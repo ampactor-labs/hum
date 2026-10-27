@@ -33,12 +33,12 @@
 <p>AI now helps write the software that runs machines: batteries, flywheels, flight controls. People test that code and review it, and then they trust it. No mainstream language lets a team write "this never touches the internet" or "this never asks for more than 100 kW" and have the compiler prove it.</p>
 
 <h2>What exists</h2>
-<p><b>Mentl</b> is a programming language I have built in Utah since March 15, 2026: 2,610 commits before this week, open source. You write a promise into the code, and the compiler checks it through every function the code calls. Break the promise and the program won't build. The compiler is written in Mentl and compiles itself.</p>
+<p><b>Mentl</b> is a programming language I have built since March 15, 2026: 2,610 commits before this week, open source. You write a rule into the code, and the compiler checks it through every function the code calls. Break the rule and the program won't build. The compiler is written in Mentl and compiles itself.</p>
 <p><b>sonido</b> is my audio library, built since January 25, 2026: effects that run in plugins, in a browser and on a guitar pedal.</p>
 
 <h2>Built this week</h2>
 <ul>
-  <li>A guitar pickup hears the power grid's frequency in a room's wiring, measured by sonido to a thousandth of a hertz and shown on sonido's tuner.</li>
+  <li>A guitar pickup picks up the power grid's hum in a room's wiring, and sonido measures its frequency to a thousandth of a hertz and shows it on sonido's tuner.</li>
   <li>A model of a Torus Station decides, typically in under a millisecond, what its flywheel and battery should do: ride out tomorrow's rush hour, catch a real 2019 grid failure, keep the building on when the grid goes dark.</li>
   <li>That decision is written in Mentl and proven unable to reach the internet. Add one line that reads a price online and the compiler refuses to build it.</li>
 </ul>

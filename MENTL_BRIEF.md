@@ -4,7 +4,7 @@ Three programs in the Mentl repository, under `examples/grid/`, do HUM's decidin
 
 ## station.mn: the controller
 
-It reads one line per reading from the director and answers each with one decision line. The function that decides, `decide`, makes four promises in its signature: no memory allocation, no network, no file system, and no call outside the program at all (`!Alloc + !Network + !Filesystem + !WASI`). The compiler proves all four through every function `decide` calls.
+It reads one line per reading from the director and answers each with one decision line. The function that decides, `decide`, declares four restrictions in its signature: no memory allocation, no network, no file system, and no call outside the program at all (`!Alloc + !Network + !Filesystem + !WASI`). The compiler proves all four through every function `decide` calls.
 
 Power commands are clamped in code, the flywheel to ±100 kW and the battery to ±300 kW, and their types state those ranges. The frequency the fast rules act on must lie between 55 and 65 Hz. Every number is an integer in thousandths, read from the line's text, so the decision never rounds a floating-point number.
 
@@ -32,7 +32,7 @@ The same controller with one line a reasonable engineer might add: read the hour
 
 ## listen.mn: the learner
 
-One number learns the hum's frequency from a 480 Hz copy of the signal. A pure tone obeys x[n] = a·x[n−1] − x[n−2] with a = 2·cos ω, so the program predicts each sample from the two before it and nudges `a` against the slope of the squared error. The compiler derives that slope itself, from `d(e * e)` under `~> grad(a)`. A low-pass filter at 80 Hz keeps the hum's harmonics out, and both stages promise `!Alloc`. Once a second it prints a line such as `{"hz_learned":60.000312}`.
+One number learns the hum's frequency from a 480 Hz copy of the signal. A pure tone obeys x[n] = a·x[n−1] − x[n−2] with a = 2·cos ω, so the program predicts each sample from the two before it and nudges `a` against the slope of the squared error. The compiler derives that slope itself, from `d(e * e)` under `~> grad(a)`. A low-pass filter at 80 Hz keeps the hum's harmonics out, and both stages are declared `!Alloc`. Once a second it prints a line such as `{"hz_learned":60.000312}`.
 
 Measured: within 5 mHz of the zero-crossing reading on a hum that wobbles ±20 mHz, and 60.05000 on a 60.050 Hz tone. It trails a fast fall, so the stage does not show it.
 
