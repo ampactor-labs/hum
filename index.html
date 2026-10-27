@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HUM · the grid, heard</title>
+<meta name="description" content="The grid's frequency heard live from a room's wiring, and a Torus Station answering in two bands.">
+<style>
+@font-face {
+  font-family: "Share Tech Mono";
+  src: url("fonts/ShareTechMono.woff2") format("woff2");
+  font-display: swap;
+}
+:root {
+  --void: #07060E; --panel: #100E21; --panel-hi: #1B1836; --line: #2E2952; --dim: #242042;
+  --ink: #F2EEFF; --ink-2: #ABA5CF; --ink-3: #7A74A3;
+  --grid: #1C9DB8; --spin: #BC8A24; --pulse: #8E7ADF; --alarm: #E03A6B;
+  --mono: "Share Tech Mono", ui-monospace, "DejaVu Sans Mono", monospace;
+  --sans: Inter, Cantarell, "Noto Sans", system-ui, sans-serif;
+  --halo: 0.35; --stroke: 2;
+}
+html { font-size: calc(100vw / 120); }   /* 16px at 1920 wide; everything scales with the screen */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--void); color: var(--ink); overflow: hidden; }
+body { font-family: var(--mono); display: grid; grid-template-rows: 3rem 1fr; gap: 1.25rem; padding: 1.25rem 1.5rem 1.5rem; cursor: none; }
+body.cursor { cursor: default; }
+body.bright { --ink-2: #D9D4F2; --ink-3: #ABA5CF; --line: #4A4480; --halo: 0; --stroke: 3; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 0 0.25rem; }
+.top .name { font-size: 1.5rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.top .name small { color: var(--ink-2); text-transform: none; letter-spacing: 0; font-size: 1.25rem; margin-left: 0.5rem; }
+.chip { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 1.25rem; color: var(--ink); }
+.chip .dot { width: 0.8rem; height: 0.8rem; border-radius: 50%; background: var(--ink); display: inline-block; }
+.chip.live .dot { animation: pulse 1s ease-in-out infinite; }
+.chip.waiting .dot { background: transparent; border: 2px solid var(--ink-2); }
+.chip.replay .dot { background: transparent; border: 2px solid var(--grid); }
+.chip.recording .dot { background: var(--spin); }
+.chip.reconnecting .dot { background: var(--alarm); animation: pulse 0.5s ease-in-out infinite; }
+.chip .label { color: var(--ink-2); }
+.chip .clock { color: var(--ink-3); margin-left: 0.5rem; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+.buttons { display: flex; gap: 0.75rem; }
+button { font-family: var(--mono); font-size: 1.1rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); background: var(--panel-hi); border: 1px solid var(--line); border-radius: 0.75rem; height: 3rem; padding: 0 1.1rem; cursor: pointer; }
+button:hover { border-color: var(--ink-3); }
+button.on { border-color: var(--grid); color: var(--grid); }
+.grid { display: grid; grid-template-columns: 59.3fr 40.7fr; grid-template-rows: 61fr 39fr; gap: 1.5rem; min-height: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 0.75rem; padding: 1.25rem; display: flex; flex-direction: column; min-height: 0; min-width: 0; position: relative; transition: opacity 0.4s; }
+.panel h2 { margin: 0 0 0.5rem; font-size: 1.375rem; font-weight: normal; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); display: flex; justify-content: space-between; }
+.panel h2 .sub { color: var(--ink-3); text-transform: none; letter-spacing: 0; }
+.caption { font-family: var(--sans); font-size: 1.25rem; color: var(--ink-2); line-height: 1.35; margin-top: 0.75rem; }
+.caption .sim { color: var(--ink-3); }
+.foot { font-size: 1.1rem; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: auto; padding-top: 0.5rem; }
+canvas { display: block; width: 100%; height: 100%; }
+.screen { position: relative; flex: 1; min-height: 0; border-radius: 0.75rem; overflow: hidden; background: var(--void); border: 1px solid var(--line); }
+.screen::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.45) 100%); }
+body.bright .screen::after { background: none; }
+#heartbeat.dark { opacity: 0.4; }
+.banner { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; font-size: 3rem; letter-spacing: 0.12em; color: var(--alarm); text-shadow: 0 0 1.5rem rgba(224,58,107,0.5); z-index: 2; }
+.banner.show { display: flex; }
+/* HEARTBEAT */
+.hero { display: flex; align-items: baseline; gap: 1rem; line-height: 1; margin-top: 0.25rem; }
+.hero .hz { font-size: 8.75rem; letter-spacing: -0.02em; transition: opacity 0.12s; }
+.hero .unit { font-size: 3rem; color: var(--ink-2); }
+.hero .note { font-size: 2rem; color: var(--ink-2); margin-left: auto; text-align: right; line-height: 1.2; }
+.hero .note b { color: var(--ink); font-weight: normal; font-size: 2.25rem; }
+.sub { display: flex; gap: 2.5rem; font-size: 1.5rem; color: var(--ink-2); margin: 0.25rem 0 0.25rem; }
+.sub b { color: var(--ink); font-weight: normal; }
+.est { display: flex; gap: 2rem; font-size: 1.25rem; color: var(--ink-3); margin-bottom: 0.6rem; }
+.est b { color: var(--ink-2); font-weight: normal; }
+/* STATION */
+.mode { font-size: 2.75rem; letter-spacing: 0.1em; margin: 0.25rem 0 0.5rem; transition: color 0.2s; }
+.mode.GRID { color: var(--ink); } .mode.EVENT { color: var(--spin); } .mode.RUSH { color: var(--pulse); } .mode.ISLAND { color: var(--alarm); }
+.mode.flash { animation: flash 0.2s ease-out; }
+@keyframes flash { 0% { filter: brightness(2); } 100% { filter: brightness(1); } }
+.reason { font-family: var(--sans); font-size: 1.75rem; color: var(--ink); line-height: 1.3; margin-top: 0.75rem; min-height: 2.6em; }
+.reason::before { content: "“"; color: var(--ink-3); } .reason::after { content: "”"; color: var(--ink-3); }
+/* LEDGER */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; margin-top: 0.5rem; }
+.tile .v { font-size: 2.5rem; line-height: 1.1; }
+.tile .l { font-size: 1.1rem; color: var(--ink-2); letter-spacing: 0.04em; margin-top: 0.2rem; }
+.latency { font-family: var(--sans); font-size: 1.5rem; color: var(--ink); margin-top: 1rem; }
+.latency b { font-family: var(--mono); font-weight: normal; }
+/* overlays */
+.overlay { position: fixed; inset: 0; background: rgba(7,6,14,0.92); display: none; align-items: center; justify-content: center; z-index: 10; }
+.overlay.show { display: flex; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 0.75rem; padding: 2rem 2.5rem; width: 82vw; max-height: 86vh; overflow: auto; }
+.card h2 { margin: 0 0 1.25rem; font-size: 1.75rem; font-weight: normal; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); display: flex; justify-content: space-between; align-items: baseline; }
+.card h2 .tag { font-size: 1.25rem; color: var(--ink); border: 1px solid var(--ink-3); border-radius: 0.5rem; padding: 0.2rem 0.6rem; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.cols h3 { font-size: 1.5rem; font-weight: normal; letter-spacing: 0.08em; margin: 0 0 1rem; color: var(--ink-2); }
+.cols ul { list-style: none; margin: 0; padding: 0; font-family: var(--sans); font-size: 1.6rem; line-height: 1.5; }
+.cols li { display: flex; gap: 0.9rem; align-items: baseline; }
+.cols li .g { font-family: var(--mono); color: var(--ink); width: 1.5rem; }
+.cols li .g.no { color: var(--alarm); }
+pre { font-family: var(--mono); font-size: 1.15rem; color: var(--ink-2); white-space: pre-wrap; line-height: 1.45; margin: 1.5rem 0 0; }
+pre b { color: var(--ink); font-weight: normal; }
+pre .hi { color: var(--alarm); }
+.path { display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; }
+.path .node { border: 2px solid var(--alarm); color: var(--ink); border-radius: 0.6rem; padding: 0.6rem 1.2rem; font-size: 1.6rem; }
+.path .arrow { color: var(--alarm); font-size: 2rem; }
+.path .note { font-family: var(--sans); color: var(--ink-2); font-size: 1.3rem; margin-left: 1rem; }
+table { border-collapse: collapse; width: 100%; font-size: 1.1rem; }
+th, td { text-align: right; padding: 0.3rem 0.6rem; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+th { color: var(--ink-3); font-weight: normal; letter-spacing: 0.06em; }
+td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
+.help { position: fixed; left: 1.5rem; bottom: 0.5rem; font-size: 0.95rem; color: var(--ink-3); letter-spacing: 0.06em; opacity: 0.7; }
+@media (prefers-reduced-motion: reduce) { .chip .dot, .mode.flash { animation: none; } }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="name">HUM <small>· the grid, heard</small></div>
+  <div class="chip waiting" id="chip"><span class="dot"></span><span id="chipText">WAITING</span><span class="label" id="chipLabel">no signal yet</span><span class="clock" id="clock"></span></div>
+  <div class="buttons">
+    <button id="btnReplay" title="E">Replay event</button>
+    <button id="btnIsland" title="I">Island</button>
+    <button id="btnSound" title="S">Sound</button>
+  </div>
+</div>
+<div class="grid">
+  <section class="panel" id="heartbeat">
+    <h2>Heartbeat <span class="sub" id="harmonic"></span></h2>
+    <div class="hero"><span class="hz" id="hz">——.———</span><span class="unit">Hz</span><span class="note" id="note"></span></div>
+    <div class="sub"><span id="rocof">listening</span><span id="thd"></span></div>
+    <div class="est"><span>crossings <b id="eCross">—</b></span><span>spectrum <b id="eStft">—</b></span><span>learned <b id="eLearn">—</b></span></div>
+    <div class="screen"><canvas id="cHeart"></canvas><div class="banner" id="banner">GRID DARK · ISLANDED</div></div>
+    <div class="caption" id="capHeart">The Western Interconnection, measured from this room's wiring through a guitar pickup.</div>
+  </section>
+  <section class="panel" id="station">
+    <h2>Station <span class="sub">two bands</span></h2>
+    <div class="mode GRID" id="mode">GRID</div>
+    <div class="screen" style="border:none;background:transparent"><canvas id="cStation"></canvas></div>
+    <div class="reason" id="reason">listening</div>
+    <div class="caption"><span class="sim" id="stationLabel">Modeled from Torus's published figures: 10C Spin, six-minute discharge, four-hour Pulse, under 250 ms. Simulated.</span></div>
+    <div class="foot">Spin · Pulse · Lasso</div>
+  </section>
+  <section class="panel" id="rush">
+    <h2>Rush hour <span class="sub">PacifiCorp East · today and tomorrow</span></h2>
+    <div class="screen" style="border:none;background:transparent"><canvas id="cRush"></canvas></div>
+    <div class="caption" id="capRush">EIA-930 hourly, no key.</div>
+  </section>
+  <section class="panel" id="ledger">
+    <h2>Ledger <span class="sub">since the page opened</span></h2>
+    <div class="tiles">
+      <div class="tile"><div class="v" id="lEvents">0</div><div class="l">events caught</div></div>
+      <div class="tile"><div class="v" id="lMoved">0 kWh</div><div class="l">moved off the rush hour</div></div>
+      <div class="tile"><div class="v" id="lSpin">0.00</div><div class="l">Spin cycles spent</div></div>
+      <div class="tile"><div class="v" id="lSaved">0.000</div><div class="l">Pulse cycles saved</div></div>
+    </div>
+    <div class="latency" id="latency">No event yet.</div>
+  </section>
+</div>
+
+<div class="overlay" id="ovCert"><div class="card">
+  <h2>What the program that decides can and cannot do <span class="tag" id="certTag">PROVEN · mentl check</span></h2>
+  <div class="cols">
+    <div><h3>CAN</h3><ul>
+      <li><span class="g">✓</span> read the stream of readings</li>
+      <li><span class="g">✓</span> write a command for Spin and for Pulse</li>
+      <li><span class="g">✓</span> keep its own state of charge and its last reading</li>
+    </ul></div>
+    <div><h3>CANNOT</h3><ul>
+      <li><span class="g no">⊘</span> reach the network while deciding</li>
+      <li><span class="g no">⊘</span> touch the filesystem while deciding</li>
+      <li><span class="g no">⊘</span> allocate memory mid-decision</li>
+      <li><span class="g no">⊘</span> ask Spin for more than 100 kW, or Pulse for more than 300 kW</li>
+      <li><span class="g no">⊘</span> accept a frequency outside 55 to 65 Hz as real</li>
+    </ul></div>
+  </div>
+  <pre id="certRaw" style="display:none"></pre>
+  <div class="caption">Not by policy: proven by the compiler through every call the program makes. <span class="sim">Press A for the compiler's own words.</span></div>
+</div></div>
+
+<div class="overlay" id="ovRefuse"><div class="card">
+  <h2>The same program, one line added <span class="tag" style="border-color:var(--alarm);color:var(--alarm)">REFUSED</span></h2>
+  <pre id="leakSrc"><b>effect</b> Net {
+  fetch(url: String) -> String
+}
+
+<b>fn</b> decide(reading, station) <b>with</b> !Alloc + !Network + !Filesystem = {
+  <span class="hi">let price = fetch("https://api.eia.gov/price")   // scale the slow band by price</span>
+  ...
+}</pre>
+  <div class="path"><span class="node">decide</span><span class="arrow">→</span><span class="node">fetch</span><span class="arrow">→</span><span class="node">Net</span><span class="note">the path the network takes into a function that swore it never would</span></div>
+  <pre id="refuseRaw">E_EffectMismatch: effect row mismatch: !Network vs ... Net — declared as decide; Net enters through `fetch`, an op of Net.</pre>
+  <div class="caption">This is what review cannot do: the build refuses, and names the line.</div>
+</div></div>
+
+<div class="overlay" id="ovTable"><div class="card">
+  <h2>The last twenty readings and decisions <span class="tag">RAW</span></h2>
+  <table id="tbl"><thead><tr><th>time</th><th>hz fast</th><th>hz</th><th>spectrum</th><th>fall Hz/s</th><th>level dB</th><th>h</th><th>rush</th><th>mode</th><th>Spin W</th><th>Pulse W</th><th>Spin</th><th>Pulse</th></tr></thead><tbody></tbody></table>
+</div></div>
+
+<div class="overlay" id="ovMesh"><div class="card" style="height:86vh;display:flex;flex-direction:column">
+  <h2>Mesh <span class="tag" style="border-color:var(--ink-3);color:var(--ink-3)">SIMULATED</span></h2>
+  <div class="screen" style="flex:1"><canvas id="cMesh"></canvas></div>
+  <div class="caption">Two Stations with GPS time see the <b>angle</b> between them, which is the flow on the line between them, and an event's wave arrives at one before the other. FNET has done this from wall outlets since 2004; a fleet that both sees and answers at 10C has not existed. <span class="sim">Simulated from the day's shape and the replayed event.</span></div>
+</div></div>
+
+<div class="help">E replay · I island · P certificate · R refusal · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NOMINAL = 60.0, B1 = 61.7354, DEADBAND = 0.036;
+const params = new URLSearchParams(location.search);
+const sessionFile = params.get("session");
+let state = null, lastGood = 0, lastFetch = 0, connected = false;
+let modeShown = "GRID", recent = [], islandOn = false;
+let heroShown = null, heroAt = 0;
+
+// ---------- data: live polling or playback of a recorded session ----------
+async function poll() {
+  try {
+    const r = await fetch("/state.json?ts=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    state = await r.json();
+    lastGood = performance.now();
+    connected = !!state.connected;
+  } catch (e) {
+    connected = false;
+  }
+  lastFetch = performance.now();
+  onState();
+}
+function startLive() { poll(); setInterval(poll, 250); }
+
+async function startPlayback(path) {
+  const r = await fetch(path, { cache: "no-store" });
+  const lines = (await r.text()).split("\n").filter(l => l.trim());
+  const rows = lines.map(l => JSON.parse(l));
+  const speed = parseFloat(params.get("speed") || "1");
+  const built = { trace_fast: [], trace: [], station_trace: [], ledger: { events: 0, kwh_moved: 0, spin_cycles: 0, pulse_cycles_saved: 0 }, latency_ms: 48, learned: {}, pace: null, station: {} };
+  try { built.pace = (await (await fetch("data/pace.json", { cache: "no-store" })).json()); } catch (e) {}
+  if (built.pace) { built.pace = { today: built.pace.today, tomorrow: built.pace.tomorrow, window: built.pace.window, forecast_source: built.pace.forecast_source, as_of_local: built.pace.as_of_local, demand_today: (built.pace.for_today||{}).demand, forecast_today: (built.pace.for_today||{}).forecast, forecast_tomorrow: (built.pace.for_tomorrow||{}).forecast, shape: built.pace.shape, clean: built.pace.clean_mean, charge_hours: [] }; }
+  let i = 0, lastMode = "GRID", t0 = performance.now(), base = rows.length ? rows[0].ear.t : 0;
+  const label = params.get("label") || path.replace(/^.*\//, "");
+  function step() {
+    const elapsed = (performance.now() - t0) / 1000 * speed;
+    while (i < rows.length && rows[i].ear.t - base <= elapsed) {
+      const { ear, station } = rows[i++];
+      const now = Object.assign({}, ear, station || {});
+      if (station) {
+        if (station.mode === "EVENT" && lastMode !== "EVENT") built.ledger.events++;
+        lastMode = station.mode;
+        if (station.pulse_w > 0 && ear.rush) built.ledger.kwh_moved += station.pulse_w * 0.05 / 3600 / 1000;
+        if (station.spin_w > 0) { const kwh = station.spin_w * 0.05 / 3600 / 1000; built.ledger.spin_cycles += kwh / 10; built.ledger.pulse_cycles_saved += kwh / 1200; }
+      }
+      built.trace_fast.push([ear.t, ear.hz_fast]); if (built.trace_fast.length > 1200) built.trace_fast.shift();
+      if (i % 10 === 0) { built.trace.push([ear.t, ear.hz]); built.station_trace.push([ear.t, station ? station.spin_w : 0, station ? station.pulse_w : 0, station ? station.mode : "GRID"]); if (built.trace.length > 1200) { built.trace.shift(); built.station_trace.shift(); } }
+      state = Object.assign({}, built, { now, source: "recording", source_label: label, connected: true, offset_mhz: ear.offset_mhz || 0, clock: new Date(ear.t * 1000).toLocaleTimeString("en-US", { hour12: false, timeZone: "America/Denver" }) + " MDT" });
+      connected = true; lastGood = performance.now();
+    }
+    onState();
+    if (i < rows.length) setTimeout(step, 50); else { connected = false; }
+  }
+  step();
+}
+
+// ---------- the chip ----------
+function setChip(kind, text, label) {
+  const chip = $("chip"); chip.className = "chip " + kind; $("chipText").textContent = text; $("chipLabel").textContent = label || "";
+}
+function updateChip() {
+  if (!state) { setChip("waiting", "WAITING", "no signal yet"); return; }
+  if (!connected && performance.now() - lastGood > 1500) { setChip("reconnecting", "RECONNECTING", state.source_label || ""); return; }
+  const s = state.source;
+  const map = { live: ["live", "● LIVE"], pedal: ["live", "● PEDAL"], wav: ["recording", "▶ RECORDING"], recording: ["recording", "▶ RECORDING"], replay: ["replay", "⟲ REPLAY"], silence: ["waiting", "○ SILENCE"], sample: ["replay", "⟲ SAMPLE"] };
+  const [kind, text] = map[s] || ["waiting", "○ " + s];
+  if (state.now && state.now.hz == null && s !== "silence") { setChip("waiting", "○ WAITING", "no hum yet · " + (state.source_label || "")); return; }
+  setChip(kind, text.replace(/^[●▶⟲○] /, ""), state.source_label || "");
+  $("clock").textContent = state.clock || "";
+}
+
+// ---------- numbers ----------
+function fmt(v, d) { return v == null ? "—" : Number(v).toFixed(d); }
+function centsFromB1(hz) { return 1200 * Math.log2(hz / B1); }
+function onState() {
+  updateChip();
+  if (!state) return;
+  const n = state.now || {};
+  const hz = n.hz;
+  const t = performance.now();
+  if (hz != null && (heroShown == null || Math.abs(hz - heroShown) > 0.0004) && t - heroAt > 950) {
+    const el = $("hz"); el.style.opacity = 0.55; setTimeout(() => { el.textContent = hz.toFixed(3); el.style.opacity = 1; }, 60);
+    heroShown = hz; heroAt = t;
+    const c = centsFromB1(hz); $("note").innerHTML = "<b>B1</b> " + (c >= 0 ? "+" : "−") + Math.abs(c).toFixed(1) + " ¢<br><span style='font-size:1.1rem'>the grid as a note</span>";
+  }
+  if (hz == null) { $("hz").textContent = "——.———"; $("note").innerHTML = ""; heroShown = null; }
+  const r = n.rocof;
+  if (r == null) $("rocof").textContent = n.hz == null && state.source === "silence" ? "the hum died" : "listening";
+  else { const a = Math.abs(r); $("rocof").innerHTML = (a < 0.002 ? "→ steady" : (r < 0 ? "↓ falling at " : "↑ rising at ") + "<b>" + a.toFixed(3) + "</b> Hz/s"); }
+  $("thd").innerHTML = n.thd == null ? "" : "wave <b>" + Number(n.thd).toFixed(1) + "%</b> distorted";
+  $("eCross").textContent = fmt(n.hz, 3); $("eStft").textContent = fmt(n.hz_stft, 3);
+  $("eLearn").textContent = state.learned && state.learned.hz != null ? Number(state.learned.hz).toFixed(3) : "—";
+  $("harmonic").textContent = n.harmonic ? (n.harmonic === 1 ? "on the fundamental" : "on harmonic " + n.harmonic) : "";
+  const off = state.offset_mhz;
+  $("capHeart").innerHTML = "The Western Interconnection, measured from this room's wiring through a guitar pickup." + (off != null && state.source === "live" ? " Clock offset " + (off >= 0 ? "+" : "−") + Math.abs(off).toFixed(1) + " mHz, calibrated against the grid's long-run mean." : "");
+  // mode
+  const mode = n.mode || "GRID";
+  const m = $("mode");
+  if (mode !== modeShown) { m.className = "mode " + mode + " flash"; setTimeout(() => m.classList.remove("flash"), 220); modeShown = mode; }
+  m.textContent = mode === "ISLAND" ? "ISLAND" : mode === "EVENT" ? "EVENT · Spin" : mode === "RUSH" ? "RUSH HOUR · Pulse" : "GRID";
+  m.className = "mode " + mode + (m.classList.contains("flash") ? " flash" : "");
+  $("reason").textContent = n.reason || "listening";
+  $("heartbeat").classList.toggle("dark", mode === "ISLAND");
+  $("banner").classList.toggle("show", mode === "ISLAND");
+  if (state.station && state.station.label) $("stationLabel").textContent = state.station.label;
+  // ledger
+  const L = state.ledger || {};
+  $("lEvents").textContent = L.events || 0;
+  $("lMoved").textContent = (L.kwh_moved || 0).toFixed(L.kwh_moved >= 10 ? 0 : 1) + " kWh";
+  $("lSpin").textContent = (L.spin_cycles || 0).toFixed(2);
+  $("lSaved").textContent = (L.pulse_cycles_saved || 0).toFixed(3);
+  $("latency").innerHTML = state.latency_ms != null ? "Last event: heard → commanded in <b>" + (state.latency_ms < 1 ? "under 1" : state.latency_ms) + " ms</b>." : "No event yet.";
+  // rush caption
+  const p = state.pace || {};
+  const src = p.forecast_source === "eia-day-ahead-tomorrow" ? "tomorrow's day-ahead forecast" : p.forecast_source === "eia-day-ahead-today" ? "today's day-ahead forecast" : "the seven-day shape (no forecast filed yet)";
+  $("capRush").innerHTML = "EIA-930 hourly, no key" + (p.as_of_local ? ", reported through " + p.as_of_local : "") + ". The rush hour is " + (p.window ? hourLabel(p.window[0]) + " to " + hourLabel(p.window[1]) : "—") + ", from " + src + ". The strip is the hour's clean share; Pulse charges in the hours marked under it." + (state.learned && state.learned.window ? " Learned on-device: " + hourLabel(state.learned.window[0]) + " to " + hourLabel(state.learned.window[1]) + "." : "");
+  // table ring
+  recent.push(n); if (recent.length > 20) recent.shift();
+  sound.update(n, state);
+}
+function hourLabel(h) { h = ((h % 24) + 24) % 24; const ap = h < 12 ? "am" : "pm"; const hh = h % 12 === 0 ? 12 : h % 12; return hh + " " + ap; }
+
+// ---------- canvases ----------
+function setup(c) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = c.clientWidth, h = c.clientHeight;
+  if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); }
+  const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); return [g, w, h];
+}
+const rem = () => parseFloat(getComputedStyle(document.documentElement).fontSize);
+function rgba(hex, a) { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; }
+
+function drawHeart() {
+  const [g, w, h] = setup($("cHeart"));
+  const ink = css("--ink"), grid = css("--grid"), line = css("--line"), dim = css("--dim"), ink3 = css("--ink-3");
+  g.clearRect(0, 0, w, h);
+  // the floor: a faint perspective grid in the lower third, the cabinet's horizon
+  const horizon = h * 0.62;
+  g.strokeStyle = rgba(line, 0.5); g.lineWidth = 1;
+  for (let i = 0; i <= 8; i++) { const y = horizon + (h - horizon) * Math.pow(i / 8, 1.6); g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+  for (let i = -6; i <= 6; i++) { g.beginPath(); g.moveTo(w / 2 + i * w / 12, horizon); g.lineTo(w / 2 + i * w / 2.2, h); g.stroke(); }
+  const pad = { l: rem() * 4.5, r: rem() * 1.5, t: rem() * 1, b: rem() * 2 };
+  const tr = (state && state.trace) || [];
+  const tnow = state && state.now && state.now.t ? state.now.t + (performance.now() - lastGood) / 1000 : Date.now() / 1000;
+  const span = 600, x0 = tnow - span;
+  const vals = tr.filter(p => p[1] != null).map(p => p[1]);
+  const maxdev = vals.length ? Math.max(0.08, 1.2 * Math.max(...vals.map(v => Math.abs(v - NOMINAL)))) : 0.08;
+  const yOf = v => pad.t + (h - pad.t - pad.b) * (1 - (v - (NOMINAL - maxdev)) / (2 * maxdev));
+  const xOf = t => pad.l + (w - pad.l - pad.r) * (t - x0) / span;
+  // the deadband
+  g.fillStyle = rgba(dim, 0.9); g.fillRect(pad.l, yOf(NOMINAL + DEADBAND), w - pad.l - pad.r, yOf(NOMINAL - DEADBAND) - yOf(NOMINAL + DEADBAND));
+  g.strokeStyle = rgba(grid, 0.6); g.lineWidth = 1;
+  [NOMINAL + DEADBAND, NOMINAL - DEADBAND].forEach(v => { g.beginPath(); g.moveTo(pad.l, yOf(v)); g.lineTo(w - pad.r, yOf(v)); g.stroke(); });
+  // axis labels
+  g.fillStyle = ink3; g.font = `${rem() * 0.95}px ${css("--mono")}`; g.textAlign = "right"; g.textBaseline = "middle";
+  const step = maxdev > 0.5 ? 0.5 : maxdev > 0.2 ? 0.1 : 0.05;
+  for (let v = Math.ceil((NOMINAL - maxdev) / step) * step; v <= NOMINAL + maxdev + 1e-9; v += step) { const y = yOf(v); if (y < pad.t || y > h - pad.b) continue; g.fillText(v.toFixed(2), pad.l - rem() * 0.5, y); g.strokeStyle = rgba(line, 0.9); g.beginPath(); g.moveTo(pad.l, y); g.lineTo(w - pad.r, y); g.stroke(); }
+  g.textAlign = "center"; g.textBaseline = "top";
+  [600, 450, 300, 150, 0].forEach(s => { g.fillText(s === 0 ? "now" : "−" + (s / 60) + " min", xOf(tnow - s), h - pad.b + rem() * 0.4); });
+  g.fillStyle = ink3; g.textAlign = "left"; g.fillText("±36 mHz: the band where nothing needs to happen", pad.l + rem() * 0.5, yOf(NOMINAL + DEADBAND) - rem() * 1.3);
+  // the lit trace
+  const pts = tr.filter(p => p[1] != null && p[0] >= x0).map(p => [xOf(p[0]), yOf(p[1])]);
+  if (pts.length > 1) {
+    const halo = parseFloat(css("--halo")), stroke = parseFloat(css("--stroke"));
+    const path = () => { g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); };
+    if (halo > 0) { g.strokeStyle = rgba(grid, halo); g.lineWidth = 7; g.lineJoin = "round"; g.lineCap = "round"; path(); g.stroke(); }
+    g.strokeStyle = ink; g.lineWidth = stroke; path(); g.stroke();
+    const last = pts[pts.length - 1];
+    g.fillStyle = css("--panel"); g.beginPath(); g.arc(last[0], last[1], 6, 0, Math.PI * 2); g.fill();
+    g.fillStyle = ink; g.beginPath(); g.arc(last[0], last[1], 4, 0, Math.PI * 2); g.fill();
+  } else if (!state || !(state.now && state.now.hz != null)) {
+    g.strokeStyle = rgba(dim, 1); g.lineWidth = 2; g.beginPath(); g.moveTo(pad.l, yOf(NOMINAL)); g.lineTo(w - pad.r, yOf(NOMINAL)); g.stroke();
+    g.fillStyle = ink3; g.textAlign = "center"; g.font = `${rem() * 1.2}px ${css("--sans")}`; g.fillText("waiting for the hum", (pad.l + w - pad.r) / 2, yOf(NOMINAL) - rem() * 2);
+  }
+}
+
+let ringAngle = 0, lastFrame = performance.now();
+function drawStation() {
+  const [g, w, h] = setup($("cStation"));
+  const n = (state && state.now) || {}, S = (state && state.station) || { spin_w: 100000, spin_wh: 10000, pulse_w: 300000, pulse_wh: 1200000 };
+  const ink = css("--ink"), ink2 = css("--ink-2"), ink3 = css("--ink-3"), grid = css("--grid"), spin = css("--spin"), pulse = css("--pulse"), line = css("--line"), hi = css("--panel-hi"), alarm = css("--alarm");
+  g.clearRect(0, 0, w, h);
+  const mono = `${rem() * 1.05}px ${css("--mono")}`, monoBig = `${rem() * 1.35}px ${css("--mono")}`;
+  const island = n.mode === "ISLAND";
+  const spinW = n.spin_w || 0, pulseW = n.pulse_w || 0;
+  const spinSoc = (n.spin_soc_m != null ? n.spin_soc_m : 940) / 1000, pulseSoc = (n.pulse_soc_m != null ? n.pulse_soc_m : 620) / 1000;
+  const midY = h * 0.46;
+  const small = `${rem() * 0.95}px ${css("--mono")}`;
+  // the grid wire, the station box, the building
+  g.strokeStyle = island ? rgba(alarm, 0.5) : grid; g.lineWidth = 3; g.setLineDash(island ? [6, 8] : []);
+  g.beginPath(); g.moveTo(0, midY); g.lineTo(w * 0.17, midY); g.stroke(); g.setLineDash([]);
+  g.fillStyle = ink2; g.font = mono; g.textAlign = "left"; g.textBaseline = "bottom"; g.fillText(island ? "grid dark" : "grid", rem() * 0.3, midY - rem() * 0.5);
+  const boxX = w * 0.19, boxW = w * 0.56, boxY = h * 0.04, boxH = h * 0.92, cx = boxX + boxW / 2;
+  g.strokeStyle = line; g.lineWidth = 1; g.fillStyle = rgba(hi, 0.5);
+  g.beginPath(); g.roundRect(boxX, boxY, boxW, boxH, 10); g.fill(); g.stroke();
+  g.fillStyle = ink3; g.font = small; g.textAlign = "center"; g.textBaseline = "top"; g.fillText("TORUS STATION", cx, boxY + rem() * 0.35);
+  // Spin: the ring, spinning with its charge
+  const dt = (performance.now() - lastFrame) / 1000; lastFrame = performance.now();
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduce) ringAngle += dt * (0.6 + 2.4 * spinSoc) * (island || n.mode === "EVENT" ? 1.6 : 1);
+  const r1 = Math.min(boxW * 0.135, boxH * 0.22), sx = boxX + boxW * 0.27, sy = boxY + boxH * 0.42;
+  g.strokeStyle = rgba(spin, 0.3); g.lineWidth = 6; g.beginPath(); g.arc(sx, sy, r1, 0, Math.PI * 2); g.stroke();
+  g.strokeStyle = spin; g.lineWidth = 6; g.setLineDash([r1 * 0.9, r1 * 0.5]); g.lineDashOffset = -ringAngle * r1; g.beginPath(); g.arc(sx, sy, r1, 0, Math.PI * 2 * spinSoc); g.stroke(); g.setLineDash([]);
+  g.fillStyle = ink; g.font = monoBig; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText((Math.abs(spinW) / 1000).toFixed(0) + " kW", sx, sy - rem() * 0.1);
+  g.fillStyle = ink2; g.font = small; g.fillText(spinW < 0 ? "charging" : spinW > 0 ? "discharging" : "idle", sx, sy + rem() * 1.3);
+  g.fillStyle = ink; g.font = mono; g.textBaseline = "top"; g.fillText("SPIN", sx, sy + r1 + rem() * 0.5);
+  g.fillStyle = ink2; g.font = small; g.fillText("the milliseconds", sx, sy + r1 + rem() * 1.75);
+  g.fillStyle = ink3; g.fillText((spinSoc * S.spin_wh / S.spin_w * 3600).toFixed(0) + " s left at full power", sx, sy + r1 + rem() * 2.85);
+  // Pulse: the tank, filled with its charge
+  const px = boxX + boxW * 0.74, pw = r1 * 1.2, ph = r1 * 2.0, py = sy - ph / 2;
+  g.strokeStyle = pulse; g.lineWidth = 2; g.fillStyle = rgba(pulse, 0.12); g.beginPath(); g.roundRect(px - pw / 2, py, pw, ph, 6); g.fill(); g.stroke();
+  g.fillStyle = rgba(pulse, 0.55); g.fillRect(px - pw / 2 + 3, py + 3 + (ph - 6) * (1 - pulseSoc), pw - 6, (ph - 6) * pulseSoc);
+  g.fillStyle = ink; g.font = monoBig; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText((Math.abs(pulseW) / 1000).toFixed(0) + " kW", px, sy - rem() * 0.1);
+  g.fillStyle = ink2; g.font = small; g.fillText(pulseW < 0 ? "charging" : pulseW > 0 ? "discharging" : "idle", px, sy + rem() * 1.3);
+  g.fillStyle = ink; g.font = mono; g.textBaseline = "top"; g.fillText("PULSE", px, py + ph + rem() * 0.5);
+  g.fillStyle = ink2; g.font = small; g.fillText("the hours", px, py + ph + rem() * 1.75);
+  g.fillStyle = ink3; g.fillText((pulseSoc * S.pulse_wh / S.pulse_w).toFixed(1) + " h left at full power", px, py + ph + rem() * 2.85);
+  // the building and the flow arrows
+  const bx = w * 0.79, bw = w * 0.2;
+  g.strokeStyle = line; g.fillStyle = rgba(hi, 0.8); g.beginPath(); g.roundRect(bx, midY - h * 0.16, bw, h * 0.32, 6); g.fill(); g.stroke();
+  g.fillStyle = ink2; g.font = mono; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("building", bx + bw / 2, midY - rem() * 0.6);
+  g.fillStyle = ink3; g.font = small; g.fillText(island ? "on the station" : "on the grid", bx + bw / 2, midY + rem() * 0.8);
+  const total = spinW + pulseW;
+  const arrow = (x1, x2, y, width, color) => { if (width < 1) return; g.strokeStyle = color; g.lineWidth = width; g.beginPath(); g.moveTo(x1, y); g.lineTo(x2 - 10, y); g.stroke(); g.fillStyle = color; g.beginPath(); g.moveTo(x2, y); g.lineTo(x2 - 12, y - 7); g.lineTo(x2 - 12, y + 7); g.fill(); };
+  if (total > 0) arrow(boxX + boxW, bx, midY, Math.min(12, 2 + total / 30000), total === spinW ? spin : pulse);
+  if (total < 0) arrow(bx, boxX + boxW, midY, Math.min(12, 2 - total / 30000), grid);
+}
+
+function drawRush() {
+  const [g, w, h] = setup($("cRush"));
+  const p = (state && state.pace) || {};
+  const ink = css("--ink"), ink2 = css("--ink-2"), ink3 = css("--ink-3"), grid = css("--grid"), dim = css("--dim"), line = css("--line"), pulse = css("--pulse");
+  g.clearRect(0, 0, w, h);
+  const pad = { l: rem() * 3.6, r: rem() * 1, t: rem() * 0.8, b: rem() * 3.4 };
+  const stripH = rem() * 0.9;
+  const plotB = h - pad.b;
+  const demand = p.demand_today || [], fT = p.forecast_today || [], fTm = p.forecast_tomorrow || [], shape = p.shape || [];
+  const series48 = (a, b) => { const out = []; for (let i = 0; i < 48; i++) { const v = i < 24 ? a[i] : b[i - 24]; out.push(v == null ? null : v); } return out; };
+  const fore = series48(fT.some(v => v != null) ? fT : shape, fTm.some(v => v != null) ? fTm : shape);
+  const dem = series48(demand, []);
+  const all = [...fore, ...dem].filter(v => v != null);
+  if (!all.length) { g.fillStyle = ink3; g.font = `${rem() * 1.2}px ${css("--sans")}`; g.textAlign = "center"; g.fillText("no hours loaded", w / 2, h / 2); return; }
+  const lo = Math.min(...all) * 0.9, hi = Math.max(...all) * 1.05;
+  const xOf = i => pad.l + (w - pad.l - pad.r) * i / 48;
+  const yOf = v => pad.t + (plotB - pad.t) * (1 - (v - lo) / (hi - lo));
+  // the window, today and tomorrow
+  const win = p.window || [17, 21];
+  g.fillStyle = rgba(dim, 1);
+  [0, 24].forEach(d => g.fillRect(xOf(d + win[0]), pad.t, xOf(d + win[1]) - xOf(d + win[0]), plotB - pad.t));
+  g.fillStyle = ink3; g.font = `${rem() * 0.95}px ${css("--mono")}`; g.textAlign = "center"; g.textBaseline = "top";
+  [0, 24].forEach(d => g.fillText("rush hour", xOf(d + (win[0] + win[1]) / 2), pad.t + rem() * 0.2));
+  // learned window bracket
+  if (state && state.learned && state.learned.window) { const lw = state.learned.window; g.strokeStyle = pulse; g.lineWidth = 2; [0, 24].forEach(d => { const y = pad.t + rem() * 1.6; g.beginPath(); g.moveTo(xOf(d + lw[0]), y + 6); g.lineTo(xOf(d + lw[0]), y); g.lineTo(xOf(d + lw[1]), y); g.lineTo(xOf(d + lw[1]), y + 6); g.stroke(); }); g.fillStyle = pulse; g.fillText("learned", xOf((lw[0] + lw[1]) / 2), pad.t + rem() * 1.9); }
+  // gridlines and axes
+  g.strokeStyle = rgba(line, 0.9); g.lineWidth = 1; g.fillStyle = ink3; g.textAlign = "right"; g.textBaseline = "middle";
+  const stepV = (hi - lo) > 3000 ? 1000 : 500;
+  for (let v = Math.ceil(lo / stepV) * stepV; v <= hi; v += stepV) { g.beginPath(); g.moveTo(pad.l, yOf(v)); g.lineTo(w - pad.r, yOf(v)); g.stroke(); g.fillText((v / 1000).toFixed(1) + " GW", pad.l - rem() * 0.4, yOf(v)); }
+  g.textAlign = "center"; g.textBaseline = "top";
+  for (let i = 0; i <= 48; i += 6) { g.fillText(i === 0 ? "today" : i === 24 ? "tomorrow" : i === 48 ? "" : hourLabel(i), xOf(i), plotB + rem() * 0.3); }
+  g.strokeStyle = line; g.beginPath(); g.moveTo(xOf(24), pad.t); g.lineTo(xOf(24), plotB); g.stroke();
+  // lines: forecast in ink_2, demand in GRID, direct labels at the ends
+  const drawLine = (arr, color, width, label, above, labelAt) => { let started = false, labelP = null; g.strokeStyle = color; g.lineWidth = width; g.lineJoin = "round"; g.beginPath(); arr.forEach((v, i) => { if (v == null) { started = false; return; } const x = xOf(i + 0.5), y = yOf(v); if (!started) { g.moveTo(x, y); started = true; } else g.lineTo(x, y); if (i === labelAt || (labelP == null && labelAt == null)) labelP = [x, y]; }); g.stroke(); if (labelP && label) { g.fillStyle = color; g.textAlign = "left"; g.textBaseline = above ? "bottom" : "top"; g.fillText(label, labelP[0] + rem() * 0.3, labelP[1] + (above ? -rem() * 0.5 : rem() * 0.5)); } };
+  drawLine(fore, ink2, 2, p.forecast_source && p.forecast_source.startsWith("eia") ? "forecast" : "seven-day shape", true, 26);
+  drawLine(dem, grid, 2.5, "demand", false, 1);
+  // now marker
+  const nowH = (state && state.now && state.now.hour_local != null) ? state.now.hour_local : null;
+  if (nowH != null) { const x = xOf(nowH); g.strokeStyle = ink; g.lineWidth = 1; g.beginPath(); g.moveTo(x, pad.t); g.lineTo(x, plotB); g.stroke(); g.fillStyle = ink; g.textAlign = "center"; g.textBaseline = "bottom"; g.fillText("now", x, pad.t - 1); }
+  // the clean strip: one hue, light to dark, more clean is deeper
+  const clean = p.clean || [];
+  const stripY = h - stripH - rem() * 0.1;
+  for (let i = 0; i < 48; i++) { const c = clean[i % 24]; if (c == null) continue; g.fillStyle = rgba(grid, 0.15 + 0.85 * Math.min(1, c / 0.6)); g.fillRect(xOf(i) + 1, stripY, xOf(i + 1) - xOf(i) - 2, stripH); }
+  g.fillStyle = ink3; g.textAlign = "right"; g.textBaseline = "middle"; g.fillText("clean share", pad.l - rem() * 0.4, stripY + stripH / 2);
+  (p.charge_hours || []).forEach(hh => { [0, 24].forEach(d => { g.strokeStyle = pulse; g.lineWidth = 2; g.beginPath(); g.moveTo(xOf(d + hh) + 1, stripY + stripH + 3); g.lineTo(xOf(d + hh + 1) - 1, stripY + stripH + 3); g.stroke(); }); });
+}
+
+let meshT0 = performance.now();
+function drawMesh() {
+  const [g, w, h] = setup($("cMesh"));
+  const ink = css("--ink"), ink2 = css("--ink-2"), ink3 = css("--ink-3"), grid = css("--grid"), line = css("--line"), alarm = css("--alarm"), spin = css("--spin");
+  g.clearRect(0, 0, w, h);
+  const t = (performance.now() - meshT0) / 1000;
+  const A = [w * 0.42, h * 0.55], B = [w * 0.36, h * 0.30], C = [w * 0.20, h * 0.86];
+  g.strokeStyle = rgba(line, 1); g.lineWidth = 1;
+  // a schematic valley: the Wasatch front as a ridge line on the right
+  g.beginPath(); g.moveTo(w * 0.62, 0); g.lineTo(w * 0.66, h * 0.3); g.lineTo(w * 0.60, h * 0.6); g.lineTo(w * 0.64, h); g.stroke();
+  g.fillStyle = ink3; g.font = `${rem() * 1}px ${css("--mono")}`; g.textAlign = "left"; g.fillText("Wasatch", w * 0.67, h * 0.5);
+  // the line between A and B, and the flow on it
+  const n = (state && state.now) || {};
+  const hour = n.hour_local != null ? n.hour_local : 12;
+  const flow = 0.4 + 0.6 * Math.abs(Math.sin(hour / 24 * Math.PI));
+  const angle = (6 + 18 * flow);
+  g.strokeStyle = grid; g.lineWidth = 2 + 10 * flow; g.beginPath(); g.moveTo(A[0], A[1]); g.lineTo(B[0], B[1]); g.stroke();
+  [[A, "Aernata · 250 E 200 S"], [B, "GigaOne · the airport"], [C, "St. George"]].forEach(([P, name]) => { g.fillStyle = css("--panel"); g.beginPath(); g.arc(P[0], P[1], 9, 0, Math.PI * 2); g.fill(); g.fillStyle = ink; g.beginPath(); g.arc(P[0], P[1], 6, 0, Math.PI * 2); g.fill(); g.fillStyle = ink2; g.textAlign = "left"; g.fillText(name, P[0] + 14, P[1] + 4); });
+  g.fillStyle = ink; g.font = `${rem() * 1.6}px ${css("--mono")}`; g.textAlign = "left";
+  g.fillText("angle " + angle.toFixed(1) + "°  →  flow " + (flow * 42).toFixed(0) + " MW", w * 0.05, h * 0.12);
+  g.fillStyle = ink3; g.font = `${rem() * 1}px ${css("--sans")}`; g.fillText("the phase angle between two ears is the power flowing between them", w * 0.05, h * 0.12 + rem() * 1.6);
+  // an event's wave: from the south, arriving at St. George first, Salt Lake 0.8 s later
+  const period = 6, phase = (t % period);
+  const origin = [w * 0.1, h * 0.98];
+  const vel = Math.hypot(C[0] - origin[0], C[1] - origin[1]) / 1.2;
+  const rad = phase * vel;
+  if (rad > 0) { g.strokeStyle = rgba(alarm, Math.max(0, 0.8 - phase / period)); g.lineWidth = 2; g.beginPath(); g.arc(origin[0], origin[1], rad, 0, Math.PI * 2); g.stroke(); }
+  const dC = Math.hypot(C[0] - origin[0], C[1] - origin[1]) / vel, dA = Math.hypot(A[0] - origin[0], A[1] - origin[1]) / vel;
+  g.fillStyle = ink2; g.font = `${rem() * 1}px ${css("--mono")}`; g.textAlign = "left";
+  g.fillText("wave arrives: St. George " + dC.toFixed(1) + " s, Salt Lake " + dA.toFixed(1) + " s → the trip was south", w * 0.05, h * 0.22);
+  if (phase > dC) { g.fillStyle = alarm; g.beginPath(); g.arc(C[0], C[1], 12, 0, Math.PI * 2); g.stroke(); }
+  if (phase > dA) { g.strokeStyle = alarm; g.beginPath(); g.arc(A[0], A[1], 12, 0, Math.PI * 2); g.stroke(); }
+}
+
+function frame() {
+  drawHeart(); drawStation(); drawRush();
+  if ($("ovMesh").classList.contains("show")) drawMesh();
+  requestAnimationFrame(frame);
+}
+
+// ---------- sound ----------
+const sound = {
+  on: false, ctx: null, osc: null, gain: null, drone: null, droneGain: null, lastSpin: 0, lastMode: "GRID",
+  toggle() {
+    this.on = !this.on; $("btnSound").classList.toggle("on", this.on);
+    if (this.on) {
+      if (!this.ctx) { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); this.osc = this.ctx.createOscillator(); this.gain = this.ctx.createGain(); this.gain.gain.value = 0; this.osc.type = "sine"; this.osc.frequency.value = 960; this.osc.connect(this.gain).connect(this.ctx.destination); this.osc.start(); this.drone = this.ctx.createOscillator(); this.droneGain = this.ctx.createGain(); this.droneGain.gain.value = 0; this.drone.type = "sawtooth"; this.drone.frequency.value = 55; this.drone.connect(this.droneGain).connect(this.ctx.destination); this.drone.start(); }
+      this.ctx.resume(); this.gain.gain.setTargetAtTime(0.08, this.ctx.currentTime, 0.1);
+    } else if (this.ctx) { this.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1); this.droneGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1); }
+  },
+  update(n, s) {
+    if (!this.on || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    if (n.mode === "ISLAND" || n.hz == null) { this.gain.gain.setTargetAtTime(0, t, 0.3); this.droneGain.gain.setTargetAtTime(n.mode === "ISLAND" ? 0.05 : 0, t, 0.5); }
+    else {
+      const dev = n.hz_fast != null ? n.hz_fast - NOMINAL : n.hz - NOMINAL;
+      const cents = Math.max(-2400, Math.min(2400, dev * 2000));
+      this.osc.frequency.setTargetAtTime(960 * Math.pow(2, cents / 1200), t, 0.05);
+      this.gain.gain.setTargetAtTime(0.08, t, 0.2); this.droneGain.gain.setTargetAtTime(0, t, 0.3);
+    }
+    if ((n.spin_w || 0) > 0 && this.lastSpin <= 0 || (n.mode === "EVENT" && this.lastMode !== "EVENT")) this.pluck();
+    this.lastSpin = n.spin_w || 0; this.lastMode = n.mode || "GRID";
+  },
+  pluck() {
+    const o = this.ctx.createOscillator(), gn = this.ctx.createGain(); o.type = "triangle"; o.frequency.value = 1500; gn.gain.value = 0.12; o.connect(gn).connect(this.ctx.destination); const t = this.ctx.currentTime; gn.gain.setValueAtTime(0.12, t); gn.gain.exponentialRampToValueAtTime(0.001, t + 0.12); o.start(t); o.stop(t + 0.14);
+  },
+};
+
+// ---------- commands and keys ----------
+async function cmd(q) { try { await fetch("/cmd?" + q + "&ts=" + Date.now(), { cache: "no-store" }); } catch (e) {} }
+function replay() { if (sessionFile) return; cmd("src=replay"); }
+function island() { if (sessionFile) return; islandOn = !islandOn; $("btnIsland").classList.toggle("on", islandOn); cmd(islandOn ? "src=silence" : "src=back"); }
+function reset() { closeAll(); if (islandOn) island(); if (sound.on) sound.toggle(); if (!sessionFile) { cmd("src=back"); cmd("reset=1"); } document.body.classList.remove("bright"); }
+const overlays = ["ovCert", "ovRefuse", "ovTable", "ovMesh"];
+function closeAll() { overlays.forEach(id => $(id).classList.remove("show")); }
+function toggleOverlay(id) { const was = $(id).classList.contains("show"); closeAll(); if (!was) { $(id).classList.add("show"); if (id === "ovTable") fillTable(); if (id === "ovMesh") meshT0 = performance.now(); } }
+function fillTable() {
+  const tb = $("tbl").querySelector("tbody"); tb.textContent = "";
+  recent.slice().reverse().forEach(n => { const tr = document.createElement("tr"); const cells = [n.t ? new Date(n.t * 1000).toLocaleTimeString("en-US", { hour12: false }) + "." + String(Math.round((n.t % 1) * 100)).padStart(2, "0") : "", fmt(n.hz_fast, 4), fmt(n.hz, 4), fmt(n.hz_stft, 4), fmt(n.rocof, 3), fmt(n.level_db, 1), n.harmonic ?? "", n.rush ?? "", n.mode || "", n.spin_w ?? "", n.pulse_w ?? "", n.spin_soc_m != null ? (n.spin_soc_m / 10).toFixed(1) + "%" : "", n.pulse_soc_m != null ? (n.pulse_soc_m / 10).toFixed(1) + "%" : ""]; cells.forEach(c => { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); }); tb.appendChild(tr); });
+}
+async function loadCaptures() {
+  try { const r = await fetch("pitch/audit.txt", { cache: "no-store" }); if (r.ok) { $("certRaw").textContent = await r.text(); } else $("certRaw").textContent = "mentl audit examples/grid/station.mn — capture pending"; } catch (e) { $("certRaw").textContent = "capture pending"; }
+  try { const r = await fetch("pitch/refusal.txt", { cache: "no-store" }); if (r.ok) $("refuseRaw").textContent = await r.text(); } catch (e) {}
+}
+document.addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (k === "escape") closeAll();
+  else if (k === "e") replay();
+  else if (k === "i") island();
+  else if (k === "p") toggleOverlay("ovCert");
+  else if (k === "a") { $("certRaw").style.display = $("certRaw").style.display === "none" ? "block" : "none"; if (!$("ovCert").classList.contains("show")) toggleOverlay("ovCert"); }
+  else if (k === "r") toggleOverlay("ovRefuse");
+  else if (k === "t") toggleOverlay("ovTable");
+  else if (k === "m") toggleOverlay("ovMesh");
+  else if (k === "s") sound.toggle();
+  else if (k === "b") document.body.classList.toggle("bright");
+  else if (k === "c") document.body.classList.toggle("cursor");
+  else if (k === "0") reset();
+});
+$("btnReplay").onclick = replay; $("btnIsland").onclick = island; $("btnSound").onclick = () => sound.toggle();
+document.addEventListener("mousemove", () => { document.body.classList.add("cursor"); clearTimeout(window._cursorT); window._cursorT = setTimeout(() => document.body.classList.remove("cursor"), 2000); });
+
+loadCaptures();
+if (sessionFile) startPlayback(sessionFile); else startLive();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

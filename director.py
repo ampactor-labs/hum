@@ -181,7 +181,8 @@ class StubController:
                 self.event_since = t
             elif self.event_since is not None:
                 held = t - self.event_since
-                if held >= EVENT_MAX_S or (held >= EVENT_MIN_S and abs(rocof) < ROCOF_LEAVE):
+                deep = abs(d) > DEADBAND + FULL_AT / 2  # Spin above half its rating: still the event
+                if (held >= EVENT_MAX_S and not deep) or (held >= EVENT_MIN_S and abs(rocof) < ROCOF_LEAVE and not deep):
                     self.event_since = None
             if self.event_since is not None:
                 mode = "EVENT"
@@ -310,7 +311,13 @@ class Source:
                 ear = self._spawn_ear(["--wav", o.wav, "--realtime", "--source", "wav"])
                 self.procs = [ear]
             elif self.mode == "replay":
-                ear = self._spawn_ear(["--replay", o.event, "--seconds", "3000", "--realtime", "--source", "replay"])
+                seconds = 70
+                try:
+                    rows = [l.split(",") for l in open(o.event) if l.strip() and not l.startswith("#")]
+                    seconds = int(float(rows[-1][0])) + 2
+                except Exception:
+                    pass
+                ear = self._spawn_ear(["--replay", o.event, "--seconds", str(seconds), "--realtime", "--source", "replay"])
                 self.procs = [ear]
             elif self.mode == "silence":
                 ear = self._spawn_ear(["--silence", "--seconds", "3600", "--realtime", "--source", "silence"])
