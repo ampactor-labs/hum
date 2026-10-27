@@ -240,7 +240,7 @@ body:not(.dash) .help { display: none; }
     <div><h3>CANNOT</h3><ul>
       <li><span class="g no">⊘</span> reach the network while deciding</li>
       <li><span class="g no">⊘</span> touch the filesystem while deciding</li>
-      <li><span class="g no">⊘</span> make any host call at all while deciding: no socket, no file, no clock</li>
+      <li><span class="g no">⊘</span> make any call outside the program while deciding: no socket, no file, no clock</li>
       <li><span class="g no">⊘</span> allocate memory mid-decision</li>
       <li><span class="g no">⊘</span> ask Spin for more than 100 kW, or Pulse for more than 300 kW</li>
       <li><span class="g no">⊘</span> accept a frequency outside 55 to 65 Hz as real</li>
@@ -761,9 +761,10 @@ function stageUpdate() {
   const sw = n.spin_w || 0, pw = n.pulse_w || 0;
   unit("stSpin", sw > 500, sw > 500 ? "Pushing" : "Ready", sw > 500 ? sw : null, n.spin_soc_m);
   unit("stPulse", pw > 500, pw > 500 ? (mode === "RUSH" || mode === "ISLAND" ? "Running the building" : "Discharging") : pw < -500 ? "Charging" : "Holding", Math.abs(pw) > 500 ? pw : null, n.pulse_soc_m);
-  // The sentence. In the replay the flywheel starts pushing about 0.35 s after
-  // the fall shows in the reading and reaches full power by 0.7 s, so "within a
-  // second" is the measured claim; the decision itself takes under a millisecond.
+  // The sentence. In the bundled replay the flywheel starts pushing 0.35 to
+  // 0.40 s after the fall shows in the reading and reaches full power within
+  // 0.75 s, so "within a second" is the measured claim. A decision itself
+  // typically takes under a millisecond.
   const dev = n.hz_fast != null ? n.hz_fast - NOMINAL : 0;
   let head;
   if (mode === "ISLAND") head = "The grid went dark. The building is still on.";

@@ -34,7 +34,7 @@ const SPEED = 4, PORT = 8791;
     await shot('stage-calm', 6);
     await until(async () => /^Rush hour/.test(await head()), 'the rush hour');
     await shot('stage-rush', 2.5);
-    await until(async () => /^Two power plants/.test(await head()), 'the event');
+    await until(async () => /^Two power plants tripped/.test(await head()), 'the event');
     await shot('stage-trip', 1.2);
     fs.copyFileSync(path.join(img, 'stage-trip.png'), path.join(__dirname, 'hero.png'));
     await p.keyboard.press('r');

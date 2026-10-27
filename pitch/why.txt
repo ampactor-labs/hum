@@ -1,8 +1,8 @@
 $ mentl why examples/grid/station.mn decide
-at 140:1-261:2: declared as decide
-declared as decide; Mutate enters at examples/grid/station:141:11, the tick, a store into the feedback line its record owns
-declared as decide; Memory enters at examples/grid/station:207:16, the tick, a store into the feedback line its record owns
-declared as decide; Trap enters at examples/grid/station:207:16, the tick, a store into the feedback line its record owns
+at 142:1-263:2: declared as decide
+declared as decide; Mutate enters at examples/grid/station:143:11, the tick, a store into the feedback line its record owns
+declared as decide; Memory enters at examples/grid/station:209:16, the tick, a store into the feedback line its record owns
+declared as decide; Trap enters at examples/grid/station:209:16, the tick, a store into the feedback line its record owns
 
 $ mentl why examples/grid/station.mn decide Network
 error: the row of decide carries no Network

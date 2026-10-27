@@ -38,7 +38,7 @@ Keys: `H` tomorrow's noon · `E` replay the 2019 event · `I` cut the hum · `P`
 
 Served as plain files with no director, the page plays `sessions/default.ndjson` and starts it over at the end. The session is about four minutes recorded with the real controller by `python3 -I record.py`. On a phone held upright the stage stacks into one column. `samples/event_gb.wav` is the 2019 event rendered as sound: 95 seconds at 8 kHz.
 
-The Mentl programs live in the Mentl repository under `examples/grid/`. `station.mn` decides, `station-leak.mn` is the copy with a price lookup that the compiler refuses, and `listen.mn` learns the frequency. `mentl check examples/grid/station-leak.mn` shows the refusal, and `mentl why examples/grid/station.mn decide WASI` shows that the decision makes no host call. `MENTL_BRIEF.md` has the details.
+The Mentl programs live in the Mentl repository under `examples/grid/`. `station.mn` decides, `station-leak.mn` is the copy with a price lookup that the compiler refuses, and `listen.mn` learns the frequency. `mentl check examples/grid/station-leak.mn` shows the refusal, and `mentl why examples/grid/station.mn decide WASI` shows that the decision makes no call outside the program. `MENTL_BRIEF.md` has the details.
 
 ## The pieces
 

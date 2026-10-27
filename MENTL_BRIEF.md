@@ -13,7 +13,7 @@ The rules:
 - Within 36 mHz of 60 Hz, nothing happens.
 - Beyond that, the flywheel pushes in proportion, reaching full power 200 mHz past the band.
 - If the frequency falls or rises faster than 100 mHz per second, the flywheel goes to full power for 2 to 10 seconds. The page calls this an event and holds the word while the flywheel pushes at least 10 kW, plus two seconds.
-- In the rush-hour window, the battery runs the building at 300 kW. In a clean hour, it charges at 150 kW, up to 95 percent.
+- In the rush-hour window, the battery runs the building at 300 kW. In a clean hour, it charges at 150 kW, up to 95 percent, but never while the flywheel is pushing because the grid is low: charging then would add load to a falling grid.
 - When a hum that was heard disappears, or drops 30 dB below its ten-second average, for six readings in a row, the Station keeps the building on: the flywheel for the first two seconds, the battery after that. Two good readings end it.
 
 The Station is a model built from Torus's published figures: the flywheel 100 kW and 10 kWh, the battery 300 kW and 1,200 kWh.
@@ -22,7 +22,7 @@ Measured on the pinned compiler:
 
 - `samples/ear_event.ndjson`: the event starts on the reading where the fall crosses 100 mHz per second, "falling at 129 mHz per second, past 100".
 - `samples/ear_tone.ndjson`: no event, and the flywheel tops up from the battery at 20 kW.
-- In the director, each decision takes under a millisecond on the laptop.
+- In the bundled recording, the median decision takes 0.6 ms, counting the line's trip from the director to the controller and back. 97 in 100 take under 1 ms, and the slowest took 33 ms. The times move with the machine's load: an earlier recording had a median of 0.1 ms. The first line also waits for the controller to start.
 
 What is not proven. Some refinement claims are still open. `mentl audit` lists claims it could not settle, but its count per function moves with the file's layout, a Mentl bug recorded in Mentl's PLAN, so no count is quoted here. The program can trap. The loop that reads and writes text around the decision keeps about 8 KB per reading: harmless on the laptop for hours, but on the pedal's 64 MB it would last about seven minutes. That, together with the pedal having no WebAssembly engine, is why the pedal does not run the controller yet.
 
