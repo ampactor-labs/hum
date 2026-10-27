@@ -22,7 +22,7 @@ echo
 for repo in "$(cd "$(dirname "$0")" && pwd)" "${SONIDO:-$HOME/sonido}" "$mentl"; do
   [ -d "$repo/.git" ] || continue
   name=$(basename "$repo")
-  first=$(git -C "$repo" log --reverse --date=short --pretty='%ad' HEAD | head -1)
+  first=$(git -C "$repo" log --date=short --pretty='%ad' HEAD | tail -1)
   before=$(git -C "$repo" rev-list --count --before="$since" HEAD)
   if [ "$before" -eq 0 ]; then
     echo "- $name: nothing before kickoff; born this week"
