@@ -61,7 +61,7 @@ SOURCE_LABELS = {
     "pedal": "the pedal",
     "wav": "recording",
     "replay": "real event, GB grid 2019-08-09, transposed to 60 Hz",
-    "silence": "the hum died",
+    "silence": "the hum is cut",
     "sample": "sample file",
 }
 
@@ -169,10 +169,10 @@ class StubController:
             if t - self.island_since < 2.0 and self.spin_soc > 0.05:
                 spin_w = min(SPIN_W, load)
                 pulse_w = load - spin_w
-                reason = f"the hum died, {int(self.level_ref - level) if self.level_ref else 0} dB under its mean; Spin carries the first seconds"
+                reason = f"the hum is gone, {int(self.level_ref - level) if self.level_ref else 0} dB under its average: Spin carries the first seconds"
             else:
                 pulse_w = min(PULSE_W, load) if self.pulse_soc > 0.02 else 0
-                reason = f"the hum died; Pulse carries {load // 1000} kW, {self.pulse_soc * PULSE_WH / max(load, 1):.1f} h left"
+                reason = f"the hum is gone: Pulse carries {load // 1000} kW, {self.pulse_soc * PULSE_WH / max(load, 1):.1f} h left"
         elif hz is None:
             reason = "listening"
         else:

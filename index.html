@@ -458,7 +458,7 @@ function onState() {
   }
   if (hz == null) { $("hz").style.opacity = 0.3; $("note").innerHTML = ""; heroShown = null; if (!$("hz").textContent.match(/\d/)) $("hz").textContent = "· · ·"; } else $("hz").style.opacity = 1;
   const r = n.rocof;
-  if (r == null) $("rocof").textContent = n.hz == null && state.source === "silence" ? "the hum died" : "listening";
+  if (r == null) $("rocof").textContent = n.hz == null && state.source === "silence" ? "the hum is gone" : "listening";
   else { const a = Math.abs(r); $("rocof").innerHTML = (a < 0.002 ? "→ steady" : (r < 0 ? "↓ falling at " : "↑ rising at ") + "<b>" + a.toFixed(3) + "</b> Hz/s"); }
   $("thd").innerHTML = n.thd == null ? "" : "wave <b>" + Number(n.thd).toFixed(1) + "%</b> distorted";
   $("eCross").textContent = fmt(n.hz, 3); $("eStft").textContent = fmt(n.hz_stft, 3);

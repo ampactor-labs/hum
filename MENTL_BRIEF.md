@@ -24,7 +24,7 @@ Measured on the pinned compiler:
 - `samples/ear_tone.ndjson`: no event, and the flywheel tops up from the battery at 20 kW.
 - In the director, each decision takes under a millisecond on the laptop.
 
-What is not proven. The compiler lists claims it could not settle in eight functions, two of them inside `decide`. The program can trap. The loop that reads and writes text around the decision keeps about 8 KB per reading: harmless on the laptop for hours, but on the pedal's 64 MB it would last about seven minutes. That, together with the pedal having no WebAssembly engine, is why the pedal does not run the controller yet.
+What is not proven. The audit lists twelve claims it could not settle, in seven functions, two of them inside `decide`. The program can trap. The loop that reads and writes text around the decision keeps about 8 KB per reading: harmless on the laptop for hours, but on the pedal's 64 MB it would last about seven minutes. That, together with the pedal having no WebAssembly engine, is why the pedal does not run the controller yet.
 
 ## station-leak.mn: the copy the compiler refuses
 
