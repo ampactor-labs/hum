@@ -24,9 +24,10 @@ python3 -I build_data.py --out data               # PacifiCorp East's hours and 
 ./run.sh wav samples/hum_home.wav
 ./run.sh replay                                   # the real event, from eight seconds before its fall
 STUB=1 ./run.sh sample samples/ear_event.ndjson   # no Mentl needed: the stand-in controller
+python3 -I record.py --mode live               # re-record the bundled session on the room's own hum
 ```
 
-The page is at http://127.0.0.1:8787/. Keys: `H` tomorrow's noon (the clock set inside the rush hour) · `E` replay event · `I` island · `P` certificate · `A` the compiler's words · `R` refusal · `G` the gate · `T` table · `M` mesh · `S` sound · `B` bright room · `0` reset. The sixty-second venue drill is `setup.md`. A copy of this directory served statically, with no director, plays `sessions/default.ndjson`: four and a half minutes recorded with the real controller, the real event and the hum dying.
+The page is at http://127.0.0.1:8787/. Keys: `H` tomorrow's noon (the clock set inside the rush hour) · `E` replay event · `I` island · `P` certificate · `A` the compiler's words · `R` refusal · `G` the gate · `T` table · `M` mesh · `S` sound · `B` bright room · `0` reset. The sixty-second venue drill is `setup.md`. A copy of this directory served statically, with no director, plays `sessions/default.ndjson`: four and a half minutes recorded with the real controller, `python3 -I record.py`: tomorrow's rush hour with the clock set, the real event, and the hum dying.
 
 `samples/event_gb.wav` is the real event rendered as a hum (95 seconds from 25 s on its clock, 8 kHz, labeled): on a track in Bitwig under the sonido tuner, the note reads B, then A♯, and the room hears the pitch fall.
 

@@ -275,7 +275,7 @@ async function startPlayback(path) {
       }
       built.trace_fast.push([ear.t, ear.hz_fast]); if (built.trace_fast.length > 1200) built.trace_fast.shift();
       if (i % 10 === 0) { built.trace.push([ear.t, ear.hz]); built.station_trace.push([ear.t, station ? station.spin_w : 0, station ? station.pulse_w : 0, station ? station.mode : "GRID"]); if (built.trace.length > 1200) { built.trace.shift(); built.station_trace.shift(); } }
-      state = Object.assign({}, built, { now, source: "recording", source_label: label, connected: true, offset_mhz: ear.offset_mhz || 0, clock: new Date(ear.t * 1000).toLocaleTimeString("en-US", { hour12: false, timeZone: "America/Denver" }) + " MDT" });
+      state = Object.assign({}, built, { now, source: ear.source === "silence" ? "silence" : "recording", source_label: label, connected: true, offset_mhz: ear.offset_mhz || 0, clock: new Date(ear.t * 1000).toLocaleTimeString("en-US", { hour12: false, timeZone: "America/Denver" }) + " MDT" });
       connected = true; lastGood = performance.now();
     }
     onState();
