@@ -1,7 +1,8 @@
 ## This week (since Monday Oct 26, 4:00 PM MDT)
 
-### hum: 21 commits
+### hum: 22 commits
 
+- Tue 17:49  Slide three's ledger counts match Tuesday's print
 - Tue 17:49  The bundled session shows tomorrow's rush hour, and a recorder lives in the tree
 - Tue 17:42  The judges' audit, answered: the rush hour is shown, the oath names the host boundary, and every beat carries one idea
 - Tue 17:09  The ledger reads each repository's first commit with tail, so its age loop survives pipefail
@@ -45,5 +46,5 @@
 ## Before kickoff
 
 - hum: nothing before kickoff; born this week
-- sonido: 70 commits before kickoff, the first on 2026-06-22
-- mentl: 49 commits before kickoff, the first on 2026-10-16
+- sonido: 461 commits before kickoff, the first on 2026-01-25
+- mentl: 2610 commits before kickoff, the first on 2026-03-15
