@@ -261,8 +261,12 @@ def build_event(out_dir, allow_neso=True):
             if not cand:
                 raise RuntimeError("no 2019 August resource listed")
             url = cand[0]["url"]
-            print(f"NESO: fetching {cand[0].get('name')} ...", file=sys.stderr)
-            raw = fetch(url, timeout=600)
+            local_zip = os.environ.get("NESO_ZIP")
+            if local_zip and os.path.exists(local_zip):
+                raw = open(local_zip, "rb").read()
+            else:
+                print(f"NESO: fetching {cand[0].get('name')} ...", file=sys.stderr)
+                raw = fetch(url, timeout=600)
             if raw[:2] == b"PK":
                 import zipfile
 
@@ -274,8 +278,10 @@ def build_event(out_dir, allow_neso=True):
             header = next(reader)
             ti = next(i for i, h in enumerate(header) if "dtm" in h.lower() or "time" in h.lower())
             fi = next(i for i, h in enumerate(header) if h.lower().strip() in ("f", "frequency") or "freq" in h.lower())
-            start = dt.datetime(2019, 8, 9, 15, 45)
-            end = dt.datetime(2019, 8, 9, 16, 35)
+            # The file's clock is BST (+0100): the Hornsea and Little Barford
+            # trips at 16:52:33, the nadir of 48.8 Hz at 16:53:49, recovery by 16:55.
+            start = dt.datetime(2019, 8, 9, 16, 52, 0)
+            end = dt.datetime(2019, 8, 9, 16, 55, 0)
             rows = []
             for row in reader:
                 try:
@@ -288,10 +294,10 @@ def build_event(out_dir, allow_neso=True):
                 if start <= t <= end:
                     f = float(row[fi])
                     rows.append(((t - start).total_seconds(), 60.0 * f / 50.0))
-            if len(rows) < 600:
+            if len(rows) < 150:
                 raise RuntimeError(f"only {len(rows)} rows in the window")
             with open(path, "w") as f:
-                f.write("# real event: GB grid, 2019-08-09 15:45 to 16:35 UTC (the Hornsea and Little Barford trips), NESO open data, transposed to 60 Hz per unit\n")
+                f.write("# real event: GB grid, 2019-08-09 16:52 to 16:55 BST, the Hornsea and Little Barford trips, NESO open data at 1 s, transposed to 60 Hz per unit\n")
                 for t, hz in rows:
                     f.write(f"{t:.0f},{hz:.4f}\n")
             print(f"event.csv: real, {len(rows)} seconds, min {min(h for _, h in rows):.3f} Hz (transposed)", file=sys.stderr)
