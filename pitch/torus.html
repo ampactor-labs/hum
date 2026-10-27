@@ -27,7 +27,7 @@
       <p>A pickup is a coil. Every wire in this room hums at sixty.</p>
       <p>The hum's pitch is not the room's. It belongs to the whole Western Interconnection, Alberta to Baja. It sags when the grid is short.</p>
       <p><span class="grid">The grid is a note.</span> Sixty hertz is a B, forty-nine cents flat. One cent is thirty-five millihertz, so the grid's whole quiet life is the tenths digit on a tuner.</p>
-      <p>Read to the millihertz, three independent ways that agree, with the DSP library behind my pedals.</p>
+      <p>Read to the millihertz, two independent ways that agree, with the DSP library behind my pedals.</p>
       <p class="dim">The same code runs on a thirty-dollar chip inside a guitar pedal.</p>
     </div>
   </div>
@@ -37,12 +37,12 @@
 <section class="slide">
   <h1>Two bands<small>a Station answers at two speeds</small></h1>
   <div class="two">
-    <div class="pic"><img src="img/station-event.png" alt="The Station during the replayed event: Spin at 100 kW, the reflex curve with the live point, Pulse on the hour"></div>
+    <div class="pic" style="display:grid;grid-template-rows:1fr 1fr;gap:14px;height:700px;background:transparent;border:none"><img src="img/station-rush.png" alt="The Station at tomorrow's noon, the clock set: RUSH HOUR, Pulse carrying the building at 300 kW"><img src="img/station-event.png" alt="The Station during the replayed event: Spin at 100 kW, the reflex curve with the live point"></div>
     <div>
-      <p><span class="spin">Spin takes the milliseconds.</span> A plant trips, the frequency falls, Spin answers within a third of a second. The reflex is a compressor on the grid's pitch: the deadband is its threshold, the droop its ratio, ten C its ceiling.</p>
-      <p><span class="pulse">Pulse takes the hours.</span> The rush hour is on the page before it arrives; Pulse carries the building through it and refills in the clean hours. Price belongs here, in the hour's plan.</p>
+      <p><span class="pulse">Pulse takes the hours.</span> At tomorrow's noon the Station reads RUSH HOUR: Pulse carries the building through the jam, refills in the clean hours, and the ledger counts what stays off the grid. Price belongs here, in the hour's plan.</p>
+      <p><span class="spin">Spin takes the milliseconds.</span> A plant trips, the frequency falls, Spin answers within a third of a second. The reflex is a compressor on the grid's pitch: the deadband is its threshold, the droop its ratio, its hundred kilowatts the ceiling.</p>
       <p><span class="alarm">When the hum dies, the Station carries the building.</span> The same ear knows first. Two-way, as you said.</p>
-      <p class="dim">On 9 August 2019 the British grid changed key, B to A♯, and a million people lost power at that A♯; it replays here, transposed and labeled. The Station is simulated from Torus's published figures and labeled so.</p>
+      <p class="dim">The 2019 British event replays here, transposed and labeled; the Station is modeled from Torus's published figures and labeled so.</p>
     </div>
   </div>
   <div class="foot"><span>HUM · 3 / 5</span><span>Spin · Pulse</span></div>
@@ -54,15 +54,16 @@
     <div class="pic"><img src="img/certificate-card.png" alt="What the program can and cannot do, proven by the compiler"></div>
     <div class="pic"><img src="img/refusal-card.png" alt="The same program with a price read added inside the reflex, refused, with the path named"></div>
   </div>
-  <p class="lead" style="margin-top:36px">It cannot reach the network while deciding, and the compiler proves it through every call. Every decision says why. A price read slipped into the reflex is refused with its path: <span class="muted">decide → price_m → fetch_param → Network</span>. The layer under Lasso.</p>
-  <div class="foot"><span>HUM · 4 / 5</span><span>Lasso · Shield · the layer beneath</span></div>
+  <p class="lead" style="margin-top:36px">It cannot make a single host call while deciding, not the network, not a file, not the clock, and the compiler proves it through every call. Every decision says why. A price read slipped into the reflex is refused, and the path the price took is drawn to the line.</p>
+  <div class="foot"><span>HUM · 4 / 5</span><span>proven, not reviewed</span></div>
 </section>
 
 <section class="slide">
   <h1>What $5,000 does<small>a second ear and a GPS clock</small></h1>
-  <p class="lead">Two ears are a stereo pair. The correlation meter's angle between two Salt Lake sites is the flow on the line between them. One ear here, one at GigaOne, and the mesh sees the line, not just the frequency.</p>
+  <p class="lead">Two ears are a stereo pair: the angle between their two readings is the flow on the line between two Salt Lake sites. One ear here, one across the valley, and the mesh sees the line, not just the frequency.</p>
   <p class="lead muted">I bring that measurement to Torus engineering.</p>
-  <div class="cols3" style="margin-top:40px">
+  <p class="lead muted">For your engineers:</p>
+  <div class="cols3" style="margin-top:24px">
     <div class="card"><h3>The build</h3><p>github.com/ampactor-labs/hum<br><span class="muted">the ear, the director, the page, the data</span></p></div>
     <div class="card"><h3>The program</h3><p>github.com/ampactor-labs/mentl<br><span class="muted">examples/grid</span></p></div>
     <div class="card"><h3>The page</h3><p>ampactor.dev/hum<br><span class="muted">plays the recorded session, on a phone</span></p></div>
@@ -106,7 +107,7 @@
   <div class="cols3">
     <div class="card"><h3>Crossings</h3><p>Three bandpasses on the hum's harmonics, the loudest tracked. The period between rising zero crossings, interpolated, kept as a sample count plus a fraction so precision never decays. 100 ms and 1 s readings; the rate of fall over 300 ms.</p></div>
     <div class="card"><h3>Spectrum</h3><p>A two-second Hann window, zero-padded through sonido-analysis's FFT, the peak interpolated with a parabola on log magnitude. THD from its ThdAnalyzer on the same two seconds. The cross-check.</p></div>
-    <div class="card"><h3>Learned</h3><p>A one-coefficient predictor, <span class="muted">x[n] = a·x[n−1] − x[n−2]</span>, behind a four-pole low-pass, its coefficient learned by a gradient the compiler derives from the chain itself. Within 5 mHz of the stream's own zero crossings. The third witness.</p></div>
+    <div class="card"><h3>Learned</h3><p>A one-coefficient predictor, <span class="muted">x[n] = a·x[n−1] − x[n−2]</span>, behind a four-pole low-pass, its coefficient learned by a gradient the compiler derives from the chain itself. Within 5 mHz of the stream's own zero crossings at rest; it trails a fast fall, so it is recorded, not shown.</p></div>
   </div>
   <p style="margin-top:36px">Measured on a synthesized hum with noise at −30 dB: the one-second reading within 0.5 mHz, the spectral reading within 0.2 mHz, the rate of change under 0.023 Hz/s at rest, a trip at 0.20 Hz/s detected 250 ms after it starts. The interface's clock offset is read from the hum's long-run mean and printed on the page.</p>
   <div class="foot"><span>HUM · appendix</span><span>sonido-core/src/grid.rs · hum/ear</span></div>

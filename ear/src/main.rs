@@ -269,7 +269,7 @@ impl Spectral {
 
         // THD of the hum as heard: harmonics 2..=10 of the fundamental over the
         // fundamental, the analysis crate's own measurement.
-        let thd = 100.0 * self.thd.analyze(&ring[offset..], NOMINAL_HZ).thd_ratio;
+        let thd = 100.0 * self.thd.analyze(&ring[offset..], hz_stft).thd_ratio;
         Some((hz_stft, thd))
     }
 }

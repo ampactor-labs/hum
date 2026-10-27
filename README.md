@@ -8,7 +8,7 @@ Hard Tech Week 2026, Salt Lake City. Entered for the Torus bounty ("software tha
 
 ## In one breath
 
-Every wire in a building hums at the grid's frequency, and that frequency is set by every generator on the Western Interconnection together: it sags when the whole grid is short, and the rate it falls says how fast a plant just dropped. A guitar pickup hears the hum. The ear in this repository reads it to the millihertz three independent ways. A Torus Station, modeled from Torus's published figures, answers in two bands: Spin takes the milliseconds, Pulse takes the hours, and when the hum dies the Station carries the building. The program that decides is written in Mentl, and its compiler proves it cannot reach the network, cannot touch the filesystem, cannot allocate mid-decision and cannot command either machine past its rating, through every call. Every decision says why, in words.
+Every wire in a building hums at the grid's frequency, and that frequency is set by every generator on the Western Interconnection together: it sags when the whole grid is short, and the rate it falls says how fast a plant just dropped. A guitar pickup hears the hum. The ear in this repository reads it to the millihertz two independent ways that agree, zero crossings and a spectrum, with a third, learned by a gradient the compiler derives, recorded beside them. A Torus Station, modeled from Torus's published figures, answers in two bands: Spin takes the milliseconds, Pulse takes the hours, and when the hum dies the Station carries the building. The program that decides is written in Mentl, and its compiler proves it cannot make a single host call while deciding, not the network, not a file, not the clock, cannot allocate mid-decision and cannot command either machine past its rating, through every call. Every decision says why, in words.
 
 ## What is real and what is simulated
 
@@ -26,7 +26,7 @@ python3 -I build_data.py --out data               # PacifiCorp East's hours and 
 STUB=1 ./run.sh sample samples/ear_event.ndjson   # no Mentl needed: the stand-in controller
 ```
 
-The page is at http://127.0.0.1:8787/. Keys: `E` replay event · `I` island · `P` certificate · `A` the compiler's words · `R` refusal · `G` the gate · `T` table · `M` mesh · `S` sound · `B` bright room · `0` reset. The sixty-second venue drill is `setup.md`. A copy of this directory served statically, with no director, plays `sessions/default.ndjson`: four and a half minutes recorded with the real controller, the real event and the hum dying.
+The page is at http://127.0.0.1:8787/. Keys: `H` tomorrow's noon (the clock set inside the rush hour) · `E` replay event · `I` island · `P` certificate · `A` the compiler's words · `R` refusal · `G` the gate · `T` table · `M` mesh · `S` sound · `B` bright room · `0` reset. The sixty-second venue drill is `setup.md`. A copy of this directory served statically, with no director, plays `sessions/default.ndjson`: four and a half minutes recorded with the real controller, the real event and the hum dying.
 
 `samples/event_gb.wav` is the real event rendered as a hum (95 seconds from 25 s on its clock, 8 kHz, labeled): on a track in Bitwig under the sonido tuner, the note reads B, then A♯, and the room hears the pitch fall.
 

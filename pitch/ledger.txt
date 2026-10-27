@@ -1,0 +1,46 @@
+## This week (since Monday Oct 26, 4:00 PM MDT)
+
+### hum: 19 commits
+
+- Tue 17:09  The ledger reads each repository's first commit with tail, so its age loop survives pipefail
+- Tue 17:06  The one-page plan points at the HUM repository
+- Tue 16:58  The bundled session's learner starts at the pitch, and a source switch clears its reading
+- Tue 16:52  The bundled session carries its own latency and learned reading, and the ledger counts each commit once
+- Tue 16:49  The page reads the grid as a note and draws the reflex; the ear renders the event as a hum and reads its spectrum through the analysis crate; the decks and the script follow the storyboards
+- Tue 16:32  The controller, the twin and the learner land: the director runs them, and the captures are the compiler's own words
+- Tue 09:42  The one-pager carries the founder's email
+- Tue 09:01  The ear depends on sonido-core alone, and its lockfile is kept
+- Tue 08:53  HUM stands on its own: the ear as a crate on sonido, the paths and the docs of a repository of its own
+- Tue 08:50  HUM: the bundled session, and a stale state file is not a director
+- Tue 08:44  HUM: recordings and Python caches stay out of the tree
+- Tue 08:43  HUM: the page plays a bundled session where no director answers, and the director runs the learned estimators when their programs exist
+- Tue 08:41  HUM: the ear in a guitar pedal
+- Tue 08:37  HUM: the slides show the cards, the one-pager fits its page
+- Tue 08:35  HUM: the decks, the one-pager, the script, the run script and the README
+- Tue 08:27  HUM: the page
+- Tue 08:14  HUM: the director and the real event
+- Tue 08:09  HUM: the ear hears the grid, and the data it compares the grid to
+- Tue 07:54  HUM: the contracts every process speaks and the brief for the Mentl programs
+
+### sonido: 3 commits
+
+- Tue 08:41  The grid ear in a guitar pedal: the estimator on the Daisy Seed, one line every 50 ms over USB serial, the LEDs breathing with the grid
+- Tue 08:27  The grid ear reports nothing from a band under −60 dBFS: noise's crossings are not the grid's
+- Tue 08:09  The grid ear: a no_std estimator in sonido-core reads the hum's frequency, its rate of change and its level from a sample stream
+
+### mentl: 8 commits
+
+- Tue 17:24  The controller's clean-hour reason says percent, in a room's words
+- Tue 16:53  The learner's line starts at the nominal pitch
+- Tue 16:41  The controller's words say low or high, and the island waits six lines
+- Tue 16:28  HUM's programs: a controller whose decision cannot reach the network, the twin that refuses, and the learner
+- Tue 08:44  The frontier's run and refusal legs are the medium's contracts
+- Tue 06:28  The voice speaks in the developer's words: a precondition says what it makes safe and what that unlocks, a lock says what it unlocks and who stands on it, and a lift says the body already fixes the type
+- Tue 03:49  The voice lifts the pin the judgment derives and says what a precondition unlocks: `mentl teach` answers `lift n: Int` where the body alone decides a type, proven in a fork, and the course writes none
+- Mon 22:01  An open claim is checked where the instruction would trap: integer division and float_to_int stop saying which face failed, and the narrow column deletes into the row note
+
+## Before kickoff
+
+- hum: nothing before kickoff; born this week
+- sonido: 70 commits before kickoff, the first on 2026-06-22
+- mentl: 49 commits before kickoff, the first on 2026-10-16

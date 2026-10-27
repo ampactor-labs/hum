@@ -12,3 +12,6 @@ error: the row of decide carries no Alloc
 
 $ mentl why examples/grid/station.mn decide Filesystem
 error: the row of decide carries no Filesystem
+
+$ mentl why examples/grid/station.mn decide WASI
+error: the row of decide carries no WASI

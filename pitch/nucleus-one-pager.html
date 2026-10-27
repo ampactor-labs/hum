@@ -31,45 +31,43 @@
 <p>Software that steers physical things (inverters, flywheels, flight controls) is tested, reviewed and hoped on: no mainstream language lets a team state "this loop never reaches the network, never allocates, never commands past this bound" and have the compiler prove it. Coding agents now write that software, and the grid is where the gap bites first: every new inverter is a software product under UL 1741 SB, and Utah's data centers are the load.</p>
 
 <h2>What exists today</h2>
-<p>Mentl is a programming language and self-hosting compiler with an algebraic effect system, compiled to WebAssembly. A negated effect such as <span class="mono">!Network</span> is a claim proven through every call or the program does not build; every fact carries its reason; a learning rule is derived from the chain it learns on; a paused computation is saved by copying bytes. The pinned compiler reproduces itself byte for byte. <span class="fill">[[years]]</span> of work, open source (Apache and MIT). Beside it, sonido: a Rust DSP framework whose kernels run unchanged in plugins, a browser editor and a guitar pedal.</p>
+<p>Mentl is a programming language and self-hosting compiler with an algebraic effect system, compiled to WebAssembly. A negated effect such as <span class="mono">!Network</span> is a claim proven through every call or the program does not build; every fact carries its reason; a learning rule is derived from the chain it learns on. The pinned compiler reproduces itself byte for byte. <span class="fill">[[how long]]</span> of work, open source (Apache and MIT). Beside it, sonido: a Rust DSP framework whose kernels run unchanged in plugins, a browser editor and a guitar pedal.</p>
 
 <h2>Built this week (since Monday 4:00 PM)</h2>
 <ul>
-  <li>HUM: the grid's frequency heard live from a room's wiring through a guitar pickup, read to the millihertz three independent ways; a Torus Station modeled from Torus's published figures answering in two bands; a real 2019 grid disturbance replayed from open data.</li>
-  <li>The controller written in Mentl: proven unable to reach the network, touch the filesystem, allocate mid-decision or command either machine past its rating; every decision explained in words; a twin with one price lookup added, refused with the path named.</li>
-  <li>The learner (a frequency tracker whose gradient the compiler derives), the page, the pedal as a second ear, an agent's proposal refused by the proof gate.</li>
+  <li>HUM: the grid's frequency heard live from a room's wiring through a guitar pickup, read to the millihertz three independent ways; a Torus Station modeled from Torus's published figures answering in two bands, seen planning around tomorrow's rush hour with the clock set; a real 2019 grid disturbance replayed from open data.</li>
+  <li>The controller written in Mentl: proven unable to make any host call while deciding (no network, no file, no clock), to allocate mid-decision, or to command either machine past its rating; every decision explained in words; a twin with one price lookup added, refused with the path named.</li>
+  <li>The learner, whose gradient the compiler derives; the page; the ear in the pedal; an agent's proposal refused by the proof gate.</li>
 </ul>
 </div>
 <div>
 <h2>Who needs it, in Utah</h2>
 <ul>
-  <li><b>Torus</b> (South Salt Lake): the Station hears every cycle; the program beneath the dispatcher has never been provable. The Torus judge saw this demo at the same hackathon.</li>
-  <li><b>Hill AFB, 309th Software Engineering Group</b>: Utah's largest employer of software developers, verifying flight software by review; a proof is a deliverable.</li>
-  <li><b>Every Utah company putting agents on production code</b>: a gate that answers PROVEN or REFUSED before anything an agent wrote runs.</li>
+  <li><b>Torus</b> (South Salt Lake): the Station hears every cycle; the program beneath the dispatcher has never been provable. The Torus judge is seeing this demo at the same hackathon. First conversation: Torus engineering, this month.</li>
+  <li><b>Hill AFB, 309th Software Engineering Group</b>: one of the Air Force's largest software organizations, maintaining flight software for the F-16, the F-35 and the missile fleet; assurance evidence is a deliverable.</li>
 </ul>
 
 <h2>Milestones</h2>
 <table>
-  <tr><th>Day 30</th><td>The proven controller on inverter-class hardware on the bench. SAM.gov and SBIR.gov registered; the company formed <span class="fill">[[date / status]]</span>.</td></tr>
-  <tr><th>Day 60</th><td>One Utah site: an ear on a Station-class inverter, the dispatch explained to its operator. The SBIR Phase I draft with Nucleus Grow (AFWERX open topic or a DOE Office of Electricity topic): an assurance tool that proves properties of a flight-software module.</td></tr>
-  <tr><th>Day 90</th><td>Ninety days of decisions on the page; the proposal filed; the first paid pilot signed.</td></tr>
+  <tr><th>Day 30</th><td>The proven controller on inverter-class hardware on the bench. The company formed <span class="fill">[[date / status]]</span>; SAM.gov, SBIR.gov and DSIP registrations filed on day one, since they take weeks and cost nothing.</td></tr>
+  <tr><th>Day 60</th><td>One Utah site hosting an ear on a Station-class inverter, the dispatch explained to its operator: Torus's if that door opens, another's if not. The SBIR topic chosen with Nucleus Grow (AFWERX open topic): an assurance tool for a flight-software module, the 309th's need in their words.</td></tr>
+  <tr><th>Day 90</th><td>A pilot letter from the day-60 site; ninety days of its decisions on the page; the Phase I draft ready for the next open-topic window.</td></tr>
 </table>
 
 <h2>The $10,000</h2>
 <table>
-  <tr><th>$4,000</th><td>inverter-class development hardware and a GPS clock for the second ear</td></tr>
-  <tr><th>$3,000</th><td>ninety days of the proof gate hosted for the pilot and the first agent-running teams</td></tr>
-  <tr><th>$3,000</th><td>SBIR preparation, registration and travel</td></tr>
+  <tr><th>$7,000</th><td>inverter-class development hardware: a three-phase inverter platform and its DC supply, the controller on its supervisor</td></tr>
+  <tr><th>$3,000</th><td>the proof gate hosted for ninety days, $1,000 a month, for the pilot site and the first team running coding agents through it</td></tr>
 </table>
 
 <h2>People and resources I need</h2>
 <ul>
-  <li>Nucleus Grow for the SBIR lane and the Phase I draft.</li>
-  <li>An introduction at Torus engineering (via Nicole Witmyer) and at the 309th (via 47G).</li>
-  <li>A co-founder with power-electronics depth. Connecting people is what this program does; this is my request.</li>
+  <li>One Utah storage or inverter operator who will host an ear: Torus, if that door opens.</li>
+  <li>The 309th, through 47G, and Nucleus Grow for the SBIR lane and the Phase I draft.</li>
+  <li>A co-founder with power-electronics depth, when you meet one. Connecting people is what this program does; this is my request.</li>
 </ul>
 </div>
 </div>
-<p class="foot">Business: paid pilots with asset operators; a hosted proof gate for teams running coding agents; the SBIR lane for software assurance. The demo runs from the repository (<span class="mono">github.com/ampactor-labs/hum</span>); the proofs run with <span class="mono">mentl check</span>. <span class="fill">[[one line: who you are, in your words]]</span></p>
+<p class="foot">Business: paid pilots with asset operators first; the proof gate for teams running coding agents second; the SBIR lane is non-dilutive runway for the assurance tool. The demo: <span class="mono">github.com/ampactor-labs/hum</span>; the proofs: <span class="mono">mentl check</span>. <span class="fill">[[one line: who you are, in your words]]</span></p>
 </body>
 </html>

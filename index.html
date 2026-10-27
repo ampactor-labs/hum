@@ -121,7 +121,7 @@ td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
     <h2>Heartbeat <span class="sub" id="harmonic"></span></h2>
     <div class="hero"><span class="hz" id="hz">——.———</span><span class="unit">Hz</span><span class="note" id="note"></span></div>
     <div class="sub"><span id="rocof">listening</span><span id="thd"></span></div>
-    <div class="est"><span>crossings <b id="eCross">—</b></span><span>spectrum <b id="eStft">—</b></span><span>learned <b id="eLearn">—</b></span></div>
+    <div class="est"><span>crossings <b id="eCross">—</b></span><span>spectrum <b id="eStft">—</b></span></div>
     <div class="screen"><canvas id="cHeart"></canvas><div class="banner" id="banner">GRID DARK · ISLANDED</div></div>
     <div class="caption" id="capHeart">The Western Interconnection, measured from this room's wiring through a guitar pickup.</div>
   </section>
@@ -130,7 +130,7 @@ td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
     <div class="mode GRID" id="mode">GRID</div>
     <div class="screen" style="border:none;background:transparent"><canvas id="cStation"></canvas></div>
     <div class="reason" id="reason">listening</div>
-    <div class="caption"><span class="sim" id="stationLabel">Modeled from Torus's published figures: 10C Spin, six-minute discharge, four-hour Pulse, under 250 ms. Simulated.</span></div>
+    <div class="caption"><span class="sim" id="stationLabel">Spin, a flywheel, takes the milliseconds; Pulse, a battery, takes the hours. Modeled from Torus's published figures: 100 kW of Spin for six minutes, 300 kW of Pulse for four hours. Simulated.</span></div>
     <div class="foot">Spin · Pulse · Lasso</div>
   </section>
   <section class="panel" id="rush">
@@ -151,7 +151,7 @@ td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
 </div>
 
 <div class="overlay" id="ovCert"><div class="card">
-  <h2>What the program that decides can and cannot do <span class="tag" id="certTag">PROVEN · mentl check</span></h2>
+  <h2>What the program that decides can and cannot do <span class="tag" id="certTag">PROVEN · mentl why</span></h2>
   <div class="cols">
     <div><h3>CAN</h3><ul>
       <li><span class="g">✓</span> act on each reading the loop hands it</li>
@@ -161,15 +161,18 @@ td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
     <div><h3>CANNOT</h3><ul>
       <li><span class="g no">⊘</span> reach the network while deciding</li>
       <li><span class="g no">⊘</span> touch the filesystem while deciding</li>
+      <li><span class="g no">⊘</span> make any host call at all while deciding: no socket, no file, no clock</li>
       <li><span class="g no">⊘</span> allocate memory mid-decision</li>
       <li><span class="g no">⊘</span> ask Spin for more than 100 kW, or Pulse for more than 300 kW</li>
       <li><span class="g no">⊘</span> accept a frequency outside 55 to 65 Hz as real</li>
     </ul></div>
   </div>
   <pre id="certWhy">$ mentl why examples/grid/station.mn decide Network
-<b>the row of decide carries no Network</b></pre>
+<b>the row of decide carries no Network</b>
+$ mentl why examples/grid/station.mn decide WASI
+<b>the row of decide carries no WASI</b></pre>
   <pre id="certRaw" style="display:none"></pre>
-  <div class="caption">Not by policy: proven by the compiler through every call the program makes. <span class="sim">Press A for the compiler's own words.</span></div>
+  <div class="caption">Not by policy: proven by the compiler through every call the program makes. The bounds the verifier cannot decide are listed as pending by the audit and printed on every run. <span class="sim">Press A for the compiler's own words.</span></div>
 </div></div>
 
 <div class="overlay" id="ovRefuse"><div class="card">
@@ -181,8 +184,8 @@ td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
   ...
 }</pre>
   <div class="path"><span class="node">decide</span><span class="arrow">→</span><span class="node">price_m</span><span class="arrow">→</span><span class="node">fetch_param</span><span class="arrow">→</span><span class="node">Network</span><span class="note">the path the network takes into a function that swore it never would</span></div>
-  <pre id="refuseRaw">E_EffectMismatch: declared as decide; Network enters through `price_m` → through `fetch_param` → declared as fetch_param, an op of Network.</pre>
-  <div class="caption">This is what review cannot do: the build refuses, and names the line. Price belongs to the hour's plan, read before the reflex; a lookup inside the millisecond's decision is the bug.</div>
+  <pre id="refuseRaw" style="display:none">E_EffectMismatch: declared as decide; Network enters through `price_m` → through `fetch_param` → declared as fetch_param, an op of Network.</pre>
+  <div class="caption">This is what review cannot do: the build refuses, and names the line. Price belongs to the hour's plan, read before the reflex; a lookup inside the millisecond's decision is the bug. <span class="sim">Press A for the compiler's own words.</span></div>
 </div></div>
 
 <div class="overlay" id="ovGate"><div class="card">
@@ -202,7 +205,7 @@ td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
   <div class="caption">Two Stations with GPS time see the <b>angle</b> between them, which is the flow on the line between them, and an event's wave arrives at one before the other. FNET has done this from wall outlets since 2004; a fleet that both sees and answers at 10C has not existed. <span class="sim">Simulated from the day's shape and the replayed event.</span></div>
 </div></div>
 
-<div class="help">E replay · I island · P certificate · R refusal · G gate · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
+<div class="help">H tomorrow's noon · E replay · I island · P certificate · R refusal · G gate · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
 
 <script>
 (() => {
@@ -212,7 +215,7 @@ const NOMINAL = 60.0, B1 = 61.7354, DEADBAND = 0.036;
 const params = new URLSearchParams(location.search);
 const sessionFile = params.get("session");
 let state = null, lastGood = 0, lastFetch = 0, connected = false;
-let modeShown = "GRID", recent = [], islandOn = false;
+let modeShown = "GRID", recent = [], islandOn = false, hourOn = false;
 let heroShown = null, heroAt = 0;
 
 // ---------- data: live polling or playback of a recorded session ----------
@@ -256,7 +259,7 @@ async function startPlayback(path) {
   try { built.pace = (await (await fetch("data/pace.json", { cache: "no-store" })).json()); } catch (e) {}
   if (built.pace) { built.pace = { today: built.pace.today, tomorrow: built.pace.tomorrow, window: built.pace.window, forecast_source: built.pace.forecast_source, as_of_local: built.pace.as_of_local, demand_today: (built.pace.for_today||{}).demand, forecast_today: (built.pace.for_today||{}).forecast, forecast_tomorrow: (built.pace.for_tomorrow||{}).forecast, shape: built.pace.shape, clean: built.pace.clean_mean, charge_hours: [] }; }
   let i = 0, lastMode = "GRID", t0 = performance.now(), base = rows.length ? rows[0].ear.t : 0;
-  const label = params.get("label") || (path.endsWith("default.ndjson") ? "recorded at the demo's rehearsal: a real event, then the hum dying" : path.replace(/^.*\//, ""));
+  const label = params.get("label") || (path.endsWith("default.ndjson") ? "recorded at the demo's rehearsal: tomorrow's rush hour, a real event, then the hum dying" : path.replace(/^.*\//, ""));
   function step() {
     const elapsed = (performance.now() - t0) / 1000 * speed;
     while (i < rows.length && rows[i].ear.t - base <= elapsed) {
@@ -293,7 +296,8 @@ function updateChip() {
   const [kind, text] = map[s] || ["waiting", "○ " + s];
   if (state.now && state.now.hz == null && s !== "silence") { setChip("waiting", "○ WAITING", "no hum yet · " + (state.source_label || "")); return; }
   setChip(kind, text.replace(/^[●▶⟲○] /, ""), state.source_label || "");
-  $("clock").textContent = state.clock || "";
+  const hs = state.now && state.now.hour_set;
+  $("clock").textContent = hs != null ? hhmm(hs) + " MDT tomorrow · clock set" : (state.clock || "");
 }
 
 // ---------- numbers ----------
@@ -324,7 +328,6 @@ function onState() {
   else { const a = Math.abs(r); $("rocof").innerHTML = (a < 0.002 ? "→ steady" : (r < 0 ? "↓ falling at " : "↑ rising at ") + "<b>" + a.toFixed(3) + "</b> Hz/s"); }
   $("thd").innerHTML = n.thd == null ? "" : "wave <b>" + Number(n.thd).toFixed(1) + "%</b> distorted";
   $("eCross").textContent = fmt(n.hz, 3); $("eStft").textContent = fmt(n.hz_stft, 3);
-  $("eLearn").textContent = state.learned && state.learned.hz != null ? Number(state.learned.hz).toFixed(3) : "—";
   $("harmonic").textContent = hz != null && n.harmonic ? (n.harmonic === 1 ? "on the fundamental" : "on harmonic " + n.harmonic) : "";
   const off = state.offset_mhz;
   $("capHeart").innerHTML = "The Western Interconnection, measured from this room's wiring through a guitar pickup." + (off != null && state.source === "live" ? " Clock offset " + (off >= 0 ? "+" : "−") + Math.abs(off).toFixed(1) + " mHz, calibrated against the grid's long-run mean." : "");
@@ -353,6 +356,7 @@ function onState() {
   recent.push(n); if (recent.length > 20) recent.shift();
   sound.update(n, state);
 }
+function hhmm(h) { const hh = Math.floor(h), mm = Math.round((h - hh) * 60); return String(hh).padStart(2, "0") + ":" + String(mm).padStart(2, "0"); }
 function hourLabel(h) { h = ((h % 24) + 24) % 24; const ap = h < 12 ? "am" : "pm"; const hh = h % 12 === 0 ? 12 : h % 12; return hh + " " + ap; }
 
 // ---------- canvases ----------
@@ -516,7 +520,7 @@ function drawRush() {
   drawLine(dem, grid, 2.5, "demand", false, 1);
   // now marker
   const nowH = (state && state.now && state.now.hour_local != null) ? state.now.hour_local : null;
-  if (nowH != null) { const x = xOf(nowH); g.strokeStyle = ink; g.lineWidth = 1; g.beginPath(); g.moveTo(x, pad.t); g.lineTo(x, plotB); g.stroke(); g.fillStyle = ink; g.textAlign = "center"; g.textBaseline = "bottom"; g.fillText("now", x, pad.t - 1); }
+  if (nowH != null) { const set = state.now.hour_set != null; const x = xOf((set ? 24 : 0) + nowH); g.strokeStyle = ink; g.lineWidth = 1; g.beginPath(); g.moveTo(x, pad.t); g.lineTo(x, plotB); g.stroke(); g.fillStyle = ink; g.textAlign = "center"; g.textBaseline = "bottom"; g.fillText(set ? "clock set" : "now", x, pad.t - 1); }
   // the clean strip: one hue, light to dark, more clean is deeper
   const clean = p.clean || [];
   const stripY = h - stripH - rem() * 0.1;
@@ -542,7 +546,7 @@ function drawMesh() {
   const flow = 0.4 + 0.6 * Math.abs(Math.sin(hour / 24 * Math.PI));
   const angle = (6 + 18 * flow);
   g.strokeStyle = grid; g.lineWidth = 2 + 10 * flow; g.beginPath(); g.moveTo(A[0], A[1]); g.lineTo(B[0], B[1]); g.stroke();
-  [[A, "Aernata · 250 E 200 S"], [B, "GigaOne · the airport"], [C, "St. George"]].forEach(([P, name]) => { g.fillStyle = css("--panel"); g.beginPath(); g.arc(P[0], P[1], 9, 0, Math.PI * 2); g.fill(); g.fillStyle = ink; g.beginPath(); g.arc(P[0], P[1], 6, 0, Math.PI * 2); g.fill(); g.fillStyle = ink2; g.textAlign = "left"; g.fillText(name, P[0] + 14, P[1] + 4); });
+  [[A, "Aernata · 250 E 200 S"], [B, "a second site · the airport"], [C, "St. George"]].forEach(([P, name]) => { g.fillStyle = css("--panel"); g.beginPath(); g.arc(P[0], P[1], 9, 0, Math.PI * 2); g.fill(); g.fillStyle = ink; g.beginPath(); g.arc(P[0], P[1], 6, 0, Math.PI * 2); g.fill(); g.fillStyle = ink2; g.textAlign = "left"; g.fillText(name, P[0] + 14, P[1] + 4); });
   g.fillStyle = ink; g.font = `${rem() * 1.6}px ${css("--mono")}`; g.textAlign = "left";
   g.fillText("angle " + angle.toFixed(1) + "°  →  flow " + (flow * 42).toFixed(0) + " MW", w * 0.05, h * 0.12);
   g.fillStyle = ink3; g.font = `${rem() * 1}px ${css("--sans")}`; g.fillText("the phase angle between two ears is the power flowing between them", w * 0.05, h * 0.12 + rem() * 1.6);
@@ -596,8 +600,9 @@ const sound = {
 // ---------- commands and keys ----------
 async function cmd(q) { try { await fetch("/cmd?" + q + "&ts=" + Date.now(), { cache: "no-store" }); } catch (e) {} }
 function replay() { if (sessionFile) return; cmd("src=replay"); }
+function tomorrow() { if (sessionFile) return; hourOn = !hourOn; cmd(hourOn ? "hour=12.5" : "hour="); }
 function island() { if (sessionFile) return; islandOn = !islandOn; $("btnIsland").classList.toggle("on", islandOn); cmd(islandOn ? "src=silence" : "src=back"); }
-function reset() { closeAll(); if (islandOn) island(); if (sound.on) sound.toggle(); if (!sessionFile) { cmd("src=back"); cmd("reset=1"); } document.body.classList.remove("bright"); }
+function reset() { closeAll(); hourOn = false; if (islandOn) island(); if (sound.on) sound.toggle(); if (!sessionFile) { cmd("src=back"); cmd("reset=1"); } document.body.classList.remove("bright"); }
 const overlays = ["ovCert", "ovRefuse", "ovGate", "ovTable", "ovMesh"];
 function closeAll() { overlays.forEach(id => $(id).classList.remove("show")); }
 function toggleOverlay(id) { const was = $(id).classList.contains("show"); closeAll(); if (!was) { $(id).classList.add("show"); if (id === "ovTable") fillTable(); if (id === "ovMesh") meshT0 = performance.now(); } }
@@ -619,7 +624,9 @@ document.addEventListener("keydown", e => {
   if (k === "escape") closeAll();
   else if (k === "e") replay();
   else if (k === "i") island();
+  else if (k === "h") tomorrow();
   else if (k === "p") toggleOverlay("ovCert");
+  else if (k === "a" && $("ovRefuse").classList.contains("show")) { const r = $("refuseRaw"); r.style.display = r.style.display === "none" ? "block" : "none"; }
   else if (k === "a") { $("certRaw").style.display = $("certRaw").style.display === "none" ? "block" : "none"; if (!$("ovCert").classList.contains("show")) toggleOverlay("ovCert"); }
   else if (k === "r") toggleOverlay("ovRefuse");
   else if (k === "g") toggleOverlay("ovGate");

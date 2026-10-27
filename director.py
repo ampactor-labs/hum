@@ -10,7 +10,7 @@ serves the page. Standard library only.
 
 Sources feed the ear (`grid_ear`, C1 lines) or stand in for it (the pedal's
 serial lines, or a sample file replayed at 20 Hz). Every line is enriched
-(C1e: hour_local, rush, clean, offset_mhz), handed to the controller
+(C1e: hour_local, rush, clean, offset_mhz, and hour_set when the clock is set), handed to the controller
 (`mentl run examples/grid/station.mn`, or the in-process stub while the Mentl
 program lands), and the decision (C2) comes back on the same line. The
 director keeps the traces and the ledger, serves `/state.json` (C3) and
@@ -406,6 +406,7 @@ class State:
         self.latency_ms = None
         self.last_mode = "GRID"
         self.learned = {}
+        self.hour_set = None  # the hour the lines carry when the clock is set, tomorrow's noon on a key
         self.source = opts.mode
         self.connected = False
         self.line_count = 0
@@ -415,8 +416,10 @@ class State:
 
     def enrich(self, r):
         t = r["t"]
-        h = hour_local(t)
+        h = hour_local(t) if self.hour_set is None else self.hour_set
         r["hour_local"] = round(h, 3)
+        if self.hour_set is not None:
+            r["hour_set"] = self.hour_set
         r["rush"] = self.pace.rush(h)
         r["clean"] = self.pace.clean_at(h)
         if r.get("source") in ("live", "pedal") and r.get("hz") is not None:
@@ -464,6 +467,7 @@ class State:
 
     def reset(self):
         with self.lock:
+            self.hour_set = None
             self.trace_fast.clear()
             self.trace.clear()
             self.station_trace.clear()
@@ -488,7 +492,7 @@ class State:
                 "connected": self.connected,
                 "clock": clock_local(time.time()),
                 "station": {"spin_w": SPIN_W, "spin_wh": SPIN_WH, "pulse_w": PULSE_W, "pulse_wh": PULSE_WH,
-                             "label": "Modeled from Torus's published figures: 10C Spin, six-minute discharge, four-hour Pulse, under 250 ms. Simulated."},
+                             "label": "Spin, a flywheel, takes the milliseconds; Pulse, a battery, takes the hours. Modeled from Torus's published figures: 100 kW of Spin for six minutes, 300 kW of Pulse for four hours. Simulated."},
             }, separators=(",", ":"))
 
 
@@ -598,11 +602,15 @@ class Handler(SimpleHTTPRequestHandler):
             self.wfile.write(body)
             return
         if url.path == "/cmd":
-            q = urllib.parse.parse_qs(url.query)
+            q = urllib.parse.parse_qs(url.query, keep_blank_values=True)
             if "src" in q:
                 self.director.request(q["src"][0])
             if "reset" in q:
                 self.director.state.reset()
+            if "hour" in q:
+                # `hour=12.5` sets the clock the lines carry to tomorrow's half past noon; `hour=` returns it to now.
+                v = q["hour"][0].strip()
+                self.director.state.hour_set = float(v) if v else None
             body = b"ok"
             self.send_response(200)
             self.send_header("Content-Type", "text/plain")
@@ -672,7 +680,7 @@ def main():
     Handler.director = director
     server = ThreadingHTTPServer(("127.0.0.1", opts.port), Handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
-    log(f"serving http://127.0.0.1:{opts.port}/  state at /state.json  commands at /cmd?src=live|wav|replay|silence|pedal|back")
+    log(f"serving http://127.0.0.1:{opts.port}/  state at /state.json  commands at /cmd?src=live|wav|replay|silence|pedal|back  hour=12.5|")
     director.loop()
 
 

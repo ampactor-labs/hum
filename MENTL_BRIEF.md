@@ -4,7 +4,7 @@ Three user programs in the Mentl repository, `github.com/ampactor-labs/mentl`, u
 
 ## station.mn, the controller
 
-Reads enriched ear lines (C1e) on stdin and answers each with a decision line (C2) on the same tick. `decide` is declared `!Alloc + !Network + !Filesystem` and the compiler proves the three through every call. Every command passes a refinement type (`SpinW` ±100 kW, `PulseW` ±300 kW, `Soc` 0 to 1000) and the reading the bands act on is a `GridMhz` (55 to 65 Hz). Every number is an integer in milli-units read off the line's text, so the decision never rounds a float and never reaches the one conversion that can trap. The Station is modeled from Torus's published figures (Spin 100 kW / 10 kWh, Pulse 300 kW / 1,200 kWh) and labeled so.
+Reads enriched ear lines (C1e) on stdin and answers each with a decision line (C2) on the same tick. `decide` is declared `!Alloc + !Network + !Filesystem + !WASI` and the compiler proves the three through every call. Every command passes a refinement type (`SpinW` ±100 kW, `PulseW` ±300 kW, `Soc` 0 to 1000) and the reading the bands act on is a `GridMhz` (55 to 65 Hz). Every number is an integer in milli-units read off the line's text, so the decision never rounds a float and never reaches the one conversion that can trap. The Station is modeled from Torus's published figures (Spin 100 kW / 10 kWh, Pulse 300 kW / 1,200 kWh) and labeled so.
 
 The rules, as the program states them: a 36 mHz deadband; a droop that reaches full Spin at 200 mHz past the band; the reflex at 100 mHz/s, full Spin, held 2 to 10 s; EVENT for as long as the fast band pushes at least 10 kW and two seconds after; RUSH discharging Pulse at 300 kW through the window; a clean hour charging Pulse at 150 kW to 95 percent; ISLAND two lines after the hum, once heard, is 30 dB under its ten-second mean or gone, Spin for two seconds and Pulse after; two lines of the hum back end it.
 
@@ -26,7 +26,7 @@ One coefficient learns the hum's frequency from the 480 Hz stream (`hum_480.txt`
 
 - `refusal.txt`: `mentl check examples/grid/station-leak.mn`.
 - `audit.txt`: `mentl audit examples/grid/station.mn`, the certificate: `decide` Real-time safe (proven zero allocation), the module Sandbox (proven no network access).
-- `why.txt`: `mentl why examples/grid/station.mn decide`, and with `Network`, `Alloc`, `Filesystem`: "the row of decide carries no Network".
+- `why.txt`: `mentl why examples/grid/station.mn decide`, and with `Network`, `Alloc`, `Filesystem`, `WASI`: "the row of decide carries no Network", "the row of decide carries no WASI": no host call of any kind inside a decision.
 - `gate.txt`: `mentl mcp`, the proof gate on stdio: a clean reflex proposed, PROVEN; the same reflex with a price read inside, REFUSED, nothing emitted.
 
 ## What was cut

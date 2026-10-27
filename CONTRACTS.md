@@ -30,7 +30,7 @@ The director adds four fields before the controller sees a line, and the pedal's
 "hour_local":21.4,"rush":0,"clean":0.31,"offset_mhz":2.1
 ```
 
-- `hour_local` MDT hours as a float.
+- `hour_local` MDT hours as a float; when the director's clock is set (C4 `hour=`), the hour it is set to, and the line also carries `hour_set` with that hour, so a recording replays the set clock.
 - `rush` 1 inside the rush-hour window from `data/pace.json`, else 0.
 - `clean` the hour's clean share of generation, 0 to 1.
 - `offset_mhz` the session's running mean of `hz` minus 60.000, in millihertz, live lines only.
@@ -75,7 +75,8 @@ NDJSON from the controller, one per input line, written on the same line as its 
 ## C4, director commands
 
 - `GET /cmd?src=live|wav|replay|island|pedal|silence` switches the ear's input or the line source and answers `200 ok`.
-- `GET /cmd?reset=1` clears the ledger and traces.
+- `GET /cmd?reset=1` clears the ledger, the traces and the set clock.
+- `GET /cmd?hour=12.5` sets the clock the lines carry to tomorrow's half past noon, inside the rush window, so the Station is seen planning around it at any hour of the day; `GET /cmd?hour=` returns the clock to now.
 - `GET /state.json?ts=<ms>` is cache-busted by the page.
 - Static files are served from the demo directory on port 8787.
 
