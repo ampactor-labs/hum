@@ -4,7 +4,7 @@ The power grid's frequency, heard live through a guitar pickup, and a model of a
 
 Hard Tech Week 2026, Salt Lake City. Entered for the Torus bounty ("software that knows when the grid is jammed and stays out of traffic") and the Nucleus × Startup State open call. Every commit here is from the hackathon week. What existed before lives in [sonido](https://github.com/ampactor-labs/sonido) and [Mentl](https://github.com/ampactor-labs/mentl).
 
-![The live screen while a replayed 2019 grid failure pulls the frequency down and the flywheel answers](pitch/hero.png)
+![The stage during the replayed 2019 grid failure: the frequency falls and the flywheel pushes 100 kW](pitch/hero.png)
 
 ## What it does
 
@@ -16,8 +16,8 @@ Every wire in a building hums at the power grid's frequency. That one number is 
 
 ## What is real and what is simulated
 
-- **Real:** the hum and its frequency, live or from a recording made in the room; PacifiCorp East's hourly demand from EIA-930; the 9 August 2019 failure on Britain's grid, from National Grid ESO's one-second data, transposed to 60 Hz and labeled on screen; the compiler's proofs.
-- **Simulated, and labeled on screen:** the Station, modeled from Torus's published figures (100 kW from the flywheel for six minutes, 300 kW from the battery for four hours), and the building's load.
+- **Real:** the hum and its frequency when the ear listens live or to a recording made in a room; PacifiCorp East's hourly demand from EIA-930; the 9 August 2019 failure on Britain's grid, from National Grid ESO's one-second data, transposed to 60 Hz and labeled on screen; the compiler's proofs.
+- **Simulated, and labeled on screen:** the Station, modeled from Torus's published figures (100 kW from the flywheel for six minutes, 300 kW from the battery for four hours); the building's load; and the test hum, a synthesized 60 Hz hum with a small wobble, which the bundled session plays on unless it was recorded live.
 
 ## Run it
 
@@ -36,7 +36,7 @@ The page is at http://127.0.0.1:8787/. It opens on the stage: the frequency, son
 
 Keys: `H` tomorrow's noon · `E` replay the 2019 event · `I` cut the hum · `P` proven · `R` refused · `K` thank you · `A` the compiler's own text on a card · `D` the engineers' dashboard · `0` reset · `Esc` close. The dashboard adds `G` the gate, `T` the raw lines, `M` the mesh, `S` sound and `B` a bright-room palette; `Shift+P` and `Shift+R` open the detailed proof and refusal. The venue drill is `setup.md`, and the pitch itself is `pitch/script.md`.
 
-Served as plain files with no director, the page plays `sessions/default.ndjson`: about four and a half minutes recorded with the real controller by `python3 -I record.py`. `samples/event_gb.wav` is the 2019 event rendered as sound: 95 seconds at 8 kHz.
+Served as plain files with no director, the page plays `sessions/default.ndjson` and starts it over at the end. The session is about four minutes recorded with the real controller by `python3 -I record.py`. On a phone held upright the stage stacks into one column. `samples/event_gb.wav` is the 2019 event rendered as sound: 95 seconds at 8 kHz.
 
 The Mentl programs live in the Mentl repository under `examples/grid/`. `station.mn` decides, `station-leak.mn` is the copy with a price lookup that the compiler refuses, and `listen.mn` learns the frequency. `mentl check examples/grid/station-leak.mn` shows the refusal, and `mentl why examples/grid/station.mn decide WASI` shows that the decision makes no host call. `MENTL_BRIEF.md` has the details.
 
@@ -50,7 +50,7 @@ The Mentl programs live in the Mentl repository under `examples/grid/`. `station
 | The director | `director.py` | Starts the ear and the controller, adds the hour, the rush window and the clean share to each line, serves the page, and records each session. |
 | The page | `index.html` | The stage, the three cards and the engineers' dashboard. It plays a recorded session when no director answers. One file with no dependencies. |
 | The data | `build_data.py`, `data/` | PacifiCorp East's demand, day-ahead forecast and clean share by hour; the event. |
-| The pitch | `pitch/` | The Nucleus deck, the Torus leave-behind, the one-page plan, the script with its answers to likely questions, and `export.js`, which writes the PDFs. |
+| The pitch | `pitch/` | The Nucleus deck, the Torus leave-behind, the one-page plan, the script with its answers to likely questions, `shots.js`, which takes the slides' pictures from the bundled session, and `export.js`, which writes the PDFs. |
 | The contracts | `CONTRACTS.md` | The line formats the ear, the director, the controller and the page use. |
 
 ## Measured

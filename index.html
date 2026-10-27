@@ -108,6 +108,8 @@ td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
 .help { position: fixed; left: 1.5rem; bottom: 0.5rem; font-size: 0.95rem; color: var(--ink-3); letter-spacing: 0.06em; opacity: 0.7; }
 @media (prefers-reduced-motion: reduce) { .chip .dot, .mode.flash { animation: none; } }
 /* THE STAGE: what the room sees. One 1920 by 1080 frame, scaled to the screen.
+   A screen taller than it is wide, such as a phone held upright, gets a 1080 by
+   1920 frame with the same parts stacked (the .tall rules below).
    Colors are sonido's: green #3DFF9A, amber #FFC53D, violet #A27BFF, red #FF2D55. */
 #stage { position: fixed; inset: 0; background: var(--void); z-index: 5; overflow: hidden; font-family: var(--sans); color: var(--ink); }
 body.dash #stage { display: none; }
@@ -151,6 +153,21 @@ body:not(.dash) .help { display: none; }
 .st-head { position: absolute; left: 64px; right: 64px; top: 834px; font-size: 62px; font-weight: 600; line-height: 1.16; letter-spacing: -0.01em; }
 .st-head.cut { color: #FF6B86; }
 .st-note { position: absolute; left: 64px; right: 64px; bottom: 32px; font-size: 22px; color: var(--ink-3); }
+/* Held upright: the number and the tuner on top, then the sentence, then the Station. */
+#stage.tall #stageInner { width: 1080px; height: 1920px; }
+#stage.tall .st-top { left: 56px; right: 56px; top: 36px; height: auto; flex-wrap: wrap; gap: 18px 36px; }
+#stage.tall .st-brand, #stage.tall .st-clock { height: 52px; display: flex; align-items: center; }
+#stage.tall .st-chip { order: 3; flex-basis: 100%; font-size: 30px; }
+#stage.tall .st-left { left: 56px; top: 176px; width: 968px; height: 770px; }
+#stage.tall .st-cap { font-size: 30px; }
+#stage.tall .st-head { left: 56px; right: 56px; top: 980px; font-size: 60px; }
+#stage.tall .st-right { left: 56px; top: 1214px; width: 968px; height: 600px; gap: 20px; }
+#stage.tall .st-unit { grid-template-columns: 132px 1fr; padding: 20px 36px; }
+#stage.tall .st-unit svg { width: 132px; height: 132px; }
+#stage.tall .st-unit .name { font-size: 30px; }
+#stage.tall .st-unit .kw { margin-bottom: 12px; }
+#stage.tall .st-unit .pct { font-size: 24px; }
+#stage.tall .st-note { left: 56px; right: 56px; bottom: 36px; font-size: 24px; }
 /* the plain cards: proven, refused, thank you */
 .ov2 { position: fixed; inset: 0; background: rgba(7,6,14,0.95); display: none; align-items: center; justify-content: center; z-index: 10; font-family: var(--sans); }
 .ov2.show { display: flex; }
@@ -369,7 +386,14 @@ async function startPlayback(path) {
   try { built.pace = (await (await fetch("data/pace.json", { cache: "no-store" })).json()); } catch (e) {}
   if (built.pace) { built.pace = { today: built.pace.today, tomorrow: built.pace.tomorrow, window: built.pace.window, forecast_source: built.pace.forecast_source, as_of_local: built.pace.as_of_local, demand_today: (built.pace.for_today||{}).demand, forecast_today: (built.pace.for_today||{}).forecast, forecast_tomorrow: (built.pace.for_tomorrow||{}).forecast, shape: built.pace.shape, clean: built.pace.clean_mean, charge_hours: [] }; }
   let i = 0, lastMode = "GRID", t0 = performance.now(), base = rows.length ? rows[0].ear.t : 0;
-  const label = params.get("label") || (path.endsWith("default.ndjson") ? "recorded at the demo's rehearsal: tomorrow's rush hour, a real event, then the hum dying" : path.replace(/^.*\//, ""));
+  const label = params.get("label") || (path.endsWith("default.ndjson") ? "a recorded run of the demo" : path.replace(/^.*\//, ""));
+  // At the end the session starts over, so the hosted copy never stops on a still frame.
+  function again() {
+    i = 0; lastMode = "GRID"; t0 = performance.now();
+    built.trace_fast = []; built.trace = []; built.station_trace = []; built.latency_ms = null;
+    built.ledger = { events: 0, kwh_moved: 0, spin_cycles: 0, pulse_cycles_saved: 0 };
+    step();
+  }
   function step() {
     const elapsed = (performance.now() - t0) / 1000 * speed;
     while (i < rows.length && rows[i].ear.t - base <= elapsed) {
@@ -385,11 +409,11 @@ async function startPlayback(path) {
       }
       built.trace_fast.push([ear.t, ear.hz_fast]); if (built.trace_fast.length > 1200) built.trace_fast.shift();
       if (i % 10 === 0) { built.trace.push([ear.t, ear.hz]); built.station_trace.push([ear.t, station ? station.spin_w : 0, station ? station.pulse_w : 0, station ? station.mode : "GRID"]); if (built.trace.length > 1200) { built.trace.shift(); built.station_trace.shift(); } }
-      state = Object.assign({}, built, { now, source: ear.source === "silence" ? "silence" : "recording", source_label: label, connected: true, offset_mhz: ear.offset_mhz || 0, clock: new Date(ear.t * 1000).toLocaleTimeString("en-US", { hour12: false, timeZone: "America/Denver" }) + " MDT" });
+      state = Object.assign({}, built, { now, playback: true, source: ear.source === "silence" ? "silence" : "recording", source_label: label, connected: true, offset_mhz: ear.offset_mhz || 0, clock: new Date(ear.t * 1000).toLocaleTimeString("en-US", { hour12: false, timeZone: "America/Denver" }) + " MDT" });
       connected = true; lastGood = performance.now();
     }
     onState();
-    if (i < rows.length) setTimeout(step, 50); else { connected = false; }
+    setTimeout(i < rows.length ? step : again, i < rows.length ? 50 : 4000);
   }
   step();
 }
@@ -684,10 +708,12 @@ function drawMesh() {
 const SON = { void: "#07060E", accent: "#8CFF5A", partner: "#36E2FF", green: "#3DFF9A", ink: "#F2EEFF", dim: "#4A4572" };
 const TUNER_REF = 427.65;
 let stageOn = params.get("view") !== "dashboard";
-let stageScale = 1, scopeGain = 1, scopeSeen = null, gridPhase = 0, lastTuner = performance.now();
+let stageScale = 1, scopeGain = 1, scopeSeen = null, gridPhase = 0, lastTuner = performance.now(), shownHz = null;
 function stageFit() {
-  stageScale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-  $("stageInner").style.transform = "translate(" + (window.innerWidth - 1920 * stageScale) / 2 + "px," + (window.innerHeight - 1080 * stageScale) / 2 + "px) scale(" + stageScale + ")";
+  const tall = window.innerHeight > window.innerWidth, W = tall ? 1080 : 1920, H = tall ? 1920 : 1080;
+  $("stage").classList.toggle("tall", tall);
+  stageScale = Math.min(window.innerWidth / W, window.innerHeight / H);
+  $("stageInner").style.transform = "translate(" + (window.innerWidth - W * stageScale) / 2 + "px," + (window.innerHeight - H * stageScale) / 2 + "px) scale(" + stageScale + ")";
 }
 function setStage(on) { stageOn = on; document.body.classList.toggle("dash", !on); }
 const kw = w => Math.round(Math.abs(w || 0) / 1000);
@@ -703,10 +729,13 @@ function unit(id, on, word, watts, socM) {
 }
 function stageUpdate() {
   if (!state) return;
-  const n = state.now || {}, src = state.source || "", mode = n.mode || "GRID";
+  const n = state.now || {}, mode = n.mode || "GRID";
+  // Each line names its own source, so a recorded session and a sample file say
+  // what they really carry: a synthesized test hum, a live room, the 2019 record.
+  const src = n.source || state.source || "", rec = !!state.playback;
   const heard = n.hz != null || n.hz_fast != null;
-  const replaying = src === "replay", cut = mode === "ISLAND" || src === "silence";
-  const chips = { live: ["live", "LIVE", "this room's wiring"], pedal: ["live", "LIVE", "through the pedal"], replay: ["replay", "REPLAY", "Great Britain, 9 August 2019, at our grid's pitch"], silence: ["cut", "THE HUM IS CUT", ""], wav: ["rec", "RECORDING", state.source_label || ""], recording: ["rec", "RECORDING", state.source_label || ""], sample: ["rec", "SAMPLE", state.source_label || ""] };
+  const replaying = src === "replay", cut = mode === "ISLAND" || src === "silence", room = src === "live" || src === "pedal";
+  const chips = { live: rec ? ["rec", "RECORDED", "live, from a room's wiring"] : ["live", "LIVE", "this room's wiring"], pedal: rec ? ["rec", "RECORDED", "live, through the pedal"] : ["live", "LIVE", "through the pedal"], replay: ["replay", "REPLAY", "Great Britain, 9 August 2019, at our grid's pitch"], silence: ["cut", "THE HUM IS CUT", ""], tone: ["rec", "TEST HUM", "synthesized at 60 Hz"], wav: ["rec", "RECORDING", state.source_label || ""] };
   const [kind, word, label] = chips[src] || ["rec", src.toUpperCase(), state.source_label || ""];
   $("stChip").className = "st-chip " + kind; $("stChipWord").textContent = word; $("stChipLabel").textContent = label;
   const set = n.hour_set != null;
@@ -715,25 +744,27 @@ function stageUpdate() {
   // The number: the one-second reading when calm, the fast one while the grid moves.
   const fast = mode === "EVENT" || replaying || Math.abs(n.rocof || 0) > 0.02;
   const hz = fast ? (n.hz_fast ?? n.hz) : (n.hz ?? n.hz_fast);
+  shownHz = hz;
   const el = $("stHz");
   if (hz == null) { el.textContent = cut ? "no hum" : "listening"; el.className = "st-hz quiet"; }
   else { el.innerHTML = hz.toFixed(3) + "<small>Hz</small>"; el.className = "st-hz" + (Math.abs(hz - NOMINAL) > DEADBAND ? " off" : ""); }
-  $("stHzCap").textContent = replaying ? "Great Britain's grid on 9 August 2019, replayed at our grid's pitch" : cut ? "the hum is gone from this room's wiring" : (src === "live" || src === "pedal") ? "the frequency of the whole Western grid, read in this room" : "the grid's frequency, from a recording";
+  $("stHzCap").textContent = replaying ? "Great Britain's grid on 9 August 2019, replayed at our grid's pitch" : cut ? "the hum is cut, as if the grid went dark" : room ? (rec ? "the Western grid's frequency, recorded from a room's wiring" : "the frequency of the whole Western grid, read in this room") : src === "tone" ? "a synthesized hum, standing in for the grid" : "the grid's frequency, from a recording";
   // The Station's two machines.
   const sw = n.spin_w || 0, pw = n.pulse_w || 0;
   unit("stSpin", sw > 500, sw > 500 ? "Pushing" : "Ready", sw > 500 ? sw : null, n.spin_soc_m);
   unit("stPulse", pw > 500, pw > 500 ? (mode === "RUSH" || mode === "ISLAND" ? "Running the building" : "Discharging") : pw < -500 ? "Charging" : "Holding", Math.abs(pw) > 500 ? pw : null, n.pulse_soc_m);
-  // The sentence.
-  const lat = state.latency_ms, quick = lat == null ? "" : lat < 1 ? " in under a millisecond" : " in " + Math.round(lat) + " milliseconds";
+  // The sentence. In the replay the flywheel starts pushing about 0.35 s after
+  // the fall shows in the reading and reaches full power by 0.7 s, so "within a
+  // second" is the measured claim; the decision itself takes under a millisecond.
   const dev = n.hz_fast != null ? n.hz_fast - NOMINAL : 0;
   let head;
   if (mode === "ISLAND") head = "The grid went dark. The building is still on.";
   else if (!heard) head = cut ? "The hum is cut." : "Listening for the grid.";
-  else if (mode === "EVENT") head = replaying ? "A power plant just tripped. The flywheel answered" + quick + "." : "The grid is falling fast. The flywheel is pushing " + kw(sw) + "\u00a0kW.";
+  else if (mode === "EVENT") head = replaying ? "Two power plants tripped. The flywheel was pushing within a second." : "The grid is falling fast. The flywheel is pushing " + kw(sw) + "\u00a0kW.";
   else if (mode === "RUSH") head = "Rush hour. The Station runs the building on its battery: " + kw(pw) + "\u00a0kW kept off a jammed grid.";
   else if (sw > 500) head = "The grid is " + Math.round(Math.abs(dev) * 1000) + "\u00a0millihertz " + (dev < 0 ? "low" : "high") + ". The flywheel is pushing " + kw(sw) + "\u00a0kW.";
   else if (replaying) head = "The grid is back in tune.";
-  else head = src === "live" || src === "pedal" ? "Every wire in this room hums the grid's note. Right now, it's in tune." : "The whole Western grid hums one note. Right now, it's in tune.";
+  else head = room && !rec ? "Every wire in this room hums the grid's note. Right now, it's in tune." : "The whole Western grid hums one note: 60 hertz.";
   $("stHead").textContent = head; $("stHead").classList.toggle("cut", mode === "ISLAND");
   const notes = [];
   if (replaying) notes.push("Frequency: National Grid ESO one-second data, 9 August 2019, transposed to 60 Hz.");
@@ -788,10 +819,10 @@ function drawTuner(now) {
   } else if (n.hz == null) neon(g, [[14, mid], [w - 14, mid]], SON.dim, 1.2);
   // The tuner: the note on a dark plate, a cents arc over it, the needle from below.
   // The tuner kernel's reading when the ear sends one. Sources without it, such
-  // as the pedal or an older recording, use the estimator's frequency: at this
-  // reference 60 Hz is exactly B1, so the cents are its distance from 60 Hz.
+  // as the pedal or an older recording, use the number shown above the tuner: at
+  // this reference 60 Hz is exactly B1, so the cents are its distance from 60 Hz.
   const own = n.tuner_hz != null && n.tuner_cents != null;
-  const hz = own ? n.tuner_hz : n.hz, cents = own ? n.tuner_cents : (n.hz != null ? 1200 * Math.log2(n.hz / NOMINAL) : null);
+  const hz = own ? n.tuner_hz : shownHz, cents = own ? n.tuner_cents : (shownHz != null ? 1200 * Math.log2(shownHz / NOMINAL) : null);
   const locked = hz != null && cents != null;
   const inTune = locked && Math.abs(cents) < 2, color = inTune ? SON.green : SON.accent;
   const px = cx, py = horizon - 6, r = Math.min(horizon - 18, w * 0.32), span = 1.0;

@@ -55,5 +55,7 @@ engineer opening the README. Write for them.
 - `index.html`: the page. `sessions/default.ndjson` plays when no director
   answers.
 - `pitch/`: the decks, the one-page plan, the script and the captured
-  compiler output.
+  compiler output. After `record.py`, `node pitch/shots.js` retakes the
+  slide pictures from the bundled session and `node pitch/export.js`
+  rewrites the PDFs.
 - The controller lives in the Mentl repository under `examples/grid/`.

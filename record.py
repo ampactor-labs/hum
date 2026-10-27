@@ -8,7 +8,9 @@ sessions/default.ndjson, which the page plays wherever no director answers.
     python3 -I record.py --mode live     # the guitar on the interface
     python3 -I record.py --mode wav --wav samples/hum_home.wav
 
-About five minutes. Nothing else should touch port 8787 while it runs.
+About four minutes. Nothing else should touch port 8787 while it runs.
+The holds are short so that someone opening the hosted copy on a phone
+reaches the event in under a minute.
 """
 import glob, json, os, signal, shutil, subprocess, sys, time, urllib.request
 
@@ -62,29 +64,29 @@ def log(m):
 try:
     s = wait(lambda s: now(s).get("mode") and now(s).get("hz") is not None, 90)
     log("first decision: " + (now(s).get("mode") if s else "none; is the source giving lines?"))
-    time.sleep(15)
+    time.sleep(10)
     cmd_("hour=12.5")
     s = wait(lambda s: now(s).get("mode") == "RUSH", 15)
     log("RUSH: " + str(now(s).get("reason") if s else None))
-    time.sleep(45)
+    time.sleep(25)
     cmd_("hour=")
     s = wait(lambda s: now(s).get("hour_set") is None and now(s).get("mode") != "RUSH", 15)
     log("back to now: " + str(now(s).get("mode") if s else None))
-    time.sleep(10)
+    time.sleep(5)
     cmd_("src=replay")
     s = wait(lambda s: now(s).get("mode") == "EVENT", 70)
     log("EVENT: " + str(now(s).get("reason") if s else None) + " | ms " + str(s.get("latency_ms") if s else None))
     s = wait(lambda s: s.get("source") == mode and now(s).get("source") != "replay", 240)
     log("replay ended: " + str(now(s).get("mode") if s else None))
-    time.sleep(15)
+    time.sleep(5)
     cmd_("src=silence")
     s = wait(lambda s: now(s).get("mode") == "ISLAND", 30)
     log("ISLAND: " + str(now(s).get("reason") if s else None))
-    time.sleep(20)
+    time.sleep(15)
     cmd_("src=back")
     s = wait(lambda s: s.get("source") == mode and now(s).get("mode") == "GRID", 40)
     log("back: " + str(now(s).get("mode") if s else None))
-    time.sleep(15)
+    time.sleep(10)
 finally:
     os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
     try:
