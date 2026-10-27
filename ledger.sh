@@ -8,7 +8,7 @@ since="2026-10-26T16:00:00-06:00"
 mentl="${1:-$HOME/mentl}"
 echo "## This week (since Monday Oct 26, 4:00 PM MDT)"
 echo
-for repo in "$(cd "$(dirname "$0")/../.." && pwd)" "$mentl"; do
+for repo in "$(cd "$(dirname "$0")" && pwd)" "${SONIDO:-$HOME/sonido}" "$mentl"; do
   [ -d "$repo/.git" ] || continue
   name=$(basename "$repo")
   n=$(git -C "$repo" log --since="$since" --oneline --all | wc -l | tr -d ' ')
@@ -19,7 +19,7 @@ for repo in "$(cd "$(dirname "$0")/../.." && pwd)" "$mentl"; do
 done
 echo "## Before kickoff"
 echo
-for repo in "$(cd "$(dirname "$0")/../.." && pwd)" "$mentl"; do
+for repo in "$(cd "$(dirname "$0")" && pwd)" "${SONIDO:-$HOME/sonido}" "$mentl"; do
   [ -d "$repo/.git" ] || continue
   name=$(basename "$repo")
   first=$(git -C "$repo" log --reverse --date=short --pretty='%ad' | head -1)

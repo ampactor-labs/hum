@@ -2,7 +2,7 @@
 
 You are writing the Mentl half of HUM, the Hard Tech Week entry judged Wednesday Oct 28 at 5:00 PM MDT. The whole build: the grid's frequency heard live from a room's wiring through a guitar pickup (a Rust ear in the sonido repository), a Torus Station modeled from Torus's published figures that answers in two bands, and the program that decides, written in Mentl with its negative capabilities proven and every decision explained. Your programs are the hard-tech center of the Nucleus pitch and the closing beat of the Torus pitch. Nobody in the energy industry ships a controller whose compiler proves it cannot reach the network while deciding. That is what these programs show.
 
-Everything you need from the other side is in this directory of the sonido repository, branch `claude/serene-fermat-5408rg`: `CONTRACTS.md` (the line formats) and `samples/` (real input lines, landing within the hour). Until the samples land, write three C1e lines by hand from the contract and develop against those.
+Everything you need from the other side is in the HUM repository, `github.com/ampactor-labs/hum`, on main: `CONTRACTS.md` (the line formats) and `samples/` (real input lines: a tone, the synthetic event, the real GB event, the island). Until the samples land, write three C1e lines by hand from the contract and develop against those.
 
 ## Rules for this work
 

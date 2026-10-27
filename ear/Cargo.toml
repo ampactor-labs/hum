@@ -1,0 +1,19 @@
+[package]
+name = "hum-ear"
+version = "0.1.0"
+edition = "2024"
+description = "The HUM ear: the grid's frequency from a mains hum, three ways, one line every 50 ms"
+license = "AGPL-3.0-or-later"
+
+[[bin]]
+name = "grid_ear"
+path = "src/main.rs"
+
+[dependencies]
+sonido-core = { git = "https://github.com/ampactor-labs/sonido", branch = "claude/serene-fermat-5408rg", default-features = false, features = ["std"] }
+sonido-analysis = { git = "https://github.com/ampactor-labs/sonido", branch = "claude/serene-fermat-5408rg" }
+rustfft = "6"
+hound = "3.5"
+
+[profile.release]
+opt-level = 3

@@ -8,3 +8,4 @@ sessions/*
 !samples/*.wav
 __pycache__/
 pitch/video/
+ear/target/

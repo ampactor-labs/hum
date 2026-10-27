@@ -18,10 +18,10 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 mode="${1:-live}"; shift || true
-EAR="../../target/release/examples/grid_ear"
+EAR="ear/target/release/grid_ear"
 if [ ! -x "$EAR" ]; then
   echo "building the ear..." >&2
-  (cd ../.. && cargo build -p sonido-analysis --release --example grid_ear)
+  (cd ear && cargo build --release)
 fi
 args=(--mode "$mode" --ear "$EAR")
 case "$mode" in

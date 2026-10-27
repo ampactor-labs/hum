@@ -626,7 +626,7 @@ def parse(argv):
     o.sample = os.path.join(HERE, "samples", "ear_tone.ndjson")
     o.serial = "/dev/ttyACM0"
     o.event = os.path.join(HERE, "data", "event.csv")
-    o.ear = os.path.join(HERE, "..", "..", "target", "release", "examples", "grid_ear")
+    o.ear = os.path.join(HERE, "ear", "target", "release", "grid_ear")
     o.capture = "arecord -D pipewire -t raw -f FLOAT_LE -r 48000 -c 1 -"
     o.stub_controller = False
     o.mentl_dir = os.environ.get("MENTL_DIR", os.path.expanduser("~/mentl"))

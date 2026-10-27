@@ -85,7 +85,7 @@ C1 without `hz_stft` and `thd`, with `"source":"pedal"`, over USB CDC at 20 Hz. 
 
 ## C6, samples
 
-Produced by the ear in this repository under `demos/grid-rush-hour/samples/` and consumed by the controller and the page before any live integration:
+Produced by the ear under `samples/` and consumed by the controller and the page before any live integration:
 
 - `ear_tone.ndjson` a synthetic hum at 60.000 Hz with a ±20 mHz wobble.
 - `ear_hum.ndjson` the user's recorded hum, once it exists.
