@@ -709,6 +709,8 @@ const SON = { void: "#07060E", accent: "#8CFF5A", partner: "#36E2FF", green: "#3
 const TUNER_REF = 427.65;
 let stageOn = params.get("view") !== "dashboard";
 let stageScale = 1, scopeGain = 1, scopeSeen = null, gridPhase = 0, lastTuner = performance.now(), shownHz = null;
+// Whether the replay has reached the fall yet: its first seconds are the calm before it.
+let replayFell = false;
 function stageFit() {
   const tall = window.innerHeight > window.innerWidth, W = tall ? 1080 : 1920, H = tall ? 1920 : 1080;
   $("stage").classList.toggle("tall", tall);
@@ -730,12 +732,18 @@ function unit(id, on, word, watts, socM) {
 function stageUpdate() {
   if (!state) return;
   const n = state.now || {}, mode = n.mode || "GRID";
-  // Each line names its own source, so a recorded session and a sample file say
-  // what they really carry: a synthesized test hum, a live room, the 2019 record.
-  const src = n.source || state.source || "", rec = !!state.playback;
+  // What the reading comes from. With a director answering, its own source
+  // decides, except that a sample file of the synthesized test hum says so. A
+  // recorded session is read line by line, since each line names its source:
+  // the test hum, a live room, or the 2019 record the director replayed. A
+  // sample file's "replay" lines may be a synthetic disturbance instead, so
+  // only the director's replay, live or recorded, is called the 2019 event.
+  const rec = !!state.playback, said = n.source || "";
+  const src = rec ? said || state.source || "" : state.source === "sample" && said === "tone" ? "tone" : state.source || "";
   const heard = n.hz != null || n.hz_fast != null;
   const replaying = src === "replay", cut = mode === "ISLAND" || src === "silence", room = src === "live" || src === "pedal";
-  const chips = { live: rec ? ["rec", "RECORDED", "live, from a room's wiring"] : ["live", "LIVE", "this room's wiring"], pedal: rec ? ["rec", "RECORDED", "live, through the pedal"] : ["live", "LIVE", "through the pedal"], replay: ["replay", "REPLAY", "Great Britain, 9 August 2019, at our grid's pitch"], silence: ["cut", "THE HUM IS CUT", ""], tone: ["rec", "TEST HUM", "synthesized at 60 Hz"], wav: ["rec", "RECORDING", state.source_label || ""] };
+  replayFell = replaying && (replayFell || mode === "EVENT" || Math.abs((n.hz_fast ?? NOMINAL) - NOMINAL) > DEADBAND);
+  const chips = { live: rec ? ["rec", "RECORDED", "live, from a room's wiring"] : ["live", "LIVE", "this room's wiring"], pedal: rec ? ["rec", "RECORDED", "live, through the pedal"] : ["live", "LIVE", "through the pedal"], replay: ["replay", "REPLAY", "Great Britain, 9 August 2019, at our grid's pitch"], silence: ["cut", "THE HUM IS CUT", ""], tone: ["rec", "TEST HUM", "synthesized at 60 Hz"], sample: ["rec", "SAMPLE", state.source_label || ""], wav: ["rec", "RECORDING", state.source_label || ""] };
   const [kind, word, label] = chips[src] || ["rec", src.toUpperCase(), state.source_label || ""];
   $("stChip").className = "st-chip " + kind; $("stChipWord").textContent = word; $("stChipLabel").textContent = label;
   const set = n.hour_set != null;
@@ -748,7 +756,7 @@ function stageUpdate() {
   const el = $("stHz");
   if (hz == null) { el.textContent = cut ? "no hum" : "listening"; el.className = "st-hz quiet"; }
   else { el.innerHTML = hz.toFixed(3) + "<small>Hz</small>"; el.className = "st-hz" + (Math.abs(hz - NOMINAL) > DEADBAND ? " off" : ""); }
-  $("stHzCap").textContent = replaying ? "Great Britain's grid on 9 August 2019, replayed at our grid's pitch" : cut ? "the hum is cut, as if the grid went dark" : room ? (rec ? "the Western grid's frequency, recorded from a room's wiring" : "the frequency of the whole Western grid, read in this room") : src === "tone" ? "a synthesized hum, standing in for the grid" : "the grid's frequency, from a recording";
+  $("stHzCap").textContent = replaying ? "Great Britain's grid on 9 August 2019, replayed at our grid's pitch" : cut ? "the hum is cut, as if the grid went dark" : room ? (rec ? "the Western grid's frequency, recorded from a room's wiring" : "the frequency of the whole Western grid, read in this room") : src === "tone" ? "a synthesized hum, standing in for the grid" : src === "sample" ? "from a sample file, not a live reading" : "the grid's frequency, from a recording";
   // The Station's two machines.
   const sw = n.spin_w || 0, pw = n.pulse_w || 0;
   unit("stSpin", sw > 500, sw > 500 ? "Pushing" : "Ready", sw > 500 ? sw : null, n.spin_soc_m);
@@ -763,7 +771,7 @@ function stageUpdate() {
   else if (mode === "EVENT") head = replaying ? "Two power plants tripped. The flywheel was pushing within a second." : "The grid is falling fast. The flywheel is pushing " + kw(sw) + "\u00a0kW.";
   else if (mode === "RUSH") head = "Rush hour. The Station runs the building on its battery: " + kw(pw) + "\u00a0kW kept off a jammed grid.";
   else if (sw > 500) head = "The grid is " + Math.round(Math.abs(dev) * 1000) + "\u00a0millihertz " + (dev < 0 ? "low" : "high") + ". The flywheel is pushing " + kw(sw) + "\u00a0kW.";
-  else if (replaying) head = "The grid is back in tune.";
+  else if (replaying) head = !replayFell ? "Two power plants are about to trip." : Math.abs(dev) > DEADBAND ? "The grid is still " + Math.round(Math.abs(dev) * 1000) + " millihertz " + (dev < 0 ? "low." : "high.") : "The grid is back in tune.";
   else head = room && !rec ? "Every wire in this room hums the grid's note. Right now, it's in tune." : "The whole Western grid hums one note: 60 hertz.";
   $("stHead").textContent = head; $("stHead").classList.toggle("cut", mode === "ISLAND");
   const notes = [];
