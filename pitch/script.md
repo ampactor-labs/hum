@@ -39,6 +39,7 @@ Each slot runs 8 to 25 minutes including questions, depending on how many teams 
 
 ## Questions, and the answers
 
+- **Isn't 60 Hz between A sharp and B?** With A at 440 Hz, yes. I set the tuner's A to 427.65 Hz so that the grid sits exactly on B. The needle then centers while the grid is in tune and swings flat when it sags.
 - **Is the guitar accurate?** On a test signal it reads within half a thousandth of a hertz. Live, the reading is calibrated against the grid's long-run average of exactly sixty, and the offset is printed on the dashboard.
 - **Doesn't a Torus Station already measure the grid?** Yes, every cycle, and better than a guitar. The guitar is how a room hears it. What's new is the proof underneath the decisions.
 - **Is the Station real?** It's a model built from Torus's published figures: 100 kW from the flywheel for six minutes, 300 kW from the battery for four hours. Every screen says it's simulated.

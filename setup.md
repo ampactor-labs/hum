@@ -20,11 +20,16 @@ Do this before the judges sit down, so everything is running when they arrive.
 
 Footswitch 1 replays the 2019 event. Footswitch 2 cuts the hum and brings it back. Toggle 1 down sets the clock to tomorrow's noon, and up returns it. The pedal types the same keys as the laptop, so the laptop keys always work as a backup.
 
-Flash it once, from sonido's `crates/sonido-daisy`, with the Seed in DFU mode (hold BOOT, tap RESET):
+Flash it once. Build the binary from sonido's `crates/sonido-daisy` on the branch `claude/serene-fermat-5408rg`:
 
 ```
-cargo objcopy --example grid_pedal --release -- -O binary -R .sram1_bss firmware/grid_pedal.bin
-dfu-util -a 0 -s 0x90040000:leave -D firmware/grid_pedal.bin
+cargo objcopy --example grid_pedal --release -- -O binary -R .sram1_bss grid_pedal.bin
+```
+
+Press RESET on the Seed. While its LED pulses, which lasts 2.5 seconds, run the line below. Pressing BOOT while the LED pulses makes it wait longer. Do not hold BOOT while you press RESET: that starts the chip's own bootloader, which cannot write this firmware. sonido's `docs/EMBEDDED.md` covers the tools and the bootloader.
+
+```
+dfu-util -a 0 -s 0x90040000:leave -D grid_pedal.bin
 ```
 
 Then check it. `cat /dev/ttyACM0` shows one line every 50 ms, and pressing footswitch 1 in a text editor types `e`.
