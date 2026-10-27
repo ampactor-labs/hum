@@ -16,7 +16,7 @@ const path = require('path');
   await page.goto('file://' + path.join(__dirname, 'nucleus-one-pager.html'), { waitUntil: 'load' });
   await page.emulateMedia({ media: 'print' });
   await page.waitForTimeout(500);
-  await page.pdf({ path: path.join(__dirname, 'nucleus-one-pager.pdf'), format: 'Letter', printBackground: true, margin: { top: '0.5in', bottom: '0.5in', left: '0.6in', right: '0.6in' } });
+  await page.pdf({ path: path.join(__dirname, 'nucleus-one-pager.pdf'), format: 'Letter', printBackground: true, preferCSSPageSize: true });
   console.log('nucleus-one-pager.pdf');
   await browser.close();
 })().catch(e => { console.error(e); process.exit(1); });
