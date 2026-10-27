@@ -505,8 +505,13 @@ class Director:
         else:
             self.controller = MentlController(opts.mentl_bin, opts.mentl_dir)
         # The learned estimator, when its program and the ear's decimated stream exist.
+        # A stream left by an earlier run is not this run's hum: it is removed first.
         listen = os.path.join(opts.mentl_dir, "examples", "grid", "listen.mn")
         if os.path.exists(listen) and opts.decimated:
+            try:
+                os.remove(opts.decimated)
+            except FileNotFoundError:
+                pass
             self.learner = Learner(opts.mentl_bin, listen, opts.decimated, self.state)
         self.source = None
         self.previous_mode = opts.mode
@@ -521,6 +526,8 @@ class Director:
         log(f"source: {mode}")
         self.state.source = mode
         self.state.connected = False
+        with self.state.lock:
+            self.state.learned = {}  # the learner's reading belonged to the source that ends here
         self.source = Source(mode, self.opts)
 
     def request(self, mode):
