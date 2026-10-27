@@ -54,6 +54,7 @@ EVENT_MIN_S = 2.0
 EVENT_MAX_S = 10.0
 LOST_DB = 30.0
 DT = 0.05
+REPLAY_FROM_S = 27  # the real event's first fall is at 35 s on its clock
 
 SOURCE_LABELS = {
     "live": "guitar, this room",
@@ -298,7 +299,19 @@ class Source:
         self.procs = []
         self.stop_flag = False
         self.ended = False
+        self.started = time.time()
+        self.locked = False
         threading.Thread(target=self._run, daemon=True).start()
+
+    def warming_up(self, r):
+        """A fresh ear's first unlocked lines are its warm-up, not the hum dying;
+        they are withheld for up to 1.5 s. Silence is the hum dying by request."""
+        if self.locked or self.mode == "silence":
+            return False
+        if r.get("hz_fast") is not None or time.time() - self.started > 1.5:
+            self.locked = True
+            return False
+        return True
 
     def _spawn_ear(self, args, stdin=None):
         cmd = [self.opts.ear] + args
@@ -344,13 +357,15 @@ class Source:
                 ear = self._spawn_ear(["--wav", o.wav, "--realtime", "--source", "wav"])
                 self.procs = [ear]
             elif self.mode == "replay":
+                # The replay starts eight seconds before the first fall, so a key
+                # press shows the event, not a minute of calm before it.
                 seconds = 70
                 try:
                     rows = [l.split(",") for l in open(o.event) if l.strip() and not l.startswith("#")]
-                    seconds = int(float(rows[-1][0])) + 2
+                    seconds = int(float(rows[-1][0])) + 2 - REPLAY_FROM_S
                 except Exception:
                     pass
-                ear = self._spawn_ear(["--replay", o.event, "--seconds", str(seconds), "--realtime", "--source", "replay"])
+                ear = self._spawn_ear(["--replay", o.event, "--from", str(REPLAY_FROM_S), "--seconds", str(seconds), "--realtime", "--source", "replay"])
                 self.procs = [ear]
             elif self.mode == "silence":
                 ear = self._spawn_ear(["--silence", "--seconds", "3600", "--realtime", "--source", "silence"])
@@ -440,7 +455,10 @@ class State:
                     del self.trace[: len(self.trace) - 1200]
                     del self.station_trace[: len(self.station_trace) - 1200]
             if self.session:
-                self.session.write(json.dumps({"ear": r, "station": d}, separators=(",", ":")) + "\n")
+                row = {"ear": r, "station": d, "ms": latency_ms}
+                if self.learned.get("hz") is not None:
+                    row["learned"] = round(self.learned["hz"], 4)
+                self.session.write(json.dumps(row, separators=(",", ":")) + "\n")
                 if self.line_count % 20 == 0:
                     self.session.flush()
 
@@ -533,6 +551,8 @@ class Director:
                 try:
                     r = json.loads(line)
                 except json.JSONDecodeError:
+                    continue
+                if self.source.warming_up(r):
                     continue
                 r = self.state.enrich(r)
                 sent = time.time()

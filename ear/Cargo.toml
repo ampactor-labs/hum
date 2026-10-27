@@ -11,7 +11,7 @@ path = "src/main.rs"
 
 [dependencies]
 sonido-core = { git = "https://github.com/ampactor-labs/sonido", branch = "claude/serene-fermat-5408rg", default-features = false, features = ["std"] }
-rustfft = "6"
+sonido-analysis = { git = "https://github.com/ampactor-labs/sonido", branch = "claude/serene-fermat-5408rg" }
 hound = "3.5"
 
 [profile.release]

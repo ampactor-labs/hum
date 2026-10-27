@@ -1,6 +1,6 @@
 //! grid_ear: the HUM ear. Reads a mains hum, measures the grid's frequency
 //! three independent ways, and prints one line every 50 ms (the C1 contract
-//! in `demos/grid-rush-hour/CONTRACTS.md`).
+//! in `CONTRACTS.md`).
 //!
 //! Sources, one per run:
 //!   --stdin-f32            raw float32 mono samples on stdin (live capture)
@@ -11,23 +11,27 @@
 //! Options:
 //!   --rate <hz>            sample rate for synthetic and stdin sources (48000)
 //!   --seconds <s>          length of a synthetic run (20)
+//!   --from <s>             where a synthetic run starts on its series' clock (0)
 //!   --wobble               ±20 mHz at 0.05 Hz on the tone, so the trace moves
 //!   --cut-at <s>           a synthetic hum that cuts to silence at this time
 //!   --realtime             pace the output at wall-clock speed
 //!   --tee <path>           append every line to this file as well
 //!   --emit-decimated <p>   the tracked band at 480 Hz, one float per line
+//!   --emit-wav <p>         every sample heard, as a 16-bit mono WAV
 //!   --source <label>       override the "source" field
 //!
 //! Three estimators: zero crossings on the loudest harmonic band (hz_fast over
 //! three cycles, hz over one second, from `sonido_core::grid::GridEar`), and the
 //! spectral peak of a two-second Hann window with quadratic interpolation
-//! (hz_stft). THD is read off the same spectrum. All three should agree to a
-//! few millihertz on a clean hum; the page shows them side by side.
+//! (hz_stft), through sonido-analysis's FFT. THD is sonido-analysis's
+//! `ThdAnalyzer` on the same two seconds: the tool that reads a pedal's
+//! distortion reads the wall's. All three frequencies should agree to a few
+//! millihertz on a clean hum; the page shows them side by side.
 //!
-//!   cargo run -p sonido-analysis --release --example grid_ear -- --tone 60.050 --seconds 5
+//!   cargo run --release -- --tone 60.050 --seconds 5
+//!   cargo run --release -- --replay ../data/event.csv --from 25 --seconds 95 --rate 8000 --emit-wav ../samples/event_gb.wav
 
-use rustfft::FftPlanner;
-use rustfft::num_complex::Complex;
+use sonido_analysis::{Fft, ThdAnalyzer, Window};
 use sonido_core::grid::GridEar;
 use std::fs::{File, OpenOptions};
 use std::io::{self, BufWriter, Read, Write};
@@ -37,6 +41,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 const NOMINAL_HZ: f32 = 60.0;
 const STFT_SECONDS: usize = 2;
 const NFFT: usize = 1 << 18;
+const THD_NFFT: usize = 1 << 17;
 const STFT_EVERY_TICKS: usize = 10;
 
 enum Mode {
@@ -51,11 +56,13 @@ struct Opts {
     mode: Mode,
     rate: f32,
     seconds: f32,
+    from: f32,
     wobble: bool,
     cut_at: Option<f32>,
     realtime: bool,
     tee: Option<String>,
     decimated: Option<String>,
+    wav_out: Option<String>,
     source: Option<String>,
 }
 
@@ -66,11 +73,13 @@ fn parse_args() -> Opts {
         mode: Mode::Silence,
         rate: 48000.0,
         seconds: 20.0,
+        from: 0.0,
         wobble: false,
         cut_at: None,
         realtime: false,
         tee: None,
         decimated: None,
+        wav_out: None,
         source: None,
     };
     let mut i = 0;
@@ -90,11 +99,13 @@ fn parse_args() -> Opts {
             "--silence" => mode = Some(Mode::Silence),
             "--rate" => opts.rate = next(&mut i).parse().expect("--rate <hz>"),
             "--seconds" => opts.seconds = next(&mut i).parse().expect("--seconds <s>"),
+            "--from" => opts.from = next(&mut i).parse().expect("--from <s>"),
             "--wobble" => opts.wobble = true,
             "--cut-at" => opts.cut_at = Some(next(&mut i).parse().expect("--cut-at <s>")),
             "--realtime" => opts.realtime = true,
             "--tee" => opts.tee = Some(next(&mut i)),
             "--emit-decimated" => opts.decimated = Some(next(&mut i)),
+            "--emit-wav" => opts.wav_out = Some(next(&mut i)),
             "--source" => opts.source = Some(next(&mut i)),
             other => {
                 eprintln!("grid_ear: unknown argument {other}");
@@ -194,12 +205,14 @@ impl Series {
     }
 }
 
-/// The spectral estimator: a Hann window over the last two seconds, zero-padded,
-/// the peak nearest the nominal harmonic interpolated with a parabola on
-/// log magnitude, and THD from the harmonics of the fundamental.
+/// The spectral estimator: a Hann window over the last two seconds, zero-padded
+/// through sonido-analysis's FFT, the peak nearest the nominal harmonic
+/// interpolated with a parabola on log magnitude; THD from sonido-analysis's
+/// `ThdAnalyzer` on the same two seconds.
 struct Spectral {
-    planner_fft: std::sync::Arc<dyn rustfft::Fft<f32>>,
-    buf: Vec<Complex<f32>>,
+    fft: Fft,
+    thd: ThdAnalyzer,
+    buf: Vec<f32>,
     window: Vec<f32>,
     rate: f32,
     len: usize,
@@ -209,11 +222,14 @@ impl Spectral {
     fn new(rate: f32) -> Self {
         let len = STFT_SECONDS * rate as usize;
         assert!(len <= NFFT, "two seconds must fit the FFT");
-        let window: Vec<f32> = (0..len)
-            .map(|i| 0.5 - 0.5 * (2.0 * std::f32::consts::PI * i as f32 / len as f32).cos())
-            .collect();
-        let mut planner = FftPlanner::<f32>::new();
-        Self { planner_fft: planner.plan_fft_forward(NFFT), buf: vec![Complex::new(0.0, 0.0); NFFT], window, rate, len }
+        Self {
+            fft: Fft::new(NFFT),
+            thd: ThdAnalyzer::new(rate, THD_NFFT).with_window(Window::Hann),
+            buf: vec![0.0; NFFT],
+            window: Window::Hann.coefficients(len),
+            rate,
+            len,
+        }
     }
 
     /// `(hz_stft, thd_percent)` for the samples in `ring` (oldest first), on the
@@ -222,19 +238,15 @@ impl Spectral {
         let n = ring.len().min(self.len);
         let offset = ring.len() - n;
         let mean: f32 = ring[offset..].iter().sum::<f32>() / n as f32;
-        for (i, c) in self.buf.iter_mut().enumerate() {
-            *c = if i < n {
-                Complex::new((ring[offset + i] - mean) * self.window[i], 0.0)
-            } else {
-                Complex::new(0.0, 0.0)
-            };
+        for (i, slot) in self.buf.iter_mut().enumerate() {
+            *slot = if i < n { (ring[offset + i] - mean) * self.window[i] } else { 0.0 };
         }
-        self.planner_fft.process(&mut self.buf);
+        let spectrum = self.fft.forward(&self.buf);
         let bin_hz = self.rate / NFFT as f32;
-        let mag = |k: usize| self.buf[k].norm();
+        let mag = |k: usize| spectrum[k].norm();
         let peak_near = |center_hz: f32, half_width_hz: f32| -> Option<(usize, f32)> {
             let lo = ((center_hz - half_width_hz) / bin_hz).max(1.0) as usize;
-            let hi = ((center_hz + half_width_hz) / bin_hz) as usize;
+            let hi = (((center_hz + half_width_hz) / bin_hz) as usize).min(spectrum.len() - 2);
             let mut best = None;
             for k in lo..=hi {
                 let m = mag(k);
@@ -245,7 +257,7 @@ impl Spectral {
             best
         };
         let (k, m) = peak_near(NOMINAL_HZ * harmonic as f32, 3.0 * harmonic as f32)?;
-        if m < 1e-6 || k == 0 || k + 1 >= NFFT / 2 {
+        if m < 1e-6 || k == 0 {
             return None;
         }
         let a = mag(k - 1).max(1e-12).ln();
@@ -255,15 +267,9 @@ impl Spectral {
         let delta = if denom.abs() > 1e-12 { 0.5 * (a - c) / denom } else { 0.0 };
         let hz_stft = (k as f32 + delta) * bin_hz / harmonic as f32;
 
-        // THD of the hum as heard: harmonics 2..=10 of the fundamental over the fundamental.
-        let (_, fund) = peak_near(NOMINAL_HZ, 3.0)?;
-        let mut harm_power = 0.0f32;
-        for h in 2..=10u32 {
-            if let Some((_, hm)) = peak_near(NOMINAL_HZ * h as f32, 3.0) {
-                harm_power += hm * hm;
-            }
-        }
-        let thd = if fund > 1e-9 { 100.0 * harm_power.sqrt() / fund } else { 0.0 };
+        // THD of the hum as heard: harmonics 2..=10 of the fundamental over the
+        // fundamental, the analysis crate's own measurement.
+        let thd = 100.0 * self.thd.analyze(&ring[offset..], NOMINAL_HZ).thd_ratio;
         Some((hz_stft, thd))
     }
 }
@@ -347,6 +353,13 @@ fn main() {
             std::process::exit(2)
         }))
     });
+    let mut wav_out = opts.wav_out.as_ref().map(|p| {
+        let spec = hound::WavSpec { channels: 1, sample_rate: rate as u32, bits_per_sample: 16, sample_format: hound::SampleFormat::Int };
+        hound::WavWriter::create(p, spec).unwrap_or_else(|e| {
+            eprintln!("grid_ear: cannot create {p}: {e}");
+            std::process::exit(2)
+        })
+    });
 
     let start_unix = now_unix();
     let start_instant = Instant::now();
@@ -397,7 +410,7 @@ fn main() {
             _ => {
                 let n = block.min(total_samples.saturating_sub(fed));
                 for i in 0..n {
-                    let t = (fed + i) as f64 / rate as f64;
+                    let t = opts.from as f64 + (fed + i) as f64 / rate as f64;
                     let silent = matches!(opts.mode, Mode::Silence)
                         || opts.cut_at.map_or(false, |c| t >= c as f64);
                     let hz = match &opts.mode {
@@ -429,6 +442,9 @@ fn main() {
                     decim_count = 0;
                     let _ = writeln!(d, "{band_out:.7}");
                 }
+            }
+            if let Some(w) = wav_out.as_mut() {
+                let _ = w.write_sample((x.clamp(-1.0, 1.0) * 32767.0) as i16);
             }
         }
         ring.extend_from_slice(&chunk[..got]);
@@ -483,5 +499,8 @@ fn main() {
     }
     if let Some(mut d) = decimated {
         let _ = d.flush();
+    }
+    if let Some(w) = wav_out {
+        let _ = w.finalize();
     }
 }

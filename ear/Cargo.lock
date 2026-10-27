@@ -19,7 +19,7 @@ name = "hum-ear"
 version = "0.1.0"
 dependencies = [
  "hound",
- "rustfft",
+ "sonido-analysis",
  "sonido-core",
 ]
 
@@ -125,6 +125,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "sonido-analysis"
+version = "0.1.0"
+source = "git+https://github.com/ampactor-labs/sonido?branch=claude%2Fserene-fermat-5408rg#7fc944af94a38ca426b52508e634ab148b062354"
+dependencies = [
+ "rustfft",
+ "sonido-core",
 ]
 
 [[package]]

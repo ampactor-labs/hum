@@ -26,14 +26,16 @@
   <div class="two">
     <div>
       <div class="cols3" style="grid-template-columns:1fr;gap:24px">
-        <div class="card"><h3>Never</h3><p>"This function never reaches the network, never allocates, never exceeds this bound" is a claim the compiler proves through every call, or the program does not build.</p></div>
+        <div class="card"><h3>Never</h3><p>"Never reaches the network, never allocates, never exceeds this bound": proven through every call, or the program does not build. The audit names it: Real-time safe, Sandbox.</p></div>
         <div class="card"><h3>Why</h3><p>Every fact carries its reason, walkable to the line that decided it. A dispatch explains itself.</p></div>
-        <div class="card"><h3>Learns</h3><p>A learning rule is read off the chain it learns on, no tape, no second copy to drift.</p></div>
+        <div class="card"><h3>Learns</h3><p>A learning rule is read off the chain it learns on, inside a loop proven not to allocate.</p></div>
       </div>
     </div>
-    <div class="pic"><img src="img/refusal-card.png" alt="A program that swore it never reaches the network, refused when a line that does is added"></div>
+    <div>
+      <div class="pic"><img src="img/refusal-card.png" alt="A program that swore it never reaches the network, refused when a line that does is added, the path named"></div>
+      <p class="dim" style="margin-top:28px">Self-hosting: the pinned compiler reproduces itself byte for byte. One WebAssembly file. Open source. [[years]] of commits.</p>
+    </div>
   </div>
-  <p class="dim" style="margin-top:28px">Self-hosting: the pinned compiler reproduces itself byte for byte. One WebAssembly file. Open source. [[years]] of commits.</p>
   <div class="foot"><span>Mentl · 2 / 5</span><span>the hard tech</span></div>
 </section>
 
@@ -42,13 +44,13 @@
   <div class="two" style="flex:0 0 auto">
     <div class="card"><h3>Before kickoff</h3><ul>
       <li>Mentl: the compiler, the proofs, the course, the Wasatch piece made of Salt Lake's readings</li>
-      <li>sonido: 36 effects, the plugin, the browser editor, the pedal firmware</li>
+      <li>sonido: 36 effects, the plugin, the browser editor, the analysis crate, the pedal firmware</li>
     </ul></div>
     <div class="card"><h3>Since Monday 4 PM</h3><ul>
-      <li>The ear: grid frequency from a guitar, three ways, to the millihertz</li>
+      <li>The ear: grid frequency from a guitar, three ways, to the millihertz, on the analysis crate</li>
       <li>The controller in Mentl, its proofs, its refusal twin, the learner</li>
-      <li>The page, the director, the data, the real event replay</li>
-      <li>The pedal as a second ear; an agent's proposal refused by the gate</li>
+      <li>The page, the director, the data, the real event replayed, the session recorded</li>
+      <li>The gate's verdicts on proposed code: PROVEN, and REFUSED with the line; the pedal firmware as a second ear</li>
     </ul></div>
   </div>
   <div class="cols3" style="margin-top:36px;flex:1;min-height:0">
@@ -112,19 +114,28 @@
   <h1>Running on a controller</h1>
   <ul>
     <li>The proof is at compile time. The artifact is one WebAssembly module importing WASI and nothing else.</li>
-    <li>It runs wherever wasmtime runs, which includes the Linux supervisors that sit beside inverters today; the demo's controller runs that way.</li>
+    <li>It runs wherever wasmtime runs, which includes the Linux supervisors that sit beside inverters today; the demo's controller runs that way and answers each reading in under a millisecond.</li>
     <li>A native backend is on the roadmap; the pedal in the demo runs the ear natively on a Cortex-M7 today.</li>
-    <li>The learner and the predictor keep learning inside a loop proven not to allocate: learning at the edge that cannot stall.</li>
+    <li>The learner keeps learning inside a loop proven not to allocate: learning at the edge that cannot stall.</li>
+    <li>A running computation is a value: the compiler's own resume verb restores a persisted image and continues, so durability is construction, not infrastructure.</li>
   </ul>
   <div class="foot"><span>Mentl · appendix</span><span>the target</span></div>
 </section>
 
 <section class="slide appendix">
   <div class="tag">Appendix</div>
-  <h1>Durable computation</h1>
-  <p>A running controller is a value: persisted by copying its image mid-stream and resumed with <span class="muted">mentl resume</span>, continuing from the same tick with the same state of charge. The recording is in the repository; the limits are stated there too.</p>
-  <p class="muted">When the grid goes dark, the computation does not.</p>
-  <div class="foot"><span>Mentl · appendix</span><span>resume</span></div>
+  <h1>The grid through a DSP library's lens</h1>
+  <table>
+    <tr><th>In sonido</th><th>On the grid</th></tr>
+    <tr><td>Pitch detection (the tuner)</td><td>Frequency: 60 Hz is a B, 49 cents flat; the 2019 event is a key change to A♯</td></tr>
+    <tr><td>THD (the distortion analyzer)</td><td>Power quality: the wave's timbre says what is plugged in</td></tr>
+    <tr><td>A compressor</td><td>Droop control: threshold, ratio, ceiling, hold; the controller's fast band is exactly that curve</td></tr>
+    <tr><td>A noise gate</td><td>Islanding detection</td></tr>
+    <tr><td>Tuning to a reference, the beat going to zero</td><td>Reconnecting an island: a synchroscope is a tuner</td></tr>
+    <tr><td>The correlation meter</td><td>Two sites: the angle between them is the flow</td></tr>
+    <tr><td>LMS (the adaptive filter)</td><td>The learner, written twice: by hand in Rust, and derived by the compiler in Mentl</td></tr>
+  </table>
+  <div class="foot"><span>Mentl · appendix</span><span>crates/sonido-analysis · examples/grid/listen.mn</span></div>
 </section>
 
 <section class="slide appendix">

@@ -22,11 +22,13 @@ Every wire in a building hums at the grid's frequency, and that frequency is set
 python3 -I build_data.py --out data               # PacifiCorp East's hours and the event (EIA_API_KEY optional)
 ./run.sh live                                     # the guitar on the interface, through PipeWire
 ./run.sh wav samples/hum_home.wav
-./run.sh replay                                   # the real event
+./run.sh replay                                   # the real event, from eight seconds before its fall
 STUB=1 ./run.sh sample samples/ear_event.ndjson   # no Mentl needed: the stand-in controller
 ```
 
-The page is at http://127.0.0.1:8787/. Keys: `E` replay event · `I` island · `P` certificate · `A` the compiler's words · `R` refusal · `T` table · `M` mesh · `S` sound · `B` bright room · `0` reset. The sixty-second venue drill is `setup.md`. A copy of this directory served statically, with no director, plays `sessions/default.ndjson`: 212 seconds recorded at the rehearsal, the real event and the hum dying.
+The page is at http://127.0.0.1:8787/. Keys: `E` replay event · `I` island · `P` certificate · `A` the compiler's words · `R` refusal · `G` the gate · `T` table · `M` mesh · `S` sound · `B` bright room · `0` reset. The sixty-second venue drill is `setup.md`. A copy of this directory served statically, with no director, plays `sessions/default.ndjson`: four and a half minutes recorded with the real controller, the real event and the hum dying.
+
+`samples/event_gb.wav` is the real event rendered as a hum (95 seconds from 25 s on its clock, 8 kHz, labeled): on a track in Bitwig under the sonido tuner, the note reads B, then A♯, and the room hears the pitch fall.
 
 The Mentl programs live in the Mentl repository under `examples/grid/`: `station.mn` (the controller), `station-leak.mn` (the refusal twin), `listen.mn` (the learner). `mentl check examples/grid/station-leak.mn` is the refusal; `mentl audit examples/grid/station.mn` is the certificate; `mentl why examples/grid/station.mn decide Network` answers "the row of decide carries no Network". What they are and what was measured is `MENTL_BRIEF.md`; the captured text is under `pitch/`.
 

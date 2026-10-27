@@ -14,9 +14,9 @@ Before the judges sit down. Everything is already plugged in and running when th
    ```
 
    Then `cat /dev/ttyACM0` shows one line every 50 ms, and `./run.sh pedal` reads them.
-6. Small speaker on the headphone out at a quarter volume. Press `S`, hear the pitch, press `S` again.
+6. Small speaker on the headphone out at a quarter volume: Bitwig's output, so the room hears the real hum. In Bitwig: track 1 the live input with the sonido tuner on it; track 2 `samples/event_gb.wav`, cued to its start, muted until the optional beat ("that is the pitch of a blackout").
 7. Press `0`. The page is in its opening state. Hands off the keyboard until the first beat.
 
-Keys during the pitch: `E` replay event · `I` island (press again to return) · `P` certificate · `A` the compiler's words · `R` refusal · `T` table · `M` mesh · `S` sound · `B` bright room · `0` reset · `Esc` close.
+Keys during the pitch: `E` replay event (eight seconds of calm, then the fall) · `I` island (press again to return) · `P` certificate · `A` the compiler's words · `R` refusal · `G` the gate · `T` table · `M` mesh · `S` the page's own tone (not used; the speaker carries the hum) · `B` bright room · `0` reset · `Esc` close.
 
-Sway: workspace 1 is the tuner, workspace 2 is HUM. `swayidle` is off: `pkill swayidle` before the demo. Do not disturb on. Nothing else open.
+Sway: workspace 1 is Bitwig with the tuner, workspace 2 is HUM, workspace 3 a terminal in the Mentl checkout for `mentl check examples/grid/station-leak.mn` in questions. `swayidle` is off: `pkill swayidle` before the demo. Do not disturb on. Nothing else open.

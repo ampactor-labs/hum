@@ -35,9 +35,12 @@ mode_word : Pure
   severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
 tenths : Memory + Alloc
   severs beyond the module: Trap — unlocks Trap-free (nothing it reaches can trap; termination unproven)
+off_words : Memory + Alloc
+  severs beyond the module: Trap — unlocks Trap-free (nothing it reaches can trap; termination unproven)
 reason_text : Memory + Alloc
   severs beyond the module: Trap — unlocks Trap-free (nothing it reaches can trap; termination unproven)
 find_key : Memory + Alloc + Trap
+  pending: 1 undischarged proof obligation(s) — the field ranks them
 find_from : Memory + Trap
   severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
   iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
@@ -50,9 +53,9 @@ is_digit : Pure
 skip_spaces : Memory + Trap
   severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
   iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
+  pending: 2 undischarged proof obligation(s) — the field ranks them
 milli_at : Memory + Trap
   severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-  pending: 2 undischarged proof obligation(s) — the field ranks them
 whole_end : Memory + Trap
   severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
   iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves

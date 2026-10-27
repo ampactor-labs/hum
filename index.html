@@ -154,9 +154,9 @@ td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
   <h2>What the program that decides can and cannot do <span class="tag" id="certTag">PROVEN · mentl check</span></h2>
   <div class="cols">
     <div><h3>CAN</h3><ul>
-      <li><span class="g">✓</span> read the stream of readings</li>
+      <li><span class="g">✓</span> act on each reading the loop hands it</li>
       <li><span class="g">✓</span> write a command for Spin and for Pulse</li>
-      <li><span class="g">✓</span> keep its own state of charge and its last reading</li>
+      <li><span class="g">✓</span> keep its own state of charge and its timers, on lines it owns</li>
     </ul></div>
     <div><h3>CANNOT</h3><ul>
       <li><span class="g no">⊘</span> reach the network while deciding</li>
@@ -166,23 +166,29 @@ td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
       <li><span class="g no">⊘</span> accept a frequency outside 55 to 65 Hz as real</li>
     </ul></div>
   </div>
+  <pre id="certWhy">$ mentl why examples/grid/station.mn decide Network
+<b>the row of decide carries no Network</b></pre>
   <pre id="certRaw" style="display:none"></pre>
   <div class="caption">Not by policy: proven by the compiler through every call the program makes. <span class="sim">Press A for the compiler's own words.</span></div>
 </div></div>
 
 <div class="overlay" id="ovRefuse"><div class="card">
-  <h2>The same program, one line added <span class="tag" style="border-color:var(--alarm);color:var(--alarm)">REFUSED</span></h2>
-  <pre id="leakSrc"><b>effect</b> Net {
-  fetch(url: String) -> String
-}
-
-<b>fn</b> decide(reading, station) <b>with</b> !Alloc + !Network + !Filesystem = {
-  <span class="hi">let price = fetch("https://api.eia.gov/price")   // scale the slow band by price</span>
+  <h2>The same program, one price read added inside the reflex <span class="tag" style="border-color:var(--alarm);color:var(--alarm)">REFUSED</span></h2>
+  <pre id="leakSrc"><b>fn</b> decide(valid, hz, rocof, level, hour, rush, clean, out) -> Mode <b>with</b> !Alloc + !Network + !Filesystem = {
+  ...
+  <span class="hi">let price = price_m("https://api.eia.gov/v2/electricity/rto/region-data/…")</span>
+  let pulse_ask = if rush == 1 { <span class="hi">if price > 50000 { 300000 } else { 200000 }</span> } else { … }
   ...
 }</pre>
-  <div class="path"><span class="node">decide</span><span class="arrow">→</span><span class="node">fetch</span><span class="arrow">→</span><span class="node">Net</span><span class="note">the path the network takes into a function that swore it never would</span></div>
-  <pre id="refuseRaw">E_EffectMismatch: effect row mismatch: !Network vs ... Net — declared as decide; Net enters through `fetch`, an op of Net.</pre>
-  <div class="caption">This is what review cannot do: the build refuses, and names the line.</div>
+  <div class="path"><span class="node">decide</span><span class="arrow">→</span><span class="node">price_m</span><span class="arrow">→</span><span class="node">fetch_param</span><span class="arrow">→</span><span class="node">Network</span><span class="note">the path the network takes into a function that swore it never would</span></div>
+  <pre id="refuseRaw">E_EffectMismatch: declared as decide; Network enters through `price_m` → through `fetch_param` → declared as fetch_param, an op of Network.</pre>
+  <div class="caption">This is what review cannot do: the build refuses, and names the line. Price belongs to the hour's plan, read before the reflex; a lookup inside the millisecond's decision is the bug.</div>
+</div></div>
+
+<div class="overlay" id="ovGate"><div class="card">
+  <h2>Code proposed through the gate <span class="tag">mentl mcp</span></h2>
+  <pre id="gateRaw">capture pending</pre>
+  <div class="caption">An agent that writes control code proposes it here. The gate answers PROVEN, or REFUSED with the line, and nothing executes unproven.</div>
 </div></div>
 
 <div class="overlay" id="ovTable"><div class="card">
@@ -196,7 +202,7 @@ td.mode { font-size: 1.1rem; letter-spacing: 0; margin: 0; }
   <div class="caption">Two Stations with GPS time see the <b>angle</b> between them, which is the flow on the line between them, and an event's wave arrives at one before the other. FNET has done this from wall outlets since 2004; a fleet that both sees and answers at 10C has not existed. <span class="sim">Simulated from the day's shape and the replayed event.</span></div>
 </div></div>
 
-<div class="help">E replay · I island · P certificate · R refusal · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
+<div class="help">E replay · I island · P certificate · R refusal · G gate · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
 
 <script>
 (() => {
@@ -245,7 +251,8 @@ async function startPlayback(path) {
   const lines = (await r.text()).split("\n").filter(l => l.trim());
   const rows = lines.map(l => JSON.parse(l));
   const speed = parseFloat(params.get("speed") || "1");
-  const built = { trace_fast: [], trace: [], station_trace: [], ledger: { events: 0, kwh_moved: 0, spin_cycles: 0, pulse_cycles_saved: 0 }, latency_ms: 48, learned: {}, pace: null, station: {} };
+  // The recording carries each line's measured latency (`ms`) and the learner's reading (`learned`); nothing is assumed.
+  const built = { trace_fast: [], trace: [], station_trace: [], ledger: { events: 0, kwh_moved: 0, spin_cycles: 0, pulse_cycles_saved: 0 }, latency_ms: null, learned: {}, pace: null, station: {} };
   try { built.pace = (await (await fetch("data/pace.json", { cache: "no-store" })).json()); } catch (e) {}
   if (built.pace) { built.pace = { today: built.pace.today, tomorrow: built.pace.tomorrow, window: built.pace.window, forecast_source: built.pace.forecast_source, as_of_local: built.pace.as_of_local, demand_today: (built.pace.for_today||{}).demand, forecast_today: (built.pace.for_today||{}).forecast, forecast_tomorrow: (built.pace.for_tomorrow||{}).forecast, shape: built.pace.shape, clean: built.pace.clean_mean, charge_hours: [] }; }
   let i = 0, lastMode = "GRID", t0 = performance.now(), base = rows.length ? rows[0].ear.t : 0;
@@ -253,10 +260,12 @@ async function startPlayback(path) {
   function step() {
     const elapsed = (performance.now() - t0) / 1000 * speed;
     while (i < rows.length && rows[i].ear.t - base <= elapsed) {
-      const { ear, station } = rows[i++];
+      const row = rows[i++];
+      const { ear, station } = row;
       const now = Object.assign({}, ear, station || {});
+      if (row.learned != null) built.learned = { hz: row.learned };
       if (station) {
-        if (station.mode === "EVENT" && lastMode !== "EVENT") built.ledger.events++;
+        if (station.mode === "EVENT" && lastMode !== "EVENT") { built.ledger.events++; if (row.ms != null) built.latency_ms = row.ms; }
         lastMode = station.mode;
         if (station.pulse_w > 0 && ear.rush) built.ledger.kwh_moved += station.pulse_w * 0.05 / 3600 / 1000;
         if (station.spin_w > 0) { const kwh = station.spin_w * 0.05 / 3600 / 1000; built.ledger.spin_cycles += kwh / 10; built.ledger.pulse_cycles_saved += kwh / 1200; }
@@ -289,7 +298,15 @@ function updateChip() {
 
 // ---------- numbers ----------
 function fmt(v, d) { return v == null ? "—" : Number(v).toFixed(d); }
-function centsFromB1(hz) { return 1200 * Math.log2(hz / B1); }
+// The grid as a note: the nearest equal-tempered pitch and the cents from it.
+// Sixty hertz sits 49 cents under B1; the 2019 event falls to A♯1.
+const NAMES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+function noteOf(hz) {
+  const n = Math.round(12 * Math.log2(hz / 440));
+  const ref = 440 * Math.pow(2, n / 12);
+  const idx = ((n + 9) % 12 + 12) % 12, octave = Math.floor((n + 9) / 12) + 4;
+  return { name: NAMES[idx] + octave, cents: 1200 * Math.log2(hz / ref) };
+}
 function onState() {
   updateChip();
   if (!state) return;
@@ -299,7 +316,7 @@ function onState() {
   if (hz != null && (heroShown == null || Math.abs(hz - heroShown) > 0.0004) && t - heroAt > 950) {
     const el = $("hz"); el.style.opacity = 0.55; setTimeout(() => { el.textContent = hz.toFixed(3); el.style.opacity = 1; }, 60);
     heroShown = hz; heroAt = t;
-    const c = centsFromB1(hz); $("note").innerHTML = "<b>B1</b> " + (c >= 0 ? "+" : "−") + Math.abs(c).toFixed(1) + " ¢<br><span style='font-size:1.1rem'>the grid as a note</span>";
+    const nt = noteOf(hz); $("note").innerHTML = "<b>" + nt.name + "</b> " + (nt.cents >= 0 ? "+" : "−") + Math.abs(nt.cents).toFixed(1) + " ¢<br><span style='font-size:1.1rem'>the grid as a note</span>";
   }
   if (hz == null) { $("hz").style.opacity = 0.3; $("note").innerHTML = ""; heroShown = null; if (!$("hz").textContent.match(/\d/)) $("hz").textContent = "· · ·"; } else $("hz").style.opacity = 1;
   const r = n.rocof;
@@ -331,7 +348,7 @@ function onState() {
   // rush caption
   const p = state.pace || {};
   const src = p.forecast_source === "eia-day-ahead-tomorrow" ? "tomorrow's day-ahead forecast" : p.forecast_source === "eia-day-ahead-today" ? "today's day-ahead forecast" : "the seven-day shape (no forecast filed yet)";
-  $("capRush").innerHTML = "EIA-930 hourly, no key" + (p.as_of_local ? ", reported through " + p.as_of_local : "") + ". The rush hour is " + (p.window ? hourLabel(p.window[0]) + " to " + hourLabel(p.window[1]) : "—") + ", from " + src + ". The strip is the hour's clean share; Pulse charges in the hours marked under it." + (state.learned && state.learned.window ? " Learned on-device: " + hourLabel(state.learned.window[0]) + " to " + hourLabel(state.learned.window[1]) + "." : "");
+  $("capRush").innerHTML = "EIA-930 hourly, no key" + (p.as_of_local ? ", reported through " + p.as_of_local : "") + ". The rush hour is " + (p.window ? hourLabel(p.window[0]) + " to " + hourLabel(p.window[1]) : "—") + ", from " + src + ". The strip is the hour's clean share; Pulse charges in the hours marked under it.";
   // table ring
   recent.push(n); if (recent.length > 20) recent.shift();
   sound.update(n, state);
@@ -395,7 +412,7 @@ function drawHeart() {
 let ringAngle = 0, lastFrame = performance.now();
 function drawStation() {
   const [g, w, h] = setup($("cStation"));
-  const n = (state && state.now) || {}, S = (state && state.station) || { spin_w: 100000, spin_wh: 10000, pulse_w: 300000, pulse_wh: 1200000 };
+  const n = (state && state.now) || {}, S = Object.assign({ spin_w: 100000, spin_wh: 10000, pulse_w: 300000, pulse_wh: 1200000 }, (state && state.station) || {});
   const ink = css("--ink"), ink2 = css("--ink-2"), ink3 = css("--ink-3"), grid = css("--grid"), spin = css("--spin"), pulse = css("--pulse"), line = css("--line"), hi = css("--panel-hi"), alarm = css("--alarm");
   g.clearRect(0, 0, w, h);
   const mono = `${rem() * 1.05}px ${css("--mono")}`, monoBig = `${rem() * 1.35}px ${css("--mono")}`;
@@ -416,7 +433,7 @@ function drawStation() {
   const dt = (performance.now() - lastFrame) / 1000; lastFrame = performance.now();
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!reduce) ringAngle += dt * (0.6 + 2.4 * spinSoc) * (island || n.mode === "EVENT" ? 1.6 : 1);
-  const r1 = Math.min(boxW * 0.135, boxH * 0.22), sx = boxX + boxW * 0.27, sy = boxY + boxH * 0.42;
+  const r1 = Math.min(boxW * 0.135, boxH * 0.22), sx = boxX + boxW * 0.21, sy = boxY + boxH * 0.42;
   g.strokeStyle = rgba(spin, 0.3); g.lineWidth = 6; g.beginPath(); g.arc(sx, sy, r1, 0, Math.PI * 2); g.stroke();
   g.strokeStyle = spin; g.lineWidth = 6; g.setLineDash([r1 * 0.9, r1 * 0.5]); g.lineDashOffset = -ringAngle * r1; g.beginPath(); g.arc(sx, sy, r1, 0, Math.PI * 2 * spinSoc); g.stroke(); g.setLineDash([]);
   g.fillStyle = ink; g.font = monoBig; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText((Math.abs(spinW) / 1000).toFixed(0) + " kW", sx, sy - rem() * 0.1);
@@ -425,7 +442,7 @@ function drawStation() {
   g.fillStyle = ink2; g.font = small; g.fillText("the milliseconds", sx, sy + r1 + rem() * 1.75);
   g.fillStyle = ink3; g.fillText((spinSoc * S.spin_wh / S.spin_w * 3600).toFixed(0) + " s at " + (S.spin_w / 1000) + " kW", sx, sy + r1 + rem() * 2.85);
   // Pulse: the tank, filled with its charge
-  const px = boxX + boxW * 0.74, pw = r1 * 1.2, ph = r1 * 2.0, py = sy - ph / 2;
+  const px = boxX + boxW * 0.8, pw = r1 * 1.2, ph = r1 * 2.0, py = sy - ph / 2;
   g.strokeStyle = pulse; g.lineWidth = 2; g.fillStyle = rgba(pulse, 0.12); g.beginPath(); g.roundRect(px - pw / 2, py, pw, ph, 6); g.fill(); g.stroke();
   g.fillStyle = rgba(pulse, 0.55); g.fillRect(px - pw / 2 + 3, py + 3 + (ph - 6) * (1 - pulseSoc), pw - 6, (ph - 6) * pulseSoc);
   g.fillStyle = ink; g.font = monoBig; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText((Math.abs(pulseW) / 1000).toFixed(0) + " kW", px, sy - rem() * 0.1);
@@ -438,6 +455,25 @@ function drawStation() {
   g.strokeStyle = line; g.fillStyle = rgba(hi, 0.8); g.beginPath(); g.roundRect(bx, midY - h * 0.16, bw, h * 0.32, 6); g.fill(); g.stroke();
   g.fillStyle = ink2; g.font = mono; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("building", bx + bw / 2, midY - rem() * 0.6);
   g.fillStyle = ink3; g.font = small; g.fillText(island ? "on the station" : "on the grid", bx + bw / 2, midY + rem() * 0.8);
+  // The reflex as a compressor on pitch: deviation in, Spin out. The deadband
+  // is the threshold, the droop the ratio, 100 kW the ceiling; the live point
+  // rides the curve.
+  const cw = boxW * 0.17, ch = boxH * 0.3, cx0 = cx - cw / 2, cy0 = boxY + boxH * 0.23;
+  const devX = d => cx0 + cw * (0.5 + Math.max(-1, Math.min(1, d / 0.3)) / 2);
+  const kwY = k => cy0 + ch * (0.5 - Math.max(-1, Math.min(1, k / 100000)) / 2);
+  g.fillStyle = rgba(css("--dim"), 1); g.fillRect(devX(-DEADBAND), cy0, devX(DEADBAND) - devX(-DEADBAND), ch);
+  g.strokeStyle = rgba(line, 1); g.lineWidth = 1;
+  g.beginPath(); g.moveTo(cx0, kwY(0)); g.lineTo(cx0 + cw, kwY(0)); g.moveTo(devX(0), cy0); g.lineTo(devX(0), cy0 + ch); g.stroke();
+  g.strokeStyle = spin; g.lineWidth = 2; g.lineJoin = "round"; g.beginPath();
+  [[-0.3, 100000], [-0.236, 100000], [-DEADBAND, 0], [DEADBAND, 0], [0.236, -100000], [0.3, -100000]].forEach((p, i) => i ? g.lineTo(devX(p[0]), kwY(p[1])) : g.moveTo(devX(p[0]), kwY(p[1])));
+  g.stroke();
+  const devNow = n.hz_fast != null ? n.hz_fast - NOMINAL : null;
+  if (devNow != null && !island) { g.fillStyle = css("--panel"); g.beginPath(); g.arc(devX(devNow), kwY(spinW), 6, 0, Math.PI * 2); g.fill(); g.fillStyle = n.mode === "EVENT" ? spin : ink; g.beginPath(); g.arc(devX(devNow), kwY(spinW), 4, 0, Math.PI * 2); g.fill(); }
+  g.fillStyle = ink3; g.font = small; g.textAlign = "left"; g.textBaseline = "top"; g.fillText("+100 kW", cx0 + 3, cy0 + 2);
+  g.textBaseline = "bottom"; g.fillText("−100", cx0 + 3, cy0 + ch - 2);
+  g.textAlign = "center"; g.textBaseline = "top";
+  g.fillText("the reflex", cx, cy0 + ch + rem() * 0.35);
+  g.fillText("±300 mHz → Spin", cx, cy0 + ch + rem() * 1.45);
   const total = spinW + pulseW;
   const arrow = (x1, x2, y, width, color) => { if (width < 1) return; g.strokeStyle = color; g.lineWidth = width; g.beginPath(); g.moveTo(x1, y); g.lineTo(x2 - 10, y); g.stroke(); g.fillStyle = color; g.beginPath(); g.moveTo(x2, y); g.lineTo(x2 - 12, y - 7); g.lineTo(x2 - 12, y + 7); g.fill(); };
   if (total > 0) arrow(boxX + boxW, bx, midY, Math.min(12, 2 + total / 30000), total === spinW ? spin : pulse);
@@ -467,8 +503,6 @@ function drawRush() {
   [0, 24].forEach(d => g.fillRect(xOf(d + win[0]), pad.t, xOf(d + win[1]) - xOf(d + win[0]), plotB - pad.t));
   g.fillStyle = ink3; g.font = `${rem() * 0.95}px ${css("--mono")}`; g.textAlign = "center"; g.textBaseline = "top";
   [0, 24].forEach(d => g.fillText("rush hour", xOf(d + (win[0] + win[1]) / 2), pad.t + rem() * 0.2));
-  // learned window bracket
-  if (state && state.learned && state.learned.window) { const lw = state.learned.window; g.strokeStyle = pulse; g.lineWidth = 2; [0, 24].forEach(d => { const y = pad.t + rem() * 1.6; g.beginPath(); g.moveTo(xOf(d + lw[0]), y + 6); g.lineTo(xOf(d + lw[0]), y); g.lineTo(xOf(d + lw[1]), y); g.lineTo(xOf(d + lw[1]), y + 6); g.stroke(); }); g.fillStyle = pulse; g.fillText("learned", xOf((lw[0] + lw[1]) / 2), pad.t + rem() * 1.9); }
   // gridlines and axes
   g.strokeStyle = rgba(line, 0.9); g.lineWidth = 1; g.fillStyle = ink3; g.textAlign = "right"; g.textBaseline = "middle";
   const stepV = (hi - lo) > 3000 ? 1000 : 500;
@@ -564,7 +598,7 @@ async function cmd(q) { try { await fetch("/cmd?" + q + "&ts=" + Date.now(), { c
 function replay() { if (sessionFile) return; cmd("src=replay"); }
 function island() { if (sessionFile) return; islandOn = !islandOn; $("btnIsland").classList.toggle("on", islandOn); cmd(islandOn ? "src=silence" : "src=back"); }
 function reset() { closeAll(); if (islandOn) island(); if (sound.on) sound.toggle(); if (!sessionFile) { cmd("src=back"); cmd("reset=1"); } document.body.classList.remove("bright"); }
-const overlays = ["ovCert", "ovRefuse", "ovTable", "ovMesh"];
+const overlays = ["ovCert", "ovRefuse", "ovGate", "ovTable", "ovMesh"];
 function closeAll() { overlays.forEach(id => $(id).classList.remove("show")); }
 function toggleOverlay(id) { const was = $(id).classList.contains("show"); closeAll(); if (!was) { $(id).classList.add("show"); if (id === "ovTable") fillTable(); if (id === "ovMesh") meshT0 = performance.now(); } }
 function fillTable() {
@@ -572,8 +606,12 @@ function fillTable() {
   recent.slice().reverse().forEach(n => { const tr = document.createElement("tr"); const cells = [n.t ? new Date(n.t * 1000).toLocaleTimeString("en-US", { hour12: false }) + "." + String(Math.round((n.t % 1) * 100)).padStart(2, "0") : "", fmt(n.hz_fast, 4), fmt(n.hz, 4), fmt(n.hz_stft, 4), fmt(n.rocof, 3), fmt(n.level_db, 1), n.harmonic ?? "", n.rush ?? "", n.mode || "", n.spin_w ?? "", n.pulse_w ?? "", n.spin_soc_m != null ? (n.spin_soc_m / 10).toFixed(1) + "%" : "", n.pulse_soc_m != null ? (n.pulse_soc_m / 10).toFixed(1) + "%" : ""]; cells.forEach(c => { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); }); tb.appendChild(tr); });
 }
 async function loadCaptures() {
-  try { const r = await fetch("pitch/audit.txt", { cache: "no-store" }); if (r.ok) { $("certRaw").textContent = await r.text(); } else $("certRaw").textContent = "mentl audit examples/grid/station.mn — capture pending"; } catch (e) { $("certRaw").textContent = "capture pending"; }
-  try { const r = await fetch("pitch/refusal.txt", { cache: "no-store" }); if (r.ok) $("refuseRaw").textContent = await r.text(); } catch (e) {}
+  const get = async p => { try { const r = await fetch(p, { cache: "no-store" }); return r.ok ? await r.text() : null; } catch (e) { return null; } };
+  const audit = await get("pitch/audit.txt"), why = await get("pitch/why.txt");
+  $("certRaw").textContent = (audit ? "$ mentl audit examples/grid/station.mn\n" + audit : "mentl audit examples/grid/station.mn — capture pending") + (why ? "\n" + why : "");
+  const refusal = await get("pitch/refusal.txt"); if (refusal) $("refuseRaw").textContent = refusal;
+  const gate = await get("pitch/gate.txt");
+  if (gate) { $("gateRaw").innerHTML = gate.split("\n").map(l => { const e = l.replace(/&/g, "&amp;").replace(/</g, "&lt;"); return /^< PROVEN/.test(l) ? "<b>" + e + "</b>" : /^< REFUSED/.test(l) ? "<span class='hi'>" + e + "</span>" : e; }).join("\n"); }
 }
 document.addEventListener("keydown", e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -584,6 +622,7 @@ document.addEventListener("keydown", e => {
   else if (k === "p") toggleOverlay("ovCert");
   else if (k === "a") { $("certRaw").style.display = $("certRaw").style.display === "none" ? "block" : "none"; if (!$("ovCert").classList.contains("show")) toggleOverlay("ovCert"); }
   else if (k === "r") toggleOverlay("ovRefuse");
+  else if (k === "g") toggleOverlay("ovGate");
   else if (k === "t") toggleOverlay("ovTable");
   else if (k === "m") toggleOverlay("ovMesh");
   else if (k === "s") sound.toggle();
