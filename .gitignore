@@ -6,3 +6,5 @@ sessions/
 !sessions/default.ndjson
 *.wav
 !samples/*.wav
+__pycache__/
+pitch/video/
