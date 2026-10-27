@@ -785,9 +785,14 @@ function drawTuner(now) {
     const pts = sc.map((v, i) => [14 + (w - 28) * i / (sc.length - 1), mid - Math.max(-1.2, Math.min(1.2, v / 1000 * scopeGain)) * amp]);
     g.strokeStyle = rgba(SON.partner, 0.45); g.lineWidth = 1.4; poly(g, pts.map(([x, y]) => [x, y + 4]));
     neon(g, pts, SON.accent, 2.4);
-  } else neon(g, [[14, mid], [w - 14, mid]], SON.dim, 1.2);
+  } else if (n.hz == null) neon(g, [[14, mid], [w - 14, mid]], SON.dim, 1.2);
   // The tuner: the note on a dark plate, a cents arc over it, the needle from below.
-  const hz = n.tuner_hz, cents = n.tuner_cents, locked = hz != null && cents != null;
+  // The tuner kernel's reading when the ear sends one. Sources without it, such
+  // as the pedal or an older recording, use the estimator's frequency: at this
+  // reference 60 Hz is exactly B1, so the cents are its distance from 60 Hz.
+  const own = n.tuner_hz != null && n.tuner_cents != null;
+  const hz = own ? n.tuner_hz : n.hz, cents = own ? n.tuner_cents : (n.hz != null ? 1200 * Math.log2(n.hz / NOMINAL) : null);
+  const locked = hz != null && cents != null;
   const inTune = locked && Math.abs(cents) < 2, color = inTune ? SON.green : SON.accent;
   const px = cx, py = horizon - 6, r = Math.min(horizon - 18, w * 0.32), span = 1.0;
   const note = locked ? noteName(hz) : "--", size = Math.max(40, Math.min(132, horizon * 0.30));

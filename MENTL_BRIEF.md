@@ -1,34 +1,44 @@
 # The Mentl half of HUM
 
-Three user programs in the Mentl repository, `github.com/ampactor-labs/mentl`, under `examples/grid/`, written against `CONTRACTS.md` and the samples here. They are the hard-tech center of the Nucleus pitch and the closing beat of the Torus pitch: nobody in the energy industry ships a controller whose compiler proves it cannot reach the network while deciding. Each program's head comment says what it is and how to run it; this page says how the three fit HUM and what was measured when they landed.
+Three programs in the Mentl repository, under `examples/grid/`, do HUM's deciding and learning. They read the line formats in `CONTRACTS.md`. Each file's opening comment says what it does and how to run it. This page says how the three fit HUM and what was measured.
 
-## station.mn, the controller
+## station.mn: the controller
 
-Reads enriched ear lines (C1e) on stdin and answers each with a decision line (C2) on the same tick. `decide` is declared `!Alloc + !Network + !Filesystem + !WASI` and the compiler proves the three through every call. Every command passes a refinement type (`SpinW` ±100 kW, `PulseW` ±300 kW, `Soc` 0 to 1000) and the reading the bands act on is a `GridMhz` (55 to 65 Hz). Every number is an integer in milli-units read off the line's text, so the decision never rounds a float and never reaches the one conversion that can trap. The Station is modeled from Torus's published figures (Spin 100 kW / 10 kWh, Pulse 300 kW / 1,200 kWh) and labeled so.
+It reads one line per reading from the director and answers each with one decision line. The function that decides, `decide`, makes four promises in its signature: no memory allocation, no network, no file system, and no host call of any kind (`!Alloc + !Network + !Filesystem + !WASI`). The compiler proves all four through every function `decide` calls.
 
-The rules, as the program states them: a 36 mHz deadband; a droop that reaches full Spin at 200 mHz past the band; the reflex at 100 mHz/s, full Spin, held 2 to 10 s; EVENT for as long as the fast band pushes at least 10 kW and two seconds after; RUSH discharging Pulse at 300 kW through the window; a clean hour charging Pulse at 150 kW to 95 percent; ISLAND two lines after the hum, once heard, is 30 dB under its ten-second mean or gone, Spin for two seconds and Pulse after; two lines of the hum back end it.
+Power commands are clamped in code, the flywheel to ±100 kW and the battery to ±300 kW, and their types state those ranges. The frequency the fast rules act on must lie between 55 and 65 Hz. Every number is an integer in thousandths, read from the line's text, so the decision never rounds a floating-point number.
 
-Measured on the pinned boot, the samples enriched by hand:
+The rules:
 
-- `ear_event.ndjson`: EVENT on the line where the rate of change crosses 100 mHz/s, "falling at 129 mHz per second, past 100"; the reflex holds ten seconds; the droop carries Spin at 52 kW at −140 mHz and the mode stays EVENT until the deviation is inside 56 mHz, 31 s later; then RUSH.
-- `ear_island.ndjson`: the reflex at the fall, then ISLAND two lines after the hum dies, "the hum died, 105.8 dB under its mean: Spin carries the first seconds", Pulse carrying 200 kW after.
-- `ear_tone.ndjson`: GRID throughout, "within 36 mHz of 60; Spin topping up from Pulse at 20 kW".
+- Within 36 mHz of 60 Hz, nothing happens.
+- Beyond that, the flywheel pushes in proportion, reaching full power 200 mHz past the band.
+- If the frequency falls or rises faster than 100 mHz per second, the flywheel goes to full power for 2 to 10 seconds. The page calls this an event and holds the word while the flywheel pushes at least 10 kW, plus two seconds.
+- In the rush-hour window, the battery runs the building at 300 kW. In a clean hour, it charges at 150 kW, up to 95 percent.
+- When a hum that was heard disappears, or drops 30 dB below its ten-second average, for six readings in a row, the Station keeps the building on: the flywheel for the first two seconds, the battery after that. Two good readings end it.
 
-## station-leak.mn, the twin that refuses
+The Station is a model built from Torus's published figures: the flywheel 100 kW and 10 kWh, the battery 300 kW and 1,200 kWh.
 
-The controller line for line with one addition a reasonable engineer would write: the hour's price read live inside the reflex, so Pulse leans harder into an expensive hour. `mentl check examples/grid/station-leak.mn` refuses: `E_EffectMismatch`, declared as decide; Network enters through `price_m` → through `fetch_param` → declared as fetch_param, an op of Network declared at dsp/signal:66:1. The chain is the point, hop by hop from the oath to the op. The text is `pitch/refusal.txt`.
+Measured on the pinned compiler:
 
-## listen.mn, the learner
+- `samples/ear_event.ndjson`: the event starts on the reading where the fall crosses 100 mHz per second, "falling at 129 mHz per second, past 100".
+- `samples/ear_tone.ndjson`: no event, and the flywheel tops up from the battery at 20 kW.
+- In the director, each decision takes under a millisecond on the laptop.
 
-One coefficient learns the hum's frequency from the 480 Hz stream (`hum_480.txt`): a sinusoid obeys x[n] = a·x[n−1] − x[n−2] with a = 2 cos ω, the squared prediction error is the chain the reading differentiates, `d(e * e)` under `~> grad(a)`, and the coefficient moves against the slope each sample, lesson 09's step. A four-pole low-pass at 80 Hz, its lines owned by the stage, keeps the hum's harmonics from bending the predictor; the step is normalized by a smoothed energy. Both stages are `!Alloc`. It prints `{"hz_learned":60.000312}` once a second (C7). Measured: within 5 mHz of the stream's own zero crossings on the recorded hum, which wobbles ±20 mHz; 60.05000 on a 60.050 Hz sine.
+What is not proven. The compiler lists claims it could not settle in eight functions, two of them inside `decide`. The program can trap. The loop that reads and writes text around the decision keeps about 8 KB per reading: harmless on the laptop for hours, but on the pedal's 64 MB it would last about seven minutes. That, together with the pedal having no WebAssembly engine, is why the pedal does not run the controller yet.
 
-## The captures, under `pitch/`
+## station-leak.mn: the copy the compiler refuses
+
+The same controller with one line a reasonable engineer might add: read the hour's electricity price online, inside the fast decision, so the battery leans harder into an expensive hour. `mentl check examples/grid/station-leak.mn` refuses it with `E_EffectMismatch` and names the path the network takes: `decide` calls `price_m`, which calls `fetch_param`, which is a network operation. The full text is `pitch/refusal.txt`.
+
+## listen.mn: the learner
+
+One number learns the hum's frequency from a 480 Hz copy of the signal. A pure tone obeys x[n] = a·x[n−1] − x[n−2] with a = 2·cos ω, so the program predicts each sample from the two before it and nudges `a` against the slope of the squared error. The compiler derives that slope itself, from `d(e * e)` under `~> grad(a)`. A low-pass filter at 80 Hz keeps the hum's harmonics out, and both stages promise `!Alloc`. Once a second it prints a line such as `{"hz_learned":60.000312}`.
+
+Measured: within 5 mHz of the zero-crossing reading on a hum that wobbles ±20 mHz, and 60.05000 on a 60.050 Hz tone. It trails a fast fall, so the stage does not show it.
+
+## The compiler's output, captured under `pitch/`
 
 - `refusal.txt`: `mentl check examples/grid/station-leak.mn`.
-- `audit.txt`: `mentl audit examples/grid/station.mn`, the certificate: `decide` Real-time safe (proven zero allocation), the module Sandbox (proven no network access).
-- `why.txt`: `mentl why examples/grid/station.mn decide`, and with `Network`, `Alloc`, `Filesystem`, `WASI`: "the row of decide carries no Network", "the row of decide carries no WASI": no host call of any kind inside a decision.
-- `gate.txt`: `mentl mcp`, the proof gate on stdio: a clean reflex proposed, PROVEN; the same reflex with a price read inside, REFUSED, nothing emitted.
-
-## What was cut
-
-`predict.mn`, `score.mn` and the resume recording were planned and cut: the EIA window suffices, the piece did not serve the pitch, and durable computation is the compiler's own `resume` verb. The brief that specified them was superseded by the programs themselves.
+- `audit.txt`: `mentl audit examples/grid/station.mn`.
+- `why.txt`: `mentl why examples/grid/station.mn decide`, then the same question about `Network`, `Alloc`, `Filesystem` and `WASI`. Each answer says `decide` carries none of them.
+- `gate.txt`: a `mentl mcp` session. A clean decision is proposed and proven, then the same decision with a price lookup is refused and nothing is built.

@@ -4,12 +4,12 @@ Do this before the judges sit down, so everything is running when they arrive.
 
 1. **Record a fallback first.** On arrival, plug in the guitar and record one minute of the room's hum: `arecord -D pipewire -f S16_LE -r 48000 -c 1 -d 60 samples/hum_aernata.wav`.
 2. **Power.** Power strip in, laptop on power.
-3. **The ear: the pedal, or the Scarlett.**
-   - Pedal: guitar into the pedal's input, the pedal's USB cable into the laptop. The LEDs breathe with the grid. Run `./run.sh pedal`.
-   - Scarlett: guitar cable in channel 1, INST lit, gain at the rehearsed mark, then leave it alone. `wpctl status` must show the Scarlett as the default source; if not, `wpctl set-default <id>`. Run `./run.sh live`.
+3. **The rig: guitar, pedal, Scarlett.** Guitar into the pedal's input. The pedal's output into the Scarlett's channel 1, INST lit, gain at the rehearsed mark, then leave it alone. The pedal's USB cable into the laptop, so its footswitches work. `wpctl status` must show the Scarlett as the default source; if not, `wpctl set-default <id>`. Run `./run.sh live`. The laptop hears the full signal, so the stage shows the waveform and sonido's tuner.
+   - Without the Scarlett: `./run.sh pedal` reads the pedal's own measurements over USB. The number and the needle work, but the waveform does not.
+   - Without the pedal: guitar straight into the Scarlett, and use the laptop keys.
 4. **Check the stage.** The kiosk window opens on the stage. Within five seconds the chip reads LIVE and the number moves.
 5. **If it stays on WAITING.** Hold the pickup against a wall wart. If it still waits after ten seconds, run `./run.sh wav samples/hum_aernata.wav`. The chip then reads RECORDING, and the pitch does not change.
-6. **Sound.** A small speaker at a quarter volume, on the pedal's output through a small amp, or on the Scarlett's output with direct monitoring on. The room hears the hum.
+6. **Sound.** A small speaker at a quarter volume on the Scarlett's output, with direct monitoring on. The room hears the hum.
 7. **Reset.** Press `0`. Hands off the keyboard until the first beat.
 
 ## The keys
