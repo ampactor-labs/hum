@@ -222,6 +222,57 @@ class StubController:
         }
 
 
+class Learner:
+    """`listen.mn` on the ear's decimated stream: the third estimator, learned.
+
+    The ear writes the tracked band at 480 Hz to a file; `tail -F` follows it
+    into `mentl run listen.mn`, whose stdout is one `{"hz_learned_m":59984}`
+    per second. Nothing here runs unless the program exists."""
+
+    def __init__(self, mentl_bin, program, decimated_path, state):
+        self.cmd = ["sh", "-c", f"tail -n +1 -F {shlex.quote(decimated_path)} | {shlex.quote(mentl_bin)} run {shlex.quote(program)}"]
+        self.state = state
+        self.proc = None
+        threading.Thread(target=self._run, daemon=True).start()
+
+    def _run(self):
+        while True:
+            try:
+                log("learner: " + " ".join(self.cmd))
+                self.proc = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, text=True, bufsize=1)
+                for line in self.proc.stdout:
+                    try:
+                        d = json.loads(line.strip())
+                    except json.JSONDecodeError:
+                        continue
+                    if "hz_learned_m" in d:
+                        with self.state.lock:
+                            self.state.learned["hz"] = d["hz_learned_m"] / 1000.0
+            except Exception as e:
+                log(f"learner: {e}")
+            time.sleep(2.0)
+
+
+def run_predictor(mentl_bin, program, hours_path, state):
+    """`predict.mn` once, on the seven days of hours: the learned rush window."""
+    try:
+        with open(hours_path) as f:
+            out = subprocess.run([mentl_bin, "run", program], stdin=f, capture_output=True, text=True, timeout=600)
+        for line in reversed(out.stdout.strip().splitlines()):
+            try:
+                d = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if "window" in d:
+                with state.lock:
+                    state.learned["window"] = d["window"]
+                log(f"predictor: window {d['window']}")
+                return
+        log(f"predictor: no window in its output ({out.stderr.strip()[:200]})")
+    except Exception as e:
+        log(f"predictor: {e}")
+
+
 class MentlController:
     """`mentl run examples/grid/station.mn`: lines in, decisions out."""
 
@@ -271,6 +322,8 @@ class Source:
 
     def _spawn_ear(self, args, stdin=None):
         cmd = [self.opts.ear] + args
+        if self.opts.decimated:
+            cmd += ["--emit-decimated", self.opts.decimated]
         log("ear: " + " ".join(cmd))
         return subprocess.Popen(cmd, stdin=stdin, stdout=subprocess.PIPE, text=True, bufsize=1)
 
@@ -453,6 +506,14 @@ class Director:
             log("controller: in-process stub (development only)")
         else:
             self.controller = MentlController(opts.mentl_bin, opts.mentl_dir)
+        # The learned estimators, when their programs exist.
+        listen = os.path.join(opts.mentl_dir, "examples", "grid", "listen.mn")
+        predict = os.path.join(opts.mentl_dir, "examples", "grid", "predict.mn")
+        if os.path.exists(listen) and opts.decimated:
+            self.learner = Learner(opts.mentl_bin, listen, opts.decimated, self.state)
+        hours = os.path.join(HERE, "data", "pace_hours.txt")
+        if os.path.exists(predict) and os.path.exists(hours):
+            threading.Thread(target=run_predictor, args=(opts.mentl_bin, predict, hours, self.state), daemon=True).start()
         self.source = None
         self.previous_mode = opts.mode
         self.requested = None
@@ -571,6 +632,7 @@ def parse(argv):
     o.mentl_dir = os.environ.get("MENTL_DIR", os.path.expanduser("~/mentl"))
     o.mentl_bin = os.environ.get("MENTL_BIN", "mentl")
     o.port = 8787
+    o.decimated = os.path.join(HERE, "sessions", "decimated_480.txt")
     i = 0
     while i < len(argv):
         a = argv[i]
@@ -589,6 +651,8 @@ def parse(argv):
         elif a == "--mentl-dir": o.mentl_dir = val()
         elif a == "--mentl-bin": o.mentl_bin = val()
         elif a == "--port": o.port = int(val())
+        elif a == "--decimated": o.decimated = val()
+        elif a == "--no-decimated": o.decimated = None
         else:
             log(f"unknown argument {a}")
             sys.exit(2)

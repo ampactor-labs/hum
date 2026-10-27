@@ -3,5 +3,6 @@ state.json
 live.ndjson
 decisions.ndjson
 sessions/
+!sessions/default.ndjson
 *.wav
 !samples/*.wav

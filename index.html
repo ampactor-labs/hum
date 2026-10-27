@@ -223,7 +223,19 @@ async function poll() {
   lastFetch = performance.now();
   onState();
 }
-function startLive() { poll(); setInterval(poll, 250); }
+async function startLive() {
+  // With no director answering, a bundled session plays instead: the hosted copy.
+  try {
+    const r = await fetch("/state.json?ts=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+  } catch (e) {
+    try {
+      const d = await fetch("sessions/default.ndjson", { method: "HEAD", cache: "no-store" });
+      if (d.ok) { startPlayback("sessions/default.ndjson"); return; }
+    } catch (e2) {}
+  }
+  poll(); setInterval(poll, 250);
+}
 
 async function startPlayback(path) {
   const r = await fetch(path, { cache: "no-store" });
@@ -234,7 +246,7 @@ async function startPlayback(path) {
   try { built.pace = (await (await fetch("data/pace.json", { cache: "no-store" })).json()); } catch (e) {}
   if (built.pace) { built.pace = { today: built.pace.today, tomorrow: built.pace.tomorrow, window: built.pace.window, forecast_source: built.pace.forecast_source, as_of_local: built.pace.as_of_local, demand_today: (built.pace.for_today||{}).demand, forecast_today: (built.pace.for_today||{}).forecast, forecast_tomorrow: (built.pace.for_tomorrow||{}).forecast, shape: built.pace.shape, clean: built.pace.clean_mean, charge_hours: [] }; }
   let i = 0, lastMode = "GRID", t0 = performance.now(), base = rows.length ? rows[0].ear.t : 0;
-  const label = params.get("label") || path.replace(/^.*\//, "");
+  const label = params.get("label") || (path.endsWith("default.ndjson") ? "recorded at the demo's rehearsal: a real event, then the hum dying" : path.replace(/^.*\//, ""));
   function step() {
     const elapsed = (performance.now() - t0) / 1000 * speed;
     while (i < rows.length && rows[i].ear.t - base <= elapsed) {
