@@ -71,4 +71,4 @@ ROCOF is "falling at"; the trigger, 0.1 Hz per second, is "pitch falling faster 
 
 ## Facts to fill before export
 
-`[[name]]`; `[[how long]]` (the ledger's evidence: sonido since June 22, 2026, Mentl's first light July 10, 2026: if that is the whole story, say "four months" and own it); `[[date / status]]` of incorporation; the one line of bio; the first customer's name if anyone has said yes; the photo of the guitar on the interface as `pitch/img/guitar.jpg`; the hosted page's URL on slide five if it differs from ampactor.dev/hum.
+`[[name]]`; `[[how long]]` (the ledger's evidence: sonido since June 22, 2026, Mentl's first light July 10, 2026: if that is the whole story, say "four months" and own it); `[[date / status]]` of incorporation; the one line of bio; the first customer's name if anyone has said yes; the photo of the guitar on the interface as `pitch/img/guitar.jpg`; the hosted page's URL on slide five if it differs from ampactor.dev/hum; the ledger's counts in slide three's foot, from `./ledger.sh ~/mentl` on Wednesday morning, then `node pitch/export.js`.

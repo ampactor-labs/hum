@@ -1,7 +1,9 @@
 ## This week (since Monday Oct 26, 4:00 PM MDT)
 
-### hum: 19 commits
+### hum: 21 commits
 
+- Tue 17:49  The bundled session shows tomorrow's rush hour, and a recorder lives in the tree
+- Tue 17:42  The judges' audit, answered: the rush hour is shown, the oath names the host boundary, and every beat carries one idea
 - Tue 17:09  The ledger reads each repository's first commit with tail, so its age loop survives pipefail
 - Tue 17:06  The one-page plan points at the HUM repository
 - Tue 16:58  The bundled session's learner starts at the pitch, and a source switch clears its reading
@@ -28,8 +30,9 @@
 - Tue 08:27  The grid ear reports nothing from a band under −60 dBFS: noise's crossings are not the grid's
 - Tue 08:09  The grid ear: a no_std estimator in sonido-core reads the hum's frequency, its rate of change and its level from a sample stream
 
-### mentl: 8 commits
+### mentl: 9 commits
 
+- Tue 17:37  The controller's decision negates the host boundary: !WASI beside !Network
 - Tue 17:24  The controller's clean-hour reason says percent, in a room's words
 - Tue 16:53  The learner's line starts at the nominal pitch
 - Tue 16:41  The controller's words say low or high, and the island waits six lines
