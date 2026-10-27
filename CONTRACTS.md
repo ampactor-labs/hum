@@ -42,10 +42,10 @@ The director never sends an empty line.
 NDJSON from the controller, one per input line, written on the same line as its reading. Integers in milli-units, strings for words:
 
 ```
-{"t_ms":1761620000500,"mode":"EVENT","spin_w":100000,"pulse_w":0,"spin_soc_m":940,"pulse_soc_m":620,"reason":"falling at 310 mHz per second, past 100"}
+{"t":1761620000.50,"mode":"EVENT","spin_w":100000,"pulse_w":0,"spin_soc_m":940,"pulse_soc_m":620,"reason":"falling at 129 mHz per second, past 100"}
 ```
 
-- `t_ms` the reading's `t` in milliseconds.
+- `t` the reading's own `t`, copied as the text it arrived as (the controller converts no floats).
 - `mode` one of `GRID`, `EVENT`, `RUSH`, `ISLAND`.
 - `spin_w`, `pulse_w` watts, positive is discharge into the facility, negative is charge.
 - `spin_soc_m`, `pulse_soc_m` state of charge in thousandths.
@@ -64,7 +64,7 @@ NDJSON from the controller, one per input line, written on the same line as its 
   "ledger": { "events": 3, "kwh_moved": 412.0, "spin_cycles": 2.0, "pulse_cycles_saved": 0.8 },
   "pace": { "today": [...24...], "tomorrow": [...24...], "forecast_today": [...], "forecast_tomorrow": [...],
             "window": [17, 21], "clean": [...24...], "as_of": "2026-10-27T14:44Z", "forecast_source": "eia-day-ahead | seven-day-mean" },
-  "learned": { "hz": 59.984, "window": [17, 21] },
+  "learned": { "hz": 59.984 },
   "source": "live", "source_label": "guitar, this room",
   "offset_mhz": 2.1,
   "latency_ms": 48,
@@ -94,3 +94,13 @@ Produced by the ear under `samples/` and consumed by the controller and the page
 - `hum_480.txt` the tracked band's signal decimated to 480 Hz, one float per line, for the learner.
 
 The `.ndjson` samples are C1 lines, not C1e; a consumer that needs the enrichment adds `hour_local`, `rush`, `clean` and `offset_mhz` itself, or runs them through the director.
+
+## C7, learner line
+
+From `listen.mn` on the 480 Hz stream (`--emit-decimated`, one float per line), once per 480 input lines:
+
+```
+{"hz_learned":60.000312}
+```
+
+The director puts it in `learned.hz`; the page shows it as the third witness under the number.

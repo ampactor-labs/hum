@@ -1,0 +1,14 @@
+$ mentl why examples/grid/station.mn decide
+at 124:1-241:2: declared as decide
+declared as decide; Mutate enters at examples/grid/station:125:11, the tick, a store into the feedback line its record owns
+declared as decide; Memory enters at examples/grid/station:188:16, the tick, a store into the feedback line its record owns
+declared as decide; Trap enters at examples/grid/station:188:16, the tick, a store into the feedback line its record owns
+
+$ mentl why examples/grid/station.mn decide Network
+error: the row of decide carries no Network
+
+$ mentl why examples/grid/station.mn decide Alloc
+error: the row of decide carries no Alloc
+
+$ mentl why examples/grid/station.mn decide Filesystem
+error: the row of decide carries no Filesystem

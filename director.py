@@ -245,32 +245,12 @@ class Learner:
                         d = json.loads(line.strip())
                     except json.JSONDecodeError:
                         continue
-                    if "hz_learned_m" in d:
+                    if "hz_learned" in d:
                         with self.state.lock:
-                            self.state.learned["hz"] = d["hz_learned_m"] / 1000.0
+                            self.state.learned["hz"] = float(d["hz_learned"])
             except Exception as e:
                 log(f"learner: {e}")
             time.sleep(2.0)
-
-
-def run_predictor(mentl_bin, program, hours_path, state):
-    """`predict.mn` once, on the seven days of hours: the learned rush window."""
-    try:
-        with open(hours_path) as f:
-            out = subprocess.run([mentl_bin, "run", program], stdin=f, capture_output=True, text=True, timeout=600)
-        for line in reversed(out.stdout.strip().splitlines()):
-            try:
-                d = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if "window" in d:
-                with state.lock:
-                    state.learned["window"] = d["window"]
-                log(f"predictor: window {d['window']}")
-                return
-        log(f"predictor: no window in its output ({out.stderr.strip()[:200]})")
-    except Exception as e:
-        log(f"predictor: {e}")
 
 
 class MentlController:
@@ -506,14 +486,10 @@ class Director:
             log("controller: in-process stub (development only)")
         else:
             self.controller = MentlController(opts.mentl_bin, opts.mentl_dir)
-        # The learned estimators, when their programs exist.
+        # The learned estimator, when its program and the ear's decimated stream exist.
         listen = os.path.join(opts.mentl_dir, "examples", "grid", "listen.mn")
-        predict = os.path.join(opts.mentl_dir, "examples", "grid", "predict.mn")
         if os.path.exists(listen) and opts.decimated:
             self.learner = Learner(opts.mentl_bin, listen, opts.decimated, self.state)
-        hours = os.path.join(HERE, "data", "pace_hours.txt")
-        if os.path.exists(predict) and os.path.exists(hours):
-            threading.Thread(target=run_predictor, args=(opts.mentl_bin, predict, hours, self.state), daemon=True).start()
         self.source = None
         self.previous_mode = opts.mode
         self.requested = None
@@ -561,7 +537,7 @@ class Director:
                 r = self.state.enrich(r)
                 sent = time.time()
                 d = self.controller.decide(r)
-                latency_ms = int((time.time() - sent) * 1000)
+                latency_ms = round((time.time() - sent) * 1000, 1)
                 self.state.record(r, d, latency_ms)
             if time.time() - last_snapshot > 1.0:
                 last_snapshot = time.time()

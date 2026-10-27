@@ -1,0 +1,80 @@
+severs module-wide: Network — unlocks Sandbox (proven no network access)
+  10 declared effect(s) sever module-wide with no capability named — naming one unlocks it everywhere
+clamp_spin : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+  referenced in comments by: droop
+clamp_pulse : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+clamp_soc : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+spin_soc_m : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+pulse_soc_m : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+magnitude : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+droop : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+reflex : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+  pending: 1 undischarged proof obligation(s) — the field ranks them
+facility_w : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+spin_tick : Memory + Trap + Mutate
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+pulse_tick : Memory + Trap + Mutate
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+  pending: 1 undischarged proof obligation(s) — the field ranks them
+decide : Mutate + Memory + Trap
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+  referenced in comments by: node 12815
+  verb-shape: 2-step let-chain reads as a |> pipe
+  anonymity: 2 effectful lambda(s) — a named stage carries the row; intent is lossless, name the stage
+  pending: 2 undischarged proof obligation(s) — the field ranks them
+mode_word : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+tenths : Memory + Alloc
+  severs beyond the module: Trap — unlocks Trap-free (nothing it reaches can trap; termination unproven)
+reason_text : Memory + Alloc
+  severs beyond the module: Trap — unlocks Trap-free (nothing it reaches can trap; termination unproven)
+find_key : Memory + Alloc + Trap
+find_from : Memory + Trap
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
+  pending: 1 undischarged proof obligation(s) — the field ranks them
+matches_at : Memory + Trap
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
+is_digit : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+skip_spaces : Memory + Trap
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
+milli_at : Memory + Trap
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+  pending: 2 undischarged proof obligation(s) — the field ranks them
+whole_end : Memory + Trap
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
+digits_value : Memory + Trap
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
+frac_value : Memory + Trap
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
+number_end : Memory + Trap
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
+exponent_scale : Memory + Trap
+  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
+shrink : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+grow : Pure
+  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
+field : Memory + Alloc + Trap
+field_or : Memory + Alloc + Trap
+stamp : Memory + Alloc + Trap
+step : Mutate + Alloc + Memory + WASI + Trap
+  pending: 1 undischarged proof obligation(s) — the field ranks them
+main : Trap + Alloc + Memory + Mutate + WASI
+  pending: 4 undischarged proof obligation(s) — the field ranks them

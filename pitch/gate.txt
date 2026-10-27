@@ -1,0 +1,24 @@
+$ mentl mcp    # the proof gate on stdio: a program is proposed, the gate answers; nothing executes unproven
+
+> propose
+    // The reflex: Spin's command from the deviation in millihertz, under the oath
+    // that deciding never reaches the network.
+    effect Network { fetch_param(url: String) -> String }
+    fn reflex(dev: Int) -> Int with !Network =
+      if dev < -36 { 100000 } else if dev > 36 { -100000 } else { 0 }
+    fn main() = reflex(-129)
+< PROVEN — every claim discharged; artifact: .build/mcp/last.wat
+
+> propose
+    // The reflex with one price read inside it, the way an agent asked to make
+    // the station price-aware would write it.
+    effect Network { fetch_param(url: String) -> String }
+    fn reflex(dev: Int) -> Int with !Network = {
+      let price = fetch_param("https://api.eia.gov/v2/electricity/rto/region-data/data/?facets[respondent][]=PACE")
+      if dev < -36 { 100000 } else if dev > 36 { -100000 } else { 0 }
+    }
+    fn main() = reflex(-129)
+< REFUSED — 2 error(s) the medium reported; nothing was emitted
+< effects: E_EffectMismatch error: effect row mismatch: !Network vs Network — at 4:1-7:2: declared as reflex; Network enters at <stdin>:5:15 through `fetch_param` → declared as fetch_param, an op of Network declared at <stdin>:3:1 at <stdin>:4:1-7:2
+< effects: E_EffectUnhandled error: effect Network reaches the executable root with no absorbing handler — calling one of its ops would read garbage evidence at runtime; nothing executes unproven. No handler in scope handles Network — declare one and install it with ~> over the performing chain. declared as main; Network enters at <stdin>:8:13 through `reflex` → at <stdin>:5:15 through `fetch_param` → declared as fetch_param, an op of Network declared at <stdin>:3:1 at <stdin>:8:1-8:25
+
