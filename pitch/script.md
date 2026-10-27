@@ -60,4 +60,4 @@ ROCOF is "falling at". THD is "how clean the wave is" ("wave 3% distorted"). The
 
 ## Facts to fill before export
 
-`[[name]]`, `[[email]]`, `[[years]]` (how long Mentl has existed, and sonido), `[[date / status]]` of incorporation, the one line of bio, the photo of the guitar on the interface as `pitch/img/guitar.jpg`, the hosted page's URL on slide five if it differs from ampactor.dev/hum.
+`[[name]]`, `[[years]]` (how long Mentl has existed, and sonido), `[[date / status]]` of incorporation, the one line of bio, the photo of the guitar on the interface as `pitch/img/guitar.jpg`, the hosted page's URL on slide five if it differs from ampactor.dev/hum.
