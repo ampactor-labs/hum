@@ -6,7 +6,14 @@ Before the judges sit down. Everything is already plugged in and running when th
 2. `wpctl status` shows the Scarlett as the default source. If not: `wpctl set-default <id>`.
 3. From the demo directory: `./run.sh live`. The kiosk window opens. The chip reads `● LIVE guitar, this room` within five seconds and the number moves.
 4. If the chip reads WAITING after ten seconds: hold the pickup against the wall wart on the table. Still waiting: `./run.sh wav samples/hum_aernata.wav`, and the chip reads `▶ RECORDING`. The pitch does not change.
-5. Pedal on its USB cable with a guitar cable in it; the lights breathe. If they do not, the pedal stays on the table unpowered.
+5. Pedal on its USB cable with a guitar cable in it; the lights breathe. If they do not, the pedal stays on the table unpowered. Flashing it (once, Tuesday), from `crates/sonido-daisy` with the Seed in DFU mode (hold BOOT, tap RESET):
+
+   ```
+   cargo objcopy --example grid_pedal --release -- -O binary -R .sram1_bss firmware/grid_pedal.bin
+   dfu-util -a 0 -s 0x90040000:leave -D firmware/grid_pedal.bin
+   ```
+
+   Then `cat /dev/ttyACM0` shows one line every 50 ms, and `./run.sh pedal` reads them.
 6. Small speaker on the headphone out at a quarter volume. Press `S`, hear the pitch, press `S` again.
 7. Press `0`. The page is in its opening state. Hands off the keyboard until the first beat.
 
