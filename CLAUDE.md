@@ -14,6 +14,12 @@ engineer opening the README. Write for them.
 - Say who or what does what, and why it matters to the listener.
 - Put one idea in each sentence. Prefer short sentences and common words.
 - No slogans, no aphorisms, no inverted or poetic word order.
+- Say it literally. When a literal phrase exists, use it instead of a
+  metaphor.
+- Avoid the habits that mark machine-written text: a "not X but Y" contrast
+  that only adds weight, a one-line closer that repeats the point, ideas
+  forced into threes, bold on every list item, and dashes where a period,
+  comma, colon or parentheses would do.
 - Keep Mentl's and this project's internal words off anything a judge sees:
   no "first light", "fixed point", "row", "host call", "WASI", "the reflex"
   or "two bands". Say what happens instead: "the compiler won't build it",

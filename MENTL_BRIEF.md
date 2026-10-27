@@ -4,7 +4,7 @@ Three programs in the Mentl repository, under `examples/grid/`, do HUM's decidin
 
 ## station.mn: the controller
 
-It reads one line per reading from the director and answers each with one decision line. The function that decides, `decide`, makes four promises in its signature: no memory allocation, no network, no file system, and no host call of any kind (`!Alloc + !Network + !Filesystem + !WASI`). The compiler proves all four through every function `decide` calls.
+It reads one line per reading from the director and answers each with one decision line. The function that decides, `decide`, makes four promises in its signature: no memory allocation, no network, no file system, and no call outside the program at all (`!Alloc + !Network + !Filesystem + !WASI`). The compiler proves all four through every function `decide` calls.
 
 Power commands are clamped in code, the flywheel to ±100 kW and the battery to ±300 kW, and their types state those ranges. The frequency the fast rules act on must lie between 55 and 65 Hz. Every number is an integer in thousandths, read from the line's text, so the decision never rounds a floating-point number.
 
@@ -28,7 +28,7 @@ What is not proven. Some refinement claims are still open. `mentl audit` lists c
 
 ## station-leak.mn: the copy the compiler refuses
 
-The same controller with one line a reasonable engineer might add: read the hour's electricity price online, inside the fast decision, so the battery leans harder into an expensive hour. `mentl check examples/grid/station-leak.mn` refuses it with `E_EffectMismatch` and names the path the network takes: `decide` calls `price_m`, which calls `fetch_param`, which is a network operation. The full text is `pitch/refusal.txt`.
+The same controller with one line a reasonable engineer might add: read the hour's electricity price online, inside the fast decision, so that in rush hour the battery runs at full power only when the price is above $50 a megawatt-hour. `mentl check examples/grid/station-leak.mn` refuses it with `E_EffectMismatch` and names the path the network takes: `decide` calls `price_m`, which calls `fetch_param`, which is a network operation. The full text is `pitch/refusal.txt`.
 
 ## listen.mn: the learner
 

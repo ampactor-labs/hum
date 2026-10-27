@@ -209,7 +209,7 @@ body:not(.dash) .help { display: none; }
     <div class="mode GRID" id="mode">GRID</div>
     <div class="screen" style="border:none;background:transparent"><canvas id="cStation"></canvas></div>
     <div class="reason" id="reason">listening</div>
-    <div class="caption"><span class="sim" id="stationLabel">Spin, a flywheel, takes the milliseconds; Pulse, a battery, takes the hours. Modeled from Torus's published figures: 100 kW of Spin for six minutes, 300 kW of Pulse for four hours. Simulated.</span></div>
+    <div class="caption"><span class="sim" id="stationLabel">Spin, a flywheel, handles fast changes; Pulse, a battery, carries load for hours. Modeled from Torus's published figures: 100 kW of Spin for six minutes, 300 kW of Pulse for four hours. Simulated.</span></div>
     <div class="foot">Spin · Pulse · Lasso</div>
   </section>
   <section class="panel" id="rush">
@@ -233,15 +233,15 @@ body:not(.dash) .help { display: none; }
   <h2>What the program that decides can and cannot do <span class="tag" id="certTag">PROVEN · mentl why</span></h2>
   <div class="cols">
     <div><h3>CAN</h3><ul>
-      <li><span class="g">✓</span> act on each reading the loop hands it</li>
+      <li><span class="g">✓</span> act on each reading it is given</li>
       <li><span class="g">✓</span> write a command for Spin and for Pulse</li>
-      <li><span class="g">✓</span> keep its own state of charge and its timers, on lines it owns</li>
+      <li><span class="g">✓</span> keep its own state of charge and timers between readings</li>
     </ul></div>
     <div><h3>CANNOT</h3><ul>
       <li><span class="g no">⊘</span> reach the network while deciding</li>
       <li><span class="g no">⊘</span> touch the filesystem while deciding</li>
       <li><span class="g no">⊘</span> make any call outside the program while deciding: no socket, no file, no clock</li>
-      <li><span class="g no">⊘</span> allocate memory mid-decision</li>
+      <li><span class="g no">⊘</span> allocate memory while deciding</li>
       <li><span class="g no">⊘</span> ask Spin for more than 100 kW, or Pulse for more than 300 kW</li>
       <li><span class="g no">⊘</span> accept a frequency outside 55 to 65 Hz as real</li>
     </ul></div>
@@ -251,26 +251,26 @@ body:not(.dash) .help { display: none; }
 $ mentl why examples/grid/station.mn decide WASI
 <b>the row of decide carries no WASI</b></pre>
   <pre id="certRaw" style="display:none"></pre>
-  <div class="caption">Not by policy: proven by the compiler through every call the program makes. The bounds the verifier cannot decide are listed as pending by the audit and printed on every run. <span class="sim">Press A for the compiler's own words.</span></div>
+  <div class="caption">The compiler proves these through every call the program makes. <code>mentl audit</code> lists claims it could not decide. <span class="sim">Press A for the compiler's own words.</span></div>
 </div></div>
 
 <div class="overlay" id="ovRefuse"><div class="card">
-  <h2>The same program, one price read added inside the reflex <span class="tag" style="border-color:var(--alarm);color:var(--alarm)">REFUSED</span></h2>
-  <pre id="leakSrc"><b>fn</b> decide(valid, hz, rocof, level, hour, rush, clean, out) -> Mode <b>with</b> !Alloc + !Network + !Filesystem = {
+  <h2>The same program, with one price lookup added inside the decision <span class="tag" style="border-color:var(--alarm);color:var(--alarm)">REFUSED</span></h2>
+  <pre id="leakSrc"><b>fn</b> decide(valid, hz, rocof, level, hour, rush, clean, out) -> Mode <b>with</b> !Alloc + !Network + !Filesystem + !WASI = {
   ...
   <span class="hi">let price = price_m("https://api.eia.gov/v2/electricity/rto/region-data/…")</span>
   let pulse_ask = if rush == 1 { <span class="hi">if price > 50000 { 300000 } else { 200000 }</span> } else { … }
   ...
 }</pre>
-  <div class="path"><span class="node">decide</span><span class="arrow">→</span><span class="node">price_m</span><span class="arrow">→</span><span class="node">fetch_param</span><span class="arrow">→</span><span class="node">Network</span><span class="note">the path the network takes into a function that swore it never would</span></div>
+  <div class="path"><span class="node">decide</span><span class="arrow">→</span><span class="node">price_m</span><span class="arrow">→</span><span class="node">fetch_param</span><span class="arrow">→</span><span class="node">Network</span><span class="note">the path from the decision to the network, one call at a time</span></div>
   <pre id="refuseRaw" style="display:none">E_EffectMismatch: declared as decide; Network enters through `price_m` → through `fetch_param` → declared as fetch_param, an op of Network.</pre>
-  <div class="caption">This is what review cannot do: the build refuses, and names the line. Price belongs to the hour's plan, read before the reflex; a lookup inside the millisecond's decision is the bug. <span class="sim">Press A for the compiler's own words.</span></div>
+  <div class="caption">The compiler refuses to build the program and names the line that broke the promise. The price belongs in the hour's plan, read before the fast decision runs. A lookup inside the decision is the bug. <span class="sim">Press A for the compiler's own words.</span></div>
 </div></div>
 
 <div class="overlay" id="ovGate"><div class="card">
   <h2>Code proposed through the gate <span class="tag">mentl mcp</span></h2>
   <pre id="gateRaw">capture pending</pre>
-  <div class="caption">An agent that writes control code proposes it here. The gate answers PROVEN, or REFUSED with the line, and nothing executes unproven.</div>
+  <div class="caption">An agent that writes control code proposes it here. The gate answers PROVEN, or REFUSED with the line that broke a promise, and refused code is never built.</div>
 </div></div>
 
 <div class="overlay" id="ovTable"><div class="card">
@@ -281,7 +281,7 @@ $ mentl why examples/grid/station.mn decide WASI
 <div class="overlay" id="ovMesh"><div class="card" style="height:86vh;display:flex;flex-direction:column">
   <h2>Mesh <span class="tag" style="border-color:var(--ink-3);color:var(--ink-3)">SIMULATED</span></h2>
   <div class="screen" style="flex:1"><canvas id="cMesh"></canvas></div>
-  <div class="caption">Two Stations with GPS time see the <b>angle</b> between them, which is the flow on the line between them, and an event's wave arrives at one before the other. FNET has done this from wall outlets since 2004; a fleet that both sees and answers at 10C has not existed. <span class="sim">Simulated from the day's shape and the replayed event.</span></div>
+  <div class="caption">Two Stations that share GPS time can measure the phase <b>angle</b> between them, which tracks the power flowing on the line between them, and an event's wave reaches one Station before the other. FNET has measured this from wall outlets since 2004. <span class="sim">Simulated from the day's shape and the replayed event.</span></div>
 </div></div>
 
 <div id="stage"><div id="stageInner">
@@ -313,7 +313,7 @@ $ mentl why examples/grid/station.mn decide WASI
 <div class="ov2" id="ovProof"><div class="scard">
   <div class="mark">✓ Proven</div>
   <h1>This software can't reach the internet while it decides.</h1>
-  <p>Not a policy and not a code review: the compiler checks every function the decision calls. The decision can't touch a file or the clock either, and it never allocates memory while it decides.</p>
+  <p>The compiler checks this through every function the decision calls. The decision can't touch a file or the clock either, and it never allocates memory while it decides.</p>
   <pre id="proofRaw" hidden></pre>
 </div></div>
 
@@ -481,7 +481,7 @@ function onState() {
   $("lMoved").textContent = (L.kwh_moved || 0).toFixed(L.kwh_moved >= 10 ? 0 : 1) + " kWh";
   $("lSpin").textContent = (L.spin_cycles || 0).toFixed(2);
   $("lSaved").textContent = (L.pulse_cycles_saved || 0).toFixed(3);
-  $("latency").innerHTML = state.latency_ms != null ? "Last event: heard → commanded in <b>" + (state.latency_ms < 1 ? "under 1" : state.latency_ms) + " ms</b>." : "No event yet.";
+  $("latency").innerHTML = state.latency_ms != null ? "Last event: decided <b>" + (state.latency_ms < 1 ? "under 1" : state.latency_ms) + " ms</b> after its reading arrived." : "No event yet.";
   // rush caption
   const p = state.pace || {};
   const src = p.forecast_source === "eia-day-ahead-tomorrow" ? "tomorrow's day-ahead forecast" : p.forecast_source === "eia-day-ahead-today" ? "today's day-ahead forecast" : "the seven-day shape (no forecast filed yet)";
@@ -684,7 +684,7 @@ function drawMesh() {
   [[A, "Aernata · 250 E 200 S"], [B, "a second site · the airport"], [C, "St. George"]].forEach(([P, name]) => { g.fillStyle = css("--panel"); g.beginPath(); g.arc(P[0], P[1], 9, 0, Math.PI * 2); g.fill(); g.fillStyle = ink; g.beginPath(); g.arc(P[0], P[1], 6, 0, Math.PI * 2); g.fill(); g.fillStyle = ink2; g.textAlign = "left"; g.fillText(name, P[0] + 14, P[1] + 4); });
   g.fillStyle = ink; g.font = `${rem() * 1.6}px ${css("--mono")}`; g.textAlign = "left";
   g.fillText("angle " + angle.toFixed(1) + "°  →  flow " + (flow * 42).toFixed(0) + " MW", w * 0.05, h * 0.12);
-  g.fillStyle = ink3; g.font = `${rem() * 1}px ${css("--sans")}`; g.fillText("the phase angle between two ears is the power flowing between them", w * 0.05, h * 0.12 + rem() * 1.6);
+  g.fillStyle = ink3; g.font = `${rem() * 1}px ${css("--sans")}`; g.fillText("the phase angle between two sites tracks the power flowing between them", w * 0.05, h * 0.12 + rem() * 1.6);
   // an event's wave: from the south, arriving at St. George first, Salt Lake 0.8 s later
   const period = 6, phase = (t % period);
   const origin = [w * 0.1, h * 0.98];

@@ -10,7 +10,7 @@ Do this before the judges sit down, so everything is running when they arrive.
 4. **Check the stage.** The kiosk window opens on the stage. Within five seconds the chip reads LIVE and the number moves.
 5. **If it stays on WAITING.** Hold the pickup against a wall wart. If it still waits after ten seconds, run `./run.sh wav samples/hum_aernata.wav`. The chip then reads RECORDING, and the pitch does not change.
 6. **Sound.** A small speaker at a quarter volume on the Scarlett's output, with direct monitoring on. The room hears the hum.
-7. **Reset.** Press `0`. Hands off the keyboard until the first beat.
+7. **Reset.** Press `0`. Then leave the keyboard alone until you start.
 
 ## The keys
 

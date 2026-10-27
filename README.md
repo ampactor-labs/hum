@@ -1,6 +1,6 @@
 # HUM
 
-The power grid's frequency, heard live through a guitar pickup, and a model of a Torus Station deciding what to do about it, in software whose compiler proves it can't reach the internet while it decides.
+HUM hears the power grid's frequency through a guitar pickup and shows a model of a Torus Station deciding what to do about it. The software that decides is written in Mentl, and Mentl's compiler proves that software can't reach the internet while it decides.
 
 Hard Tech Week 2026, Salt Lake City. Entered for the Torus bounty ("software that knows when the grid is jammed and stays out of traffic") and the Nucleus × Startup State open call. Every commit here is from the hackathon week. What existed before lives in [sonido](https://github.com/ampactor-labs/sonido) and [Mentl](https://github.com/ampactor-labs/mentl).
 
@@ -8,11 +8,13 @@ Hard Tech Week 2026, Salt Lake City. Entered for the Torus bounty ("software tha
 
 ## What it does
 
-Every wire in a building hums at the power grid's frequency. That one number is shared by the whole Western grid, from Alberta to Baja. It sags when the grid is short of power, and how fast it falls says how big the shortfall is.
+Every wire in a building hums at the power grid's frequency. The whole Western grid, from Alberta to Baja, shares that one number. It sags when the grid is short of power, and how fast it falls says how big the shortfall is.
 
-- **It hears the grid.** A guitar pickup picks up the hum. The ear, built on my audio library sonido, reads the frequency to a thousandth of a hertz and runs sonido's tuner on it.
-- **It decides.** A model of a Torus Station has a flywheel for the milliseconds and a battery for the hours. In rush hour, from EIA's data, the battery runs the building. When the frequency falls fast, the flywheel pushes. When the hum dies, the Station keeps the building on.
-- **It proves.** The decision is written in Mentl. Its compiler proves the decision can't reach the network, a file or the clock, and allocates no memory. A copy with one price lookup added is refused.
+A guitar pickup picks up the hum. The ear, a program built on my audio library sonido, reads the frequency to a thousandth of a hertz and runs sonido's tuner on it.
+
+A model of a Torus Station decides what to do. Its flywheel handles fast changes and its battery carries load for hours. In rush hour, which EIA's hourly data marks, the battery runs the building. When the frequency falls fast, the flywheel pushes. When the hum disappears, the Station keeps the building on.
+
+The decision is written in Mentl. Its compiler proves the decision can't reach the network, a file or the clock, and that it allocates no memory. A copy of the program with one price lookup added is refused.
 
 ## What is real and what is simulated
 
@@ -46,7 +48,7 @@ The Mentl programs live in the Mentl repository under `examples/grid/`. `station
 | --- | --- | --- |
 | The estimator | sonido, `crates/sonido-core/src/grid.rs` | Filters the hum's first three harmonics, follows the loudest, and times its zero crossings to a fraction of a sample. It reports the frequency over 100 ms and over 1 s, how fast it is changing, the level, and when the hum is gone. The ear and the pedal share it. |
 | The ear | `ear/` | A program built on sonido. It takes live audio, a WAV file, a test tone, the 2019 replay or silence, and prints one line every 50 ms: the estimator's readings, a spectral check, the distortion, sonido's tuner reading and a scope trace for the page. |
-| The pedal | sonido, `crates/sonido-daisy/examples/grid_pedal.rs` | The same estimator on a Daisy Seed in a Hothouse pedal. It sends its lines over USB, breathes its LEDs with the grid, and its footswitches and first toggle type the page's keys. |
+| The pedal | sonido, `crates/sonido-daisy/examples/grid_pedal.rs` | The same estimator on a Daisy Seed in a Hothouse pedal. It sends its lines over USB, blinks an LED faster the further the frequency is from 60 Hz, and its footswitches and first toggle type the page's keys. |
 | The director | `director.py` | Starts the ear and the controller, adds the hour, the rush window and the clean share to each line, serves the page, and records each session. |
 | The page | `index.html` | The stage, the three cards and the engineers' dashboard. It plays a recorded session when no director answers. One file with no dependencies. |
 | The data | `build_data.py`, `data/` | PacifiCorp East's demand, day-ahead forecast and clean share by hour; the event. |

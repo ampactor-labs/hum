@@ -78,7 +78,7 @@ NDJSON from the controller, one per input line, written on the same line as its 
 
 - `GET /cmd?src=live|wav|replay|island|pedal|silence` switches the ear's input or the line source and answers `200 ok`.
 - `GET /cmd?reset=1` clears the ledger, the traces and the set clock.
-- `GET /cmd?hour=12.5` sets the clock the lines carry to tomorrow's half past noon, inside the rush window, so the Station is seen planning around it at any hour of the day; `GET /cmd?hour=` returns the clock to now.
+- `GET /cmd?hour=12.5` sets the clock the lines carry to tomorrow's half past noon, inside the rush window, so the Station's rush-hour behavior can be shown at any time of day; `GET /cmd?hour=` returns the clock to now.
 - `GET /state.json?ts=<ms>` is cache-busted by the page.
 - Static files are served from the demo directory on port 8787.
 
@@ -106,4 +106,4 @@ From `listen.mn` on the 480 Hz stream (`--emit-decimated`, one float per line), 
 {"hz_learned":60.000312}
 ```
 
-The director puts it in `learned.hz`; the page shows it as the third witness under the number.
+The director puts it in `learned.hz`. The page does not show it, because the learner trails a fast fall.

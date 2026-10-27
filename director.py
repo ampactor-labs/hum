@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""The HUM director: owns the processes, enriches the lines, keeps the state,
-serves the page. Standard library only.
+"""The HUM director starts the ear and the controller, adds the hour and the
+grid's state to every line, keeps the state the page reads, and serves the
+page. It uses the standard library only.
 
     python3 -I director.py --mode live|wav|replay|silence|pedal|sample
         [--wav path] [--sample samples/ear_tone.ndjson] [--serial /dev/ttyACM0]
@@ -11,8 +12,8 @@ serves the page. Standard library only.
 Sources feed the ear (`grid_ear`, C1 lines) or stand in for it (the pedal's
 serial lines, or a sample file replayed at 20 Hz). Every line is enriched
 (C1e: hour_local, rush, clean, offset_mhz, and hour_set when the clock is set), handed to the controller
-(`mentl run examples/grid/station.mn`, or the in-process stub while the Mentl
-program lands), and the decision (C2) comes back on the same line. The
+(`mentl run examples/grid/station.mn`, or the in-process stand-in when Mentl
+is not available), and the decision (C2) comes back on the same line. The
 director keeps the traces and the ledger, serves `/state.json` (C3) and
 `/cmd` (C4) on port 8787, serves the page's files, and records every line to
 `sessions/<date>.ndjson` for the page's playback mode.
@@ -494,7 +495,7 @@ class State:
                 "connected": self.connected,
                 "clock": clock_local(time.time()),
                 "station": {"spin_w": SPIN_W, "spin_wh": SPIN_WH, "pulse_w": PULSE_W, "pulse_wh": PULSE_WH,
-                             "label": "Spin, a flywheel, takes the milliseconds; Pulse, a battery, takes the hours. Modeled from Torus's published figures: 100 kW of Spin for six minutes, 300 kW of Pulse for four hours. Simulated."},
+                             "label": "Spin, a flywheel, handles fast changes; Pulse, a battery, carries load for hours. Modeled from Torus's published figures: 100 kW of Spin for six minutes, 300 kW of Pulse for four hours. Simulated."},
             }, separators=(",", ":"))
 
 
