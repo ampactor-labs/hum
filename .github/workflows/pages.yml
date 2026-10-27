@@ -1,6 +1,6 @@
 # Publishes the page and the bundled session to GitHub Pages on every push to
 # main. With no director answering, the page plays sessions/default.ndjson, so
-# https://hum.ampactor.dev/ replays the demo on any phone or laptop.
+# https://ampactor.dev/hum/ replays the demo on any phone or laptop.
 name: Publish the hosted replay
 on:
   push:
