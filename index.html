@@ -935,7 +935,8 @@ const flows = {
     ["tomorrow's noon", () => { if (!hourOn) tomorrow(); }],
     ["back to now", () => { if (hourOn) tomorrow(); }],
     ["replay the 2019 event", replay],
-    ["the grid goes dark", () => { if (!islandOn) island(); }],
+    // Rolling the guitar's volume off cuts the hum for real, and the ear reports the island itself; these two beats then send nothing.
+    ["the grid goes dark", () => { if (!islandOn && modeShown !== "ISLAND") island(); }],
     ["the grid is back", () => { if (islandOn) island(); }],
     ["proven", () => showCard("ovProof")],
     ["refused", () => showCard("ovRefused")],

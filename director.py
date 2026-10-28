@@ -29,6 +29,7 @@ import math
 import os
 import queue
 import shlex
+import statistics
 import subprocess
 import sys
 import threading
@@ -404,8 +405,11 @@ class State:
         self.trace = []
         self.station_trace = []
         self.ledger = {"events": 0, "kwh_moved": 0.0, "spin_cycles": 0.0, "pulse_cycles_saved": 0.0}
-        self.offset_sum = 0.0
-        self.offset_n = 0
+        self.tuner_hist = []     # the last STEADY_WINDOW tuner readings of a live hum
+        self.median_hist = []    # the last SLOPE_WINDOW steadied readings, with their times
+        self.bias_sum = 0.0      # the session's mean of the steadied reading minus 60 Hz
+        self.bias_n = 0
+        self.bias_mhz = 0.0
         self.latency_ms = None
         self.last_mode = "GRID"
         self.learned = {}
@@ -425,11 +429,53 @@ class State:
             r["hour_set"] = self.hour_set
         r["rush"] = self.pace.rush(h)
         r["clean"] = self.pace.clean_at(h)
-        if r.get("source") in ("live", "pedal") and r.get("hz") is not None:
-            self.offset_sum += r["hz"] - NOMINAL
-            self.offset_n += 1
-        r["offset_mhz"] = round(1000.0 * self.offset_sum / self.offset_n, 1) if self.offset_n else 0.0
+        live = r.get("source") in ("live", "pedal")
+        if live:
+            self.steady(r)
+        r["offset_mhz"] = self.bias_mhz if live else 0.0
         return r
+
+    # A pickup's reading of the hum carries the pickup's own noise. On a 60 s
+    # recording of a guitar held near a 12 V adapter (2026-10-28), the ear's
+    # 100 ms reading wandered by tens of millihertz and jumped by hundreds,
+    # while the grid itself moves by a few, so the controller read the noise
+    # as the grid falling and the flywheel pushed in 78 percent of readings.
+    # A live line's frequency is therefore the median of the last 1.5 s of
+    # sonido's tuner readings, less the session's mean of that median, which
+    # is the pickup's bias against the grid's long-run average of exactly
+    # 60 Hz. The rate of change is the slope of the steadied reading over
+    # the last second. On the same recording the flywheel then pushed in
+    # 2 percent of readings. The 2019 replay, recordings and samples are not
+    # touched, so their timing stays as measured. The bias is applied only
+    # after BIAS_AFTER readings, and the history starts over whenever the hum
+    # is lost, so an island still shows within half a second.
+    STEADY_WINDOW = 30   # readings, 1.5 s at 20 per second
+    SLOPE_WINDOW = 20    # readings, 1 s
+    BIAS_AFTER = 100     # readings, 5 s
+
+    def steady(self, r):
+        v = r.get("tuner_hz")
+        if v is None or r.get("hz_fast") is None:
+            self.tuner_hist.clear()
+            self.median_hist.clear()
+            return
+        self.tuner_hist.append(v)
+        del self.tuner_hist[:-self.STEADY_WINDOW]
+        m = statistics.median(self.tuner_hist)
+        self.bias_sum += m - NOMINAL
+        self.bias_n += 1
+        bias = self.bias_sum / self.bias_n if self.bias_n >= self.BIAS_AFTER else 0.0
+        self.bias_mhz = round(1000.0 * bias, 1)
+        hz = round(m - bias, 4)
+        self.median_hist.append((r["t"], hz))
+        del self.median_hist[:-self.SLOPE_WINDOW]
+        (t0, h0), (t1, h1) = self.median_hist[0], self.median_hist[-1]
+        # Until a full second of steadied readings exists, the slope is not reported: the first readings after a hum appears are the roughest.
+        r["rocof"] = round((h1 - h0) / (t1 - t0), 4) if len(self.median_hist) == self.SLOPE_WINDOW and t1 > t0 else 0.0
+        r["hz_fast"] = hz
+        r["hz"] = hz
+        r["tuner_hz"] = hz
+        r["tuner_cents"] = round(1200.0 * math.log2(hz / NOMINAL), 1)
 
     def record(self, r, d, latency_ms):
         with self.lock:

@@ -6,13 +6,13 @@ Two rooms, 15 minutes apart: Nucleus at 5:25 PM in the group 1 room, Torus at 5:
 
 1. `git pull` in `~/hum` and `~/mentl`, then `cd ~/hum/ear && cargo build --release`.
 2. Plug the guitar into the Scarlett (INST lit, gain at the rehearsed mark) and the Scarlett into the laptop. Run `./run.sh live` and press `1`, then Space nine times, watching the timer. Press `2` and Space eight times. Then `0`.
-3. Pack: the laptop and charger, the Scarlett and its USB cable, the guitar and cable, the small speaker and its cable, a power strip, the clicker if you have one, and the printed one-page plans. The pedal and its USB cable only if it is flashed and worked at home.
+3. Pack: the laptop and charger, the Scarlett and its USB cable, the guitar and cable, the 12 V power adapter that the pickup rests on, the small speaker and its cable, a power strip, the clicker if you have one, and the printed one-page plans. The pedal and its USB cable only if it is flashed and worked at home.
 
 ## On arrival, 5:00 PM
 
 1. **Record a fallback first.** Plug in and record one minute of the venue's hum: `arecord -D pipewire -f S16_LE -r 48000 -c 1 -d 60 samples/hum_aernata.wav`.
 2. **Power.** Power strip in, laptop on power. Between rooms the laptop runs on its battery with the lid open, so nothing restarts.
-3. **The rig.** Guitar into the Scarlett's channel 1, INST lit, gain at the rehearsed mark. `wpctl status` must show the Scarlett as the default source; if not, `wpctl set-default <id>`. Run `./run.sh live`.
+3. **The rig.** Plug the 12 V adapter into the power strip: it is the hum's source. Guitar into the Scarlett's channel 1, INST lit, gain at the rehearsed mark, and the guitar's neck pickup resting against the adapter for the whole pitch (tape the adapter to the guitar stand if it slips). `wpctl status` must show the Scarlett as the default source; if not, `wpctl set-default <id>`. Run `./run.sh live`. Never touch the cable tip on stage: the ear reads that buzz about a hertz high, and the flywheel fires.
    - With the pedal: guitar into the pedal, the pedal into the Scarlett, the pedal's USB into the laptop. Its footswitches type `e` and `i`.
    - Without the Scarlett: `./run.sh pedal` reads the pedal's own measurements over USB. The number and the needle work, but the waveform does not.
 4. **Check the stage.** The kiosk window opens on the stage. Within five seconds the chip reads LIVE and the number moves.
