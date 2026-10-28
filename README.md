@@ -61,4 +61,4 @@ On a synthesized hum with harmonics and noise at −30 dB, the one-second readin
 
 ## Before kickoff and this week
 
-`./ledger.sh ~/mentl` prints every commit made in this repository, in sonido and in Mentl since Monday 26 October at 4:00 PM MDT, each with its time, and how long each repository has existed.
+`./ledger.sh` prints every commit made in this repository, in sonido and in Mentl since Monday 26 October at 4:00 PM MDT, each with its time, and how long each repository has existed.

@@ -4,7 +4,7 @@ Two rooms, 15 minutes apart: Nucleus at 5:25 PM in the group 1 room, Torus at 5:
 
 ## Before you leave home
 
-1. `git pull` in `~/hum` and `~/mentl`, then `cd ~/hum/ear && cargo build --release`.
+1. `git pull` in `~/hum` and `~/Projects/mentl`, then `cd ~/hum/ear && cargo build --release`.
 2. Plug the guitar into the Scarlett (INST lit, gain at the rehearsed mark) and the Scarlett into the laptop. Run `./run.sh live`, then step through the show with footswitch 1 to the thank-you slide, watching the timer. Then `0`.
 3. Pack: the laptop and charger, the Scarlett and its USB cable, the guitar and cable, the 12 V power adapter that the pickup rests on, the small speaker and its cable, a power strip, the clicker if you have one, and the printed one-page plans. The pedal and its USB cable only if it is flashed and worked at home.
 

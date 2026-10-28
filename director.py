@@ -6,7 +6,7 @@ page. It uses the standard library only.
     python3 -I director.py --mode live|wav|replay|silence|pedal|sample
         [--wav path] [--sample samples/ear_tone.ndjson] [--serial /dev/ttyACM0]
         [--ear ../../target/release/examples/grid_ear] [--capture "arecord -D pipewire -t raw -f FLOAT_LE -r 48000 -c 1 -"]
-        [--stub-controller | --mentl-dir ~/mentl --mentl-bin mentl]
+        [--stub-controller | --mentl-dir <the Mentl checkout> --mentl-bin mentl]
         [--port 8787]
 
 Sources feed the ear (`grid_ear`, C1 lines) or stand in for it (the pedal's
@@ -28,7 +28,9 @@ import json
 import math
 import os
 import queue
+import re
 import shlex
+import shutil
 import statistics
 import subprocess
 import sys
@@ -233,7 +235,9 @@ class Learner:
     per second. Nothing here runs unless the program exists."""
 
     def __init__(self, mentl_bin, program, decimated_path, state):
-        self.cmd = ["sh", "-c", f"tail -n +1 -F {shlex.quote(decimated_path)} | {shlex.quote(mentl_bin)} run {shlex.quote(program)}"]
+        # `--pid` ends `tail` when the director dies, however it dies, and the
+        # learner then reads the end of its input and exits.
+        self.cmd = ["sh", "-c", f"tail -n +1 -F --pid={os.getpid()} {shlex.quote(decimated_path)} | {shlex.quote(mentl_bin)} run {shlex.quote(program)}"]
         self.state = state
         self.proc = None
         threading.Thread(target=self._run, daemon=True).start()
@@ -697,7 +701,7 @@ def parse(argv):
     o.ear = os.path.join(HERE, "ear", "target", "release", "grid_ear")
     o.capture = "arecord -D pipewire -t raw -f FLOAT_LE -r 48000 -c 1 -"
     o.stub_controller = False
-    o.mentl_dir = os.environ.get("MENTL_DIR", os.path.expanduser("~/mentl"))
+    o.mentl_dir = os.environ.get("MENTL_DIR")
     o.mentl_bin = os.environ.get("MENTL_BIN", "mentl")
     o.port = 8787
     o.decimated = os.path.join(HERE, "sessions", "decimated_480.txt")
@@ -725,7 +729,27 @@ def parse(argv):
             log(f"unknown argument {a}")
             sys.exit(2)
         i += 1
+    if not o.mentl_dir:
+        o.mentl_dir = mentl_checkout(o.mentl_bin)
     return o
+
+
+def mentl_checkout(mentl_bin):
+    """The Mentl checkout to take the programs from when MENTL_DIR is unset.
+
+    The installed `mentl` command is a script that names its own checkout in
+    MENTL_HOME, so the controller is built by the compiler beside it. ~/mentl
+    is the guess when the command names none."""
+    path = shutil.which(mentl_bin)
+    if path:
+        try:
+            with open(path, errors="replace") as f:
+                m = re.search(r'^MENTL_HOME="([^"]+)"$', f.read(4096), re.M)
+            if m:
+                return m.group(1)
+        except OSError:
+            pass
+    return os.path.expanduser("~/mentl")
 
 
 pace = None
@@ -733,6 +757,14 @@ pace = None
 
 def main():
     opts = parse(sys.argv[1:])
+    station = os.path.join(opts.mentl_dir, "examples", "grid", "station.mn")
+    if not opts.stub_controller and not shutil.which(opts.mentl_bin):
+        log(f"cannot find the command {opts.mentl_bin} (PATH is {os.environ.get('PATH', '')}). Set MENTL_BIN to its full path, or STUB=1 for the stand-in.")
+        sys.exit(2)
+    if not opts.stub_controller and not os.path.exists(station):
+        log(f"the controller is not at {station}. Set MENTL_DIR to the Mentl checkout, or STUB=1 for the stand-in.")
+        sys.exit(2)
+    log(f"Mentl checkout: {opts.mentl_dir}")
     director = Director(opts)
     Handler.director = director
     server = ThreadingHTTPServer(("127.0.0.1", opts.port), Handler)

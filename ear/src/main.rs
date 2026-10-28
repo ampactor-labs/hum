@@ -538,8 +538,11 @@ fn main() {
             trace.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(","),
             source_label,
         );
-        let _ = writeln!(out, "{line}");
-        let _ = out.flush();
+        // A closed stdout means the director has gone. The ear stops too, so a
+        // live capture piped into it stops with it.
+        if writeln!(out, "{line}").and_then(|_| out.flush()).is_err() {
+            break;
+        }
         if let Some(f) = tee.as_mut() {
             let _ = writeln!(f, "{line}");
             let _ = f.flush();

@@ -9,7 +9,8 @@
 #   ./run.sh sample [file]        a sample file (development)
 #
 # Environment:
-#   MENTL_DIR   the Mentl checkout holding examples/grid/station.mn (default ~/mentl)
+#   MENTL_DIR   the Mentl checkout holding examples/grid/station.mn (default: the
+#               checkout the mentl command runs from)
 #   MENTL_BIN   the mentl command (default: mentl on PATH)
 #   STUB=1      use the in-process stand-in controller instead of Mentl
 #   NO_BROWSER=1  do not open the page
@@ -17,6 +18,9 @@
 #               (default: arecord -D pipewire -t raw -f FLOAT_LE -r 48000 -c 1 -)
 set -euo pipefail
 cd "$(dirname "$0")"
+# A desktop launcher starts with the system PATH only. mentl and cargo
+# install to these two folders.
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 mode="${1:-live}"; shift || true
 EAR="ear/target/release/grid_ear"
 if [ ! -x "$EAR" ]; then
@@ -34,7 +38,8 @@ case "$mode" in
 esac
 [ -n "${CAPTURE:-}" ] && args+=(--capture "$CAPTURE")
 if [ "${STUB:-0}" = "1" ]; then args+=(--stub-controller); else
-  args+=(--mentl-dir "${MENTL_DIR:-$HOME/mentl}" --mentl-bin "${MENTL_BIN:-mentl}")
+  [ -n "${MENTL_DIR:-}" ] && args+=(--mentl-dir "$MENTL_DIR")
+  args+=(--mentl-bin "${MENTL_BIN:-mentl}")
 fi
 if [ "${NO_BROWSER:-0}" != "1" ]; then
   ( sleep 2

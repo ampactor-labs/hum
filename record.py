@@ -22,8 +22,9 @@ if "--wav" in args:
     extra += ["--wav", args[args.index("--wav") + 1]]
 if mode == "sample":
     extra += ["--sample", os.path.join(HERE, "samples", "ear_tone.ndjson")]
+if os.environ.get("MENTL_DIR"):
+    extra += ["--mentl-dir", os.environ["MENTL_DIR"]]
 cmd = [sys.executable, "-I", os.path.join(HERE, "director.py"), "--mode", mode, "--port", "8787",
-       "--mentl-dir", os.environ.get("MENTL_DIR", os.path.expanduser("~/mentl")),
        "--mentl-bin", os.environ.get("MENTL_BIN", "mentl")] + extra
 before = set(glob.glob(os.path.join(HERE, "sessions", "*.ndjson")))
 # The director and everything it spawns share one process group, so the end is one signal.
