@@ -929,30 +929,34 @@ async function loadCaptures() {
 // flow and `2` the Nucleus flow, and each selection resets the page. Every
 // beat keeps its own key, so the presenter can leave the flow at any point.
 // The timer at the bottom right starts at the first beat and counts the slot.
+// A beat's third field is the letter key that does the same thing, so a
+// stomp on the pedal (which types `e`, `i` or `h`) or a letter pressed from
+// habit moves the flow along instead of leaving it a beat behind.
 const flows = {
   torus: [
     ["start", () => {}],
-    ["tomorrow's noon", () => { if (!hourOn) tomorrow(); }],
-    ["back to now", () => { if (hourOn) tomorrow(); }],
-    ["replay the 2019 event", replay],
+    ["tomorrow's noon", () => { if (!hourOn) tomorrow(); }, "h"],
+    ["back to now", () => { if (hourOn) tomorrow(); }, "h"],
+    ["replay the 2019 event", replay, "e"],
     // Rolling the guitar's volume off cuts the hum for real, and the ear reports the island itself; these two beats then send nothing.
-    ["the grid goes dark", () => { if (!islandOn && modeShown !== "ISLAND") island(); }],
-    ["the grid is back", () => { if (islandOn) island(); }],
-    ["proven", () => showCard("ovProof")],
-    ["refused", () => showCard("ovRefused")],
-    ["thank you", () => showCard("ovThanks")],
+    ["the grid goes dark", () => { if (!islandOn && modeShown !== "ISLAND") island(); }, "i"],
+    ["the grid is back", () => { if (islandOn) island(); }, "i"],
+    ["proven", () => showCard("ovProof"), "p"],
+    ["refused", () => showCard("ovRefused"), "r"],
+    ["thank you", () => showCard("ovThanks"), "k"],
   ],
   nucleus: [
     ["start", () => {}],
     ["slide 1, the problem", () => slide(0)],
     ["slide 2, Mentl", () => slide(1)],
-    ["replay the 2019 event", () => { closeAll(); replay(); }],
-    ["refused", () => showCard("ovRefused")],
+    ["replay the 2019 event", () => { closeAll(); replay(); }, "e"],
+    ["refused", () => showCard("ovRefused"), "r"],
     ["slide 3, built this week", () => slide(2)],
     ["slide 4, who needs it", () => slide(3)],
     ["slide 5, the $10,000", () => slide(4)],
   ],
 };
+function syncBeat(k) { if (flow && beat + 1 < flow.length && flow[beat + 1][2] === k) { beat += 1; if (!flowT0) flowT0 = performance.now(); } }
 let flow = null, flowName = "", beat = -1, flowT0 = 0;
 function showCard(id) { closeAll(); $(id).classList.add("show"); }
 // The Nucleus slides are the deck itself in a frame over the stage; the deck's script shows the slide the hash names.
@@ -988,6 +992,7 @@ document.addEventListener("keydown", e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (flowKey(e)) return;
   const k = e.key.toLowerCase();
+  if (!e.shiftKey) syncBeat(k);
   if (e.shiftKey && k === "p") { toggleOverlay("ovCert"); return; }
   if (e.shiftKey && k === "r") { toggleOverlay("ovRefuse"); return; }
   if (k === "escape") closeAll();
