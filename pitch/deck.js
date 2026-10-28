@@ -4,6 +4,8 @@
   const slides = Array.from(document.querySelectorAll(".slide"));
   let i = Math.max(0, Math.min(slides.length - 1, parseInt(location.hash.slice(1) || "0", 10) || 0));
   const nav = document.createElement("div"); nav.className = "nav"; document.body.appendChild(nav);
+  // Shown inside the live page's frame (`?embed`), the deck hides its own navigation label.
+  if (location.search.includes("embed")) nav.style.display = "none";
   function show(n) {
     i = Math.max(0, Math.min(slides.length - 1, n));
     slides.forEach((s, k) => s.classList.toggle("current", k === i));

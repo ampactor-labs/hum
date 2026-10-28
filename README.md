@@ -36,7 +36,7 @@ python3 -I record.py --mode live                  # re-record the bundled sessio
 
 The page is at http://127.0.0.1:8787/. It opens on the stage: the frequency, sonido's tuner, the Station's two machines, and one sentence about what is happening.
 
-Keys: `H` tomorrow's noon · `E` replay the 2019 event · `I` cut the hum · `P` proven · `R` refused · `K` thank you · `A` the compiler's own text on a card · `D` the engineers' dashboard · `0` reset · `Esc` close. The dashboard adds `G` the gate, `T` the raw lines, `M` the mesh, `S` sound and `B` a bright-room palette; `Shift+P` and `Shift+R` open the detailed proof and refusal. The venue drill is `setup.md`, and the pitch itself is `pitch/script.md`.
+Keys: `1` the Torus pitch's beats in order and `2` the Nucleus pitch's, then Space or a clicker's Page Down for the next beat and the left arrow for one back · `H` tomorrow's noon · `E` replay the 2019 event · `I` cut the hum · `P` proven · `R` refused · `K` thank you · `A` the compiler's own text on a card · `D` the engineers' dashboard · `0` reset · `Esc` close. The dashboard adds `G` the gate, `T` the raw lines, `M` the mesh, `S` sound and `B` a bright-room palette; `Shift+P` and `Shift+R` open the detailed proof and refusal. The venue drill is `setup.md`, and the pitch itself is `pitch/script.md`.
 
 Served as plain files with no director, the page plays `sessions/default.ndjson` and starts it over at the end. The session is about four minutes recorded with the real controller by `python3 -I record.py`. On a phone held upright the stage stacks into one column. `samples/event_gb.wav` is the 2019 event rendered as sound: 95 seconds at 8 kHz.
 

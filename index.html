@@ -183,6 +183,13 @@ body:not(.dash) .help { display: none; }
 .scard .qrrow { display: flex; gap: 3.4vw; align-items: center; margin-top: 1vw; }
 .scard .qr { width: 17vw; height: 17vw; border-radius: 1vw; background: #fff; padding: 0.6vw; }
 .scard .url { font-family: var(--mono); color: var(--ink); font-size: 2.4vw; }
+/* The presenter's timer and beat count, shown only while a pitch flow is selected (keys 1 and 2). */
+.st-timer { position: absolute; right: 64px; bottom: 32px; font-family: var(--mono); font-size: 22px; color: var(--ink-3); display: none; }
+#stage.timing .st-note { right: 300px; }
+#stage.tall .st-timer { display: none !important; }
+/* The Nucleus slides, shown over the stage in a frame; the deck's own script scales them to the window. */
+#ovDeck { background: var(--void); }
+#ovDeck iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -308,6 +315,7 @@ $ mentl why examples/grid/station.mn decide WASI
   </div>
   <div class="st-head" id="stHead">Listening for the grid.</div>
   <div class="st-note" id="stNote">The Station is a model built from Torus's published figures. Simulated.</div>
+  <div class="st-timer" id="stTimer"></div>
 </div></div>
 
 <div class="ov2" id="ovProof"><div class="scard">
@@ -332,7 +340,9 @@ $ mentl why examples/grid/station.mn decide WASI
   </div>
 </div></div>
 
-<div class="help">D stage · H tomorrow's noon · E replay · I island · P proven · R refused · K thank you · A compiler text · G gate · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
+<div class="ov2" id="ovDeck"><iframe id="deckFrame" title="The Nucleus slides"></iframe></div>
+
+<div class="help">1 Torus flow · 2 Nucleus flow · Space next · ← back · D stage · H tomorrow's noon · E replay · I island · P proven · R refused · K thank you · A compiler text · G gate · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
 
 <script>
 (() => {
@@ -894,8 +904,8 @@ async function cmd(q) { try { await fetch("/cmd?" + q + "&ts=" + Date.now(), { c
 function replay() { if (sessionFile) return; cmd("src=replay"); }
 function tomorrow() { if (sessionFile) return; hourOn = !hourOn; cmd(hourOn ? "hour=12.5" : "hour="); }
 function island() { if (sessionFile) return; islandOn = !islandOn; $("btnIsland").classList.toggle("on", islandOn); cmd(islandOn ? "src=silence" : "src=back"); }
-function reset() { closeAll(); hourOn = false; if (islandOn) island(); if (sound.on) sound.toggle(); if (!sessionFile) { cmd("src=back"); cmd("reset=1"); } document.body.classList.remove("bright"); }
-const overlays = ["ovCert", "ovRefuse", "ovGate", "ovTable", "ovMesh", "ovProof", "ovRefused", "ovThanks"];
+function reset() { closeAll(); hourOn = false; if (islandOn) island(); if (sound.on) sound.toggle(); if (!sessionFile) { cmd("src=back"); cmd("reset=1"); } document.body.classList.remove("bright"); beat = -1; flowT0 = 0; }
+const overlays = ["ovCert", "ovRefuse", "ovGate", "ovTable", "ovMesh", "ovProof", "ovRefused", "ovThanks", "ovDeck"];
 function closeAll() { overlays.forEach(id => $(id).classList.remove("show")); }
 function toggleOverlay(id) { const was = $(id).classList.contains("show"); closeAll(); if (!was) { $(id).classList.add("show"); if (id === "ovTable") fillTable(); if (id === "ovMesh") meshT0 = performance.now(); } }
 function fillTable() {
@@ -911,8 +921,70 @@ async function loadCaptures() {
   const gate = await get("pitch/gate.txt");
   if (gate) { $("gateRaw").innerHTML = gate.split("\n").map(l => { const e = l.replace(/&/g, "&amp;").replace(/</g, "&lt;"); return /^< PROVEN/.test(l) ? "<b>" + e + "</b>" : /^< REFUSED/.test(l) ? "<span class='hi'>" + e + "</span>" : e; }).join("\n"); }
 }
+// ---------- the pitch, one key at a time ----------
+// A flow lists one room's beats in order. Space, Enter, the right arrow and
+// Page Down run the next beat, so a presenter's clicker drives the whole
+// pitch; the left arrow and Page Up step back one beat. `1` selects the Torus
+// flow and `2` the Nucleus flow, and each selection resets the page. Every
+// beat keeps its own key, so the presenter can leave the flow at any point.
+// The timer at the bottom right starts at the first beat and counts the slot.
+const flows = {
+  torus: [
+    ["start", () => {}],
+    ["tomorrow's noon", () => { if (!hourOn) tomorrow(); }],
+    ["back to now", () => { if (hourOn) tomorrow(); }],
+    ["replay the 2019 event", replay],
+    ["the grid goes dark", () => { if (!islandOn) island(); }],
+    ["the grid is back", () => { if (islandOn) island(); }],
+    ["proven", () => showCard("ovProof")],
+    ["refused", () => showCard("ovRefused")],
+    ["thank you", () => showCard("ovThanks")],
+  ],
+  nucleus: [
+    ["start", () => {}],
+    ["slide 1, the problem", () => slide(0)],
+    ["slide 2, Mentl", () => slide(1)],
+    ["replay the 2019 event", () => { closeAll(); replay(); }],
+    ["refused", () => showCard("ovRefused")],
+    ["slide 3, built this week", () => slide(2)],
+    ["slide 4, who needs it", () => slide(3)],
+    ["slide 5, the $10,000", () => slide(4)],
+  ],
+};
+let flow = null, flowName = "", beat = -1, flowT0 = 0;
+function showCard(id) { closeAll(); $(id).classList.add("show"); }
+// The Nucleus slides are the deck itself in a frame over the stage; the deck's script shows the slide the hash names.
+function slide(n) { const f = $("deckFrame"); if (!f.src) f.src = "pitch/nucleus.html?embed#" + n; else f.contentWindow.location.hash = "#" + n; showCard("ovDeck"); }
+function selectFlow(name) {
+  flow = flows[name]; flowName = name === "torus" ? "T" : "N"; reset();
+  if (!$("deckFrame").src) $("deckFrame").src = "pitch/nucleus.html?embed#0";
+  $("stage").classList.add("timing"); $("stTimer").style.display = "block";
+}
+function runBeat(n) { if (!flow || n < 0 || n >= flow.length) return; beat = n; if (!flowT0) flowT0 = performance.now(); flow[n][1](); }
+function flowKey(e) {
+  if (sessionFile || (state && state.playback)) return false;
+  if (e.key === "1") { selectFlow("torus"); return true; }
+  if (e.key === "2") { selectFlow("nucleus"); return true; }
+  if (!flow) return false;
+  if (["Enter", " ", "ArrowRight", "PageDown"].includes(e.key)) { e.preventDefault(); runBeat(beat + 1); return true; }
+  if (["ArrowLeft", "PageUp"].includes(e.key)) {
+    e.preventDefault(); closeAll(); beat = Math.max(-1, beat - 1);
+    // Stepping back onto a card or a slide shows it again; stepping back onto a change of state only closes what is open.
+    if (beat >= 0 && /^(slide|proven|refused|thank)/.test(flow[beat][0])) flow[beat][1]();
+    return true;
+  }
+  return false;
+}
+setInterval(() => {
+  if (!flow) return;
+  if (!flowT0) { $("stTimer").textContent = flowName + " · ready"; return; }
+  const s = Math.floor((performance.now() - flowT0) / 1000);
+  $("stTimer").textContent = flowName + " " + (beat + 1) + "/" + flow.length + " · " + Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+}, 250);
+
 document.addEventListener("keydown", e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (flowKey(e)) return;
   const k = e.key.toLowerCase();
   if (e.shiftKey && k === "p") { toggleOverlay("ovCert"); return; }
   if (e.shiftKey && k === "r") { toggleOverlay("ovRefuse"); return; }
