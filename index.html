@@ -217,6 +217,14 @@ body:not(.dash) .help { display: none; }
 .tour button { font: inherit; font-size: clamp(26px, 2.4vw, 42px); line-height: 1; width: clamp(44px, 3.6vw, 64px); height: clamp(44px, 3.6vw, 64px); border-radius: 50%; border: 1px solid var(--line); background: #1A1730; color: var(--ink); cursor: pointer; padding: 0 0 0.2em; }
 .tour button:hover { background: #262245; }
 #stage.touring .st-note { bottom: 100px; }
+#stage.touring.timing .st-left, #stage.touring.timing .st-right { height: 630px; }
+#stage.touring.timing .st-words { top: 764px; }
+#stage.touring .st-timer { display: none !important; }
+#stage.tall.timing .st-words { top: 960px; }
+#stage.tall.timing .st-head { font-size: 44px; }
+#stage.tall .st-story { font-size: 24px; }
+#stage.tall.timing .st-left { height: 770px; }
+#stage.tall.timing .st-right { height: 600px; }
 .tour.corner { left: auto; right: 1vw; bottom: 1.2vh; transform: none; padding: 0.3vh 0.4vw; gap: 0.4vw; opacity: 0.55; }
 .tour.corner:hover { opacity: 1; }
 .tour.corner button { width: clamp(34px, 2.4vw, 46px); height: clamp(34px, 2.4vw, 46px); font-size: clamp(22px, 1.7vw, 32px); }
@@ -427,6 +435,7 @@ async function startLive() {
     } catch (e2) {}
   }
   poll(); setInterval(poll, 250);
+  startShow();
 }
 
 async function startPlayback(path) {
@@ -450,9 +459,9 @@ async function startPlayback(path) {
   // The tour jumps the recording to a chapter's start, in seconds from its first line. The chapters' moments come from the recording itself: the first line with the clock set, the first of the replay, and the first of the silence.
   const at = pred => { const k = rows.findIndex(pred); return k < 0 ? null : rows[k].ear.t - base; };
   const rushAt = at(r => r.ear.hour_set != null), replayAt = at(r => r.ear.source === "replay"), darkAt = at(r => r.ear.source === "silence");
-  chapters[1][1] = rushAt != null ? rushAt + 1.0 : null; chapters[2][1] = replayAt != null ? replayAt + 2.0 : null; chapters[3][1] = darkAt != null ? darkAt - 1.0 : null;
+  chapterAt = { "live": 1.0, "rush hour": rushAt != null ? rushAt + 1.0 : null, "replay": replayAt != null ? replayAt + 2.0 : null, "dark": darkAt != null ? darkAt - 1.0 : null };
   tour = { seek(sec) { clearTimeout(timer); i = Math.max(0, rows.findIndex(r => r.ear.t - base >= sec)); t0 = performance.now() - sec / speed * 1000; fresh(); step(); } };
-  $("stage").classList.add("touring"); $("tour").classList.add("show"); tourShow(0);
+  $("stage").classList.add("touring", "timing"); $("tour").classList.add("show"); tourGo(0);
   function step() {
     const elapsed = (performance.now() - t0) / 1000 * speed;
     while (i < rows.length && rows[i].ear.t - base <= elapsed) {
@@ -479,33 +488,36 @@ async function startPlayback(path) {
 }
 
 // ---------- the hosted replay's tour ----------
-// With no director, the page plays the bundled recording, and a viewer steps
-// through it with the arrows on screen or on the keyboard. The first four
-// chapters jump the recording to a moment; the last three are the cards.
-// While the recording plays on its own, the counter follows it.
-const chapters = [
-  ["The hum", 1.0],
-  ["Rush hour", null],
-  ["The 2019 event", null],
-  ["The grid goes dark", null],
-  ["Proven", null, "ovProof"],
-  ["Refused", null, "ovRefused"],
-  ["Replay it", null, "ovThanks"],
-];
-let tour = null, chapter = 0;
-function tourShow(n) { $("tourText").textContent = (n + 1) + " of " + chapters.length + " · " + chapters[n][0]; }
+// With no director, the page plays the bundled recording and a viewer steps
+// through the same show the presenter gives, with the arrows on screen or on
+// the keyboard. A live screen's beat jumps the recording to its moment, and
+// while the recording plays on, the counter follows it from one live screen
+// to the next. The slides and cards stay until the viewer moves on.
+let tour = null, chapter = 0, chapterAt = {};
+// What a live screen says when it is a recording, not this room.
+const recorded = {
+  "live": ["The grid's note: in this recording, a synthesized stand-in",
+    "In the room, a guitar pickup rests on a power adapter, which hums at the grid's frequency, and sonido measures it. This recording uses a synthesized 60 Hz hum in its place. At 60 Hz the tuner reads the note B, in tune. If the grid ran short of power, the number would fall."],
+};
+function tourShow(n) { $("tourText").textContent = (n + 1) + " of " + show.length + " · " + show[n][0]; }
+function tourText(n) {
+  const [name, , line, , story] = show[n], r = recorded[name] || [line, story];
+  $("stStep").textContent = r[0] || ""; $("stStory").textContent = r[1] || "";
+}
 function tourGo(n) {
   if (!tour) return;
-  chapter = (n + chapters.length) % chapters.length;
-  const [, sec, card] = chapters[chapter];
-  if (card) showCard(card); else { closeAll(); if (sec != null) tour.seek(sec); }
-  tourShow(chapter);
+  chapter = (n + show.length) % show.length;
+  const [name, view] = show[chapter];
+  closeAll();
+  if (typeof view === "number") slide(view); else if (view) showCard(view); else if (chapterAt[name] != null) tour.seek(chapterAt[name]);
+  tourText(chapter); tourShow(chapter);
 }
 function tourFollow(elapsed) {
-  const card = chapters[chapter][2];
-  if (card && $(card).classList.contains("show")) return;
-  let n = 0; chapters.forEach((c, k) => { if (c[1] != null && elapsed >= c[1]) n = k; });
-  if (n !== chapter) { chapter = n; tourShow(n); }
+  if (show[chapter][1] != null) return;
+  // When the recording starts over, the counter returns to the first live screen.
+  let n = show.findIndex(b => b[0] === "live");
+  show.forEach((b, k) => { const at = chapterAt[b[0]]; if (b[1] == null && at != null && elapsed >= at) n = k; });
+  if (n !== chapter) { chapter = n; tourText(n); tourShow(n); }
 }
 $("tourPrev").onclick = () => tour ? tourGo(chapter - 1) : runBeat(beat - 1); $("tourNext").onclick = () => tour ? tourGo(chapter + 1) : runBeat(beat + 1);
 
@@ -1127,7 +1139,7 @@ document.addEventListener("mousemove", () => { document.body.classList.add("curs
 
 loadCaptures();
 setStage(stageOn); stageFit(); window.addEventListener("resize", stageFit);
-if (sessionFile) startPlayback(sessionFile); else { startLive(); startShow(); }
+if (sessionFile) startPlayback(sessionFile); else startLive();
 requestAnimationFrame(frame);
 })();
 </script>
