@@ -28,7 +28,7 @@ The decision is written in Mentl. Its compiler proves the decision can't reach t
 python3 -I build_data.py --out data               # PacifiCorp East's hours and the 2019 event (EIA_API_KEY optional)
 ./run.sh live                                     # the guitar on the audio interface, through PipeWire
 ./run.sh pedal                                    # the guitar into the pedal, the pedal on USB
-./run.sh wav samples/hum_home.wav                 # a recording
+./run.sh wav samples/event_gb.wav                 # a recording: here, the 2019 event as sound
 ./run.sh replay                                   # the 2019 event, from eight seconds before the fall
 STUB=1 ./run.sh sample samples/ear_event.ndjson   # without Mentl: a stand-in controller written in Python
 python3 -I record.py --mode live                  # re-record the bundled session on the room's own hum

@@ -40,7 +40,6 @@
   <div class="kick">Why it matters</div>
   <h1>AI now helps write the software that runs machines. No mainstream language can prove what that software will never do.</h1>
   <p class="lead">Batteries, flywheels and flight controls run on code that people test and review, and then trust.</p>
-  <p class="lead"><b>Mentl is a programming language whose compiler proves it.</b></p>
   <div class="foot"><span>The problem</span><span>ampactor.dev/hum</span></div>
 </section>
 
@@ -53,10 +52,16 @@
       <p class="lead">The compiler checks the rule through every function the code calls. <b>Break it, and the program won't build.</b></p>
       <p class="note">Seven months and 2,600 commits since March. The compiler is written in Mentl and compiles itself. Open source: github.com/ampactor-labs/mentl</p>
     </div>
-    <div class="pic"><img src="img/card-refused.png" alt="The compiler refusing a program that broke its rule against reaching the internet"></div>
+    <div class="term">
+      <div class="cap">The compiler's answer about the controller in this demo</div>
+      <div class="cmd">$ mentl why examples/grid/station.mn decide Network</div>
+      <div>decide never uses Network: nothing in decide, and nothing it calls, performs an operation of Network</div>
+      <div class="cmd">$ mentl why examples/grid/station.mn decide Alloc</div>
+      <div>decide never uses Alloc: nothing in decide, and nothing it calls, performs an operation of Alloc</div>
+    </div>
   </div>
   <div class="foot"><span>The hard tech</span><span>ampactor.dev/hum</span></div>
-  <div class="src">Counts: the git history of github.com/ampactor-labs/mentl.</div>
+  <div class="src">Counts: the git history of github.com/ampactor-labs/mentl. The answers: pitch/why.txt, captured from the compiler on 28 Oct 2026.</div>
 </section>
 
 <section class="slide">
@@ -76,17 +81,14 @@
 
 <section class="slide">
   <div class="kick">Show it working</div>
-  <h1>Built this week: software that measures the power grid from a wall's wiring.</h1>
-  <div class="two">
-    <ul class="plain">
-      <li><b>A guitar pickup picks up the grid's hum</b> in any room, and my audio library, sonido, measures its frequency to a thousandth of a hertz.</li>
-      <li><b>A model of a Torus Station decides</b> what to do, typically in under a millisecond, with software written in Mentl.</li>
-      <li><b>That software is proven</b> unable to reach the internet while it decides.</li>
-    </ul>
-    <div class="pic"><img src="img/stage-trip.png" alt="The live screen while a replayed 2019 grid failure pulls the frequency down and the flywheel answers"></div>
+  <h1 class="small">Everything you just saw was built since Monday at 4 PM, on two tools I built before it.</h1>
+  <div class="rows">
+    <div class="row" style="grid-template-columns:250px 1fr"><b>Before</b><span>Mentl, the language: 2,610 commits since March 15. sonido, the audio library: 461 commits since January 25.</span></div>
+    <div class="row" style="grid-template-columns:250px 1fr"><b>This week</b><span>All of HUM: the ear, the controller, the director, the page and this show. In sonido, 10 commits, among them the grid ear and the pedal. In Mentl, 27.</span></div>
+    <div class="row" style="grid-template-columns:250px 1fr"><b>Check it</b><span>Every commit, with its time: github.com/ampactor-labs/hum, printed by <span class="mono">./ledger.sh</span></span></div>
   </div>
-  <div class="foot"><span>Before Monday 4 PM: the language, 2,610 commits since March 15, and sonido, 461 commits since January 25. Since then: everything on this slide.</span><span>ampactor.dev/hum</span></div>
-  <div class="src">Counts: each repository's git history, printed in pitch/ledger.txt. Picture: the 2019 replay, NESO open data at one second.</div>
+  <div class="foot"><span>Show it working</span><span>ampactor.dev/hum</span></div>
+  <div class="src">Counts: each repository's git history since Monday 26 Oct 2026, 4:00 PM MDT, printed in pitch/ledger.txt.</div>
 </section>
 
 <section class="slide">
@@ -102,7 +104,7 @@
 
 <section class="slide">
   <div class="kick">What $10,000 unlocks</div>
-  <h1 class="small">$10,000 puts a proven controller on a real machine in Utah within ninety days.</h1>
+  <h1 class="small">$10,000 puts this controller, proven unable to reach the internet, beside a real battery in Utah within ninety days.</h1>
   <div class="rows">
     <div class="row"><b>Day 30</b><span>Form the Utah company. Run the controller on a battery inverter on my bench.</span></div>
     <div class="row"><b>Day 60</b><span>Run it beside a real battery at one Utah site.</span></div>

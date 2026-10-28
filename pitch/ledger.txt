@@ -1,7 +1,32 @@
 ## This week (since Monday Oct 26, 4:00 PM MDT)
 
-### hum: 22 commits
+### hum: 47 commits
 
+- Wed 17:37  HUM starts from the desktop launcher, finds Mentl where it is checked out, and stops its ear and learner when the director stops
+- Wed 17:16  The hosted replay runs the same fifteen-beat show over the bundled recording
+- Wed 17:14  The pitch is one show for both rooms, and every screen explains itself
+- Wed 21:51  HUM quotes the compiler that proves the whole controller trap-free, and the tour finds its chapters
+- Wed 21:43  The hosted replay is a tour: arrows step through its seven chapters
+- Wed 21:18  The pedal's switches and the letter keys keep the pitch flow in step
+- Wed 21:17  The director steadies a live pickup's reading, so the flywheel no longer fires on the pickup's noise
+- Wed 20:41  HUM's text matches the controller whose decision is proven never to stop with an error
+- Wed 20:25  One key runs each pitch, and the words fit the judging sheet's five-minute slots
+- Tue 23:43  The QR code and every printed link point at ampactor.dev/hum
+- Tue 23:32  Code and machines no longer have intentions in HUM's text
+- Tue 23:27  Every text in HUM reads as plain English, checked against the humanizer's patterns
+- Tue 22:19  The recording, the slide pictures and the PDFs show the battery holding during the crash
+- Tue 22:01  The pitch says Mentl was built in Utah
+- Tue 21:59  The hosted replay publishes itself to hum.ampactor.dev
+- Tue 20:58  GitHub Pages serves the hosted replay's files as they are
+- Tue 20:57  The replay's sentences follow the 2019 record, and a sample file says it is one
+- Tue 20:51  The brief and the backup slide stop quoting the audit's count of open claims
+- Tue 20:50  The compiler's captured words match the controller as it now reads
+- Tue 20:42  The hosted replay says what it plays and fits a phone held upright
+- Tue 20:26  The venue drill flashes the pedal the way sonido's bootloader expects
+- Tue 20:24  The tuner's needle works for every source, and the drill puts the pedal in front of the Scarlett
+- Tue 20:22  The room sees one screen: sonido's tuner on the grid, the Station's two machines, and one plain sentence
+- Tue 19:44  Sessions in HUM now start with a plain-English rule and the facts every claim must respect
+- Tue 18:11  The ear stands on sonido's clean branch, and the ages are the full history's
 - Tue 17:49  Slide three's ledger counts match Tuesday's print
 - Tue 17:49  The bundled session shows tomorrow's rush hour, and a recorder lives in the tree
 - Tue 17:42  The judges' audit, answered: the rush hour is shown, the oath names the host boundary, and every beat carries one idea
@@ -25,14 +50,39 @@
 - Tue 08:09  HUM: the ear hears the grid, and the data it compares the grid to
 - Tue 07:54  HUM: the contracts every process speaks and the brief for the Mentl programs
 
-### sonido: 3 commits
+### sonido: 10 commits
 
+- Tue 23:43  sonido's embedded guide, references, specs and READMEs read as plain English
+- Tue 23:39  sonido's design decisions read as plain English
+- Tue 23:38  sonido's roadmap rounds the GRU's cost to 6,700 operations per sample
+- Tue 23:38  sonido's roadmap, changelog, contributing and getting-started guides read as plain English
+- Tue 23:35  sonido's architecture, kernel, DSP and synthesis guides read as plain English
+- Tue 23:35  Nine of sonido's documents read as plain English
+- Tue 20:26  feat: grid_pedal footswitches and toggle 1 type the HUM page's keys
 - Tue 08:41  The grid ear in a guitar pedal: the estimator on the Daisy Seed, one line every 50 ms over USB serial, the LEDs breathing with the grid
 - Tue 08:27  The grid ear reports nothing from a band under −60 dBFS: noise's crossings are not the grid's
 - Tue 08:09  The grid ear: a no_std estimator in sonido-core reads the hum's frequency, its rate of change and its level from a sample stream
 
-### mentl: 9 commits
+### mentl: 27 commits
 
+- Wed 21:41  An explicit call of list_index, byte_at, slice or str_slice is proven in bounds where its path proves it, so the call charges no Trap
+- Wed 20:26  The grid controller's decision is proven never to stop with an error, and the program runs in the same memory after 300,000 readings as after one
+- Wed 19:26  README describes the proof gate's answer in plain words
+- Wed 19:26  The proof gate's verdicts read plainly: PROVEN says every claim is proven and where the program was built, and REFUSED says nothing was built
+- Wed 19:09  A refused effect, mentl why and mentl audit read as plain English, and mentl check names every claim it could not prove
+- Wed 16:51  `mentl why` answers an absent effect as the proof it is, and `mentl audit` names the comment that cites a declaration
+- Wed 16:24  The README leads to HUM's grid controller, and every leak route the pitch survived is a fixture
+- Tue 23:56  SYNTAX.md reads as plain English while every rule of the language stays the same
+- Tue 23:54  MENTL_SPACE.md and the design system read as plain English
+- Tue 23:52  PLAN.md reads as plain English that a newcomer can follow
+- Tue 23:48  The course lessons and the two scores explain themselves in plain English
+- Tue 23:44  NATIVE.md, the IDE and library READMEs, and AGENTS.md read as plain English
+- Tue 23:36  The README and the grid examples read as plain English, and CLAUDE.md says how
+- Tue 22:12  The grid controller's battery stops charging while the grid is short of power
+- Tue 20:51  PLAN measures how the audit's pending claims move with the file's layout
+- Tue 20:50  PLAN records that a comment can change what mentl audit lists as unproven
+- Tue 20:47  The grid controller's comments and printed reasons are in plain English
+- Tue 19:44  Every session now starts with a rule to write in plain English, and CLAUDE.md follows it
 - Tue 17:37  The controller's decision negates the host boundary: !WASI beside !Network
 - Tue 17:24  The controller's clean-hour reason says percent, in a room's words
 - Tue 16:53  The learner's line starts at the nominal pitch

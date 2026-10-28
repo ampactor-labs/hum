@@ -3,8 +3,10 @@
 # since the hackathon kicked off (Monday Oct 26, 4:00 PM MDT), with
 # timestamps, for slide three and the README. Pass the Mentl checkout as $1
 # (default: MENTL_DIR, then the checkout the mentl command runs from). SONIDO
-# names sonido's checkout (default: ~/sonido or ~/Projects/sonido). A
-# repository that isn't there is named on stderr, never skipped silently.
+# names sonido's checkout (default: ~/sonido or ~/Projects/sonido). sonido is
+# read at the branch the ear builds against (ear/Cargo.toml), so fetch it
+# first; the others at their checked-out commit. A repository that isn't
+# there is named on stderr, never skipped silently.
 set -euo pipefail
 export TZ=America/Denver
 export PATH="$HOME/.local/bin:$PATH"
@@ -18,26 +20,36 @@ if [ -z "$sonido" ]; then
     if [ -d "$d/.git" ]; then sonido="$d"; break; fi
   done
 fi
-repos=()
-for repo in "$(cd "$(dirname "$0")" && pwd)" "${sonido:-$HOME/sonido}" "$mentl"; do
-  if [ -d "$repo/.git" ]; then repos+=("$repo"); else echo "ledger: no repository at $repo, so it is left out" >&2; fi
+here="$(cd "$(dirname "$0")" && pwd)"
+sonido_branch=$(sed -n 's/^sonido-core = .*branch = "\([^"]*\)".*/\1/p' "$here/ear/Cargo.toml" | head -1)
+repos=() refs=()
+for repo in "$here" "${sonido:-$HOME/sonido}" "$mentl"; do
+  if [ ! -d "$repo/.git" ]; then echo "ledger: no repository at $repo, so it is left out" >&2; continue; fi
+  ref=HEAD
+  if [ "$repo" = "${sonido:-}" ] && [ -n "$sonido_branch" ]; then
+    if git -C "$repo" rev-parse -q --verify "origin/$sonido_branch" >/dev/null; then ref="origin/$sonido_branch"
+    else echo "ledger: sonido has no origin/$sonido_branch, the branch the ear builds against, so its checked-out commit is read" >&2; fi
+  fi
+  repos+=("$repo") refs+=("$ref")
 done
 echo "## This week (since Monday Oct 26, 4:00 PM MDT)"
 echo
-for repo in "${repos[@]}"; do
+for i in "${!repos[@]}"; do
+  repo="${repos[$i]}" ref="${refs[$i]}"
   name=$(basename "$repo")
-  n=$(git -C "$repo" log --since="$since" --oneline HEAD | wc -l | tr -d ' ')
+  n=$(git -C "$repo" log --since="$since" --oneline "$ref" | wc -l | tr -d ' ')
   echo "### $name: $n commits"
   echo
-  git -C "$repo" log --since="$since" HEAD --date=format:'%a %H:%M' --pretty='- %ad  %s' | head -60
+  git -C "$repo" log --since="$since" "$ref" --date=format:'%a %H:%M' --pretty='- %ad  %s' | head -60
   echo
 done
 echo "## Before kickoff"
 echo
-for repo in "${repos[@]}"; do
+for i in "${!repos[@]}"; do
+  repo="${repos[$i]}" ref="${refs[$i]}"
   name=$(basename "$repo")
-  first=$(git -C "$repo" log --date=short --pretty='%ad' HEAD | tail -1)
-  before=$(git -C "$repo" rev-list --count --before="$since" HEAD)
+  first=$(git -C "$repo" log --date=short --pretty='%ad' "$ref" | tail -1)
+  before=$(git -C "$repo" rev-list --count --before="$since" "$ref")
   if [ "$before" -eq 0 ]; then
     echo "- $name: nothing before kickoff; born this week"
   else

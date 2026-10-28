@@ -197,6 +197,7 @@ body:not(.dash) .help { display: none; }
 .scard { width: 80vw; border: 0.2vw solid #3DFF9A; border-radius: 2.2vw; padding: 4vw 5vw; background: #0B0A16; }
 .scard.no { border-color: #FF2D55; }
 .scard.plain { border-color: var(--line); }
+.scard .path { font-family: var(--mono); font-size: 1.45vw; line-height: 1.4; color: #FF8FA6; margin: 0.4vw 0 1vw; }
 .scard .mark { font-size: 4.6vw; font-weight: 700; line-height: 1; color: #3DFF9A; }
 .scard.no .mark { color: #FF2D55; }
 .scard h1 { font-size: 4.4vw; font-weight: 700; letter-spacing: -0.02em; line-height: 1.06; margin: 1.6vw 0 1.4vw; }
@@ -377,7 +378,8 @@ $ mentl why examples/grid/station.mn decide WASI
   <div class="mark">✕ Refused</div>
   <h1>One line broke the rule.</h1>
   <code>let price = price_m("https://api.eia.gov/…")</code>
-  <p>Say an AI assistant adds one line to the decision that checks electricity prices online. The decision is marked as never reaching the internet, so the compiler refuses to build the program, and its error names the path the price lookup took.</p>
+  <p>Say an AI assistant adds this line to the split-second decision, to check electricity prices online. The hour's plan comes from EIA's data, read before the decision runs. The decision itself is marked as never reaching the internet, so the compiler won't build the program. Its error names the path:</p>
+  <div class="path">decide calls price_m → price_m calls fetch_param → fetch_param reaches the Network</div>
   <p class="src">The compiler's own output: mentl check examples/grid/station-leak.mn</p>
   <pre id="refusedRaw" hidden></pre>
 </div></div>
@@ -813,7 +815,7 @@ const TUNER_REF = 427.65;
 let stageOn = params.get("view") !== "dashboard";
 let stageScale = 1, scopeGain = 1, scopeSeen = null, gridPhase = 0, lastTuner = performance.now(), shownHz = null;
 // Whether the replay has reached the fall yet: its first seconds are the calm before it.
-let replayFell = false;
+let replayFell = false, stageReplaying = false, replayLow = null;
 function stageFit() {
   const tall = window.innerHeight > window.innerWidth, W = tall ? 1080 : 1920, H = tall ? 1920 : 1080;
   $("stage").classList.toggle("tall", tall);
@@ -849,6 +851,8 @@ function stageUpdate() {
   const waiting = !rec && room && !heard && beat >= 0;
   const cut = !waiting && (mode === "ISLAND" || src === "silence");
   replayFell = replaying && (replayFell || mode === "EVENT" || Math.abs((n.hz_fast ?? NOMINAL) - NOMINAL) > DEADBAND);
+  stageReplaying = replaying;
+  replayLow = !replaying ? null : n.hz_fast != null ? Math.min(replayLow ?? n.hz_fast, n.hz_fast) : replayLow;
   const chips = { live: rec ? ["rec", "RECORDED", "live, from a room's wiring"] : ["live", "LIVE", "this room's wiring"], pedal: rec ? ["rec", "RECORDED", "live, through the pedal"] : ["live", "LIVE", "through the pedal"], replay: ["replay", "REPLAY", "Great Britain, 9 August 2019, at our grid's pitch"], silence: ["cut", "THE HUM IS CUT", ""], tone: ["rec", "TEST HUM", "synthesized at 60 Hz"], sample: ["rec", "SAMPLE", state.source_label || ""], wav: ["rec", "RECORDING", state.source_label || ""] };
   const [kind, word, label] = chips[src] || ["rec", src.toUpperCase(), state.source_label || ""];
   $("stChip").className = "st-chip " + kind; $("stChipWord").textContent = word; $("stChipLabel").textContent = label;
@@ -877,7 +881,7 @@ function stageUpdate() {
   else if (mode === "ISLAND") head = "The grid went dark. The building is still on.";
   else if (!heard) head = cut ? "The hum is cut." : "Listening for the grid.";
   else if (mode === "EVENT") head = replaying ? "Two power plants tripped. The flywheel was pushing within a second." : "The grid is falling fast. The flywheel is pushing " + kw(sw) + "\u00a0kW.";
-  else if (mode === "RUSH") head = "Rush hour. The Station runs the building on its battery: " + kw(pw) + "\u00a0kW kept off a jammed grid.";
+  else if (mode === "RUSH") head = "Rush hour. The Station runs the building on its battery: " + kw(pw) + "\u00a0kW kept off the grid while demand peaks.";
   else if (sw > 500) head = "The grid is " + Math.round(Math.abs(dev) * 1000) + "\u00a0millihertz " + (dev < 0 ? "low" : "high") + ". The flywheel is pushing " + kw(sw) + "\u00a0kW.";
   else if (replaying) head = !replayFell ? "Two power plants are about to trip." : Math.abs(dev) > DEADBAND ? "The grid is still " + Math.round(Math.abs(dev) * 1000) + " millihertz " + (dev < 0 ? "low." : "high.") : "The grid is back in tune.";
   else head = room && !rec ? "Every wire in this room hums the grid's note. Right now, it's in tune." : "The whole Western grid hums one note: 60 hertz.";
@@ -929,6 +933,19 @@ function drawTuner(now) {
   g.strokeStyle = rgba(SON.accent, 0.45); g.lineWidth = 1;
   for (let k = -14; k <= 14; k++) { const s = k / 14; g.beginPath(); g.moveTo(cx + s * w * 0.08, horizon); g.lineTo(cx + s * w * 1.6, h); g.stroke(); }
   neon(g, [[0, horizon], [w, horizon]], SON.partner, 1.5);
+  // The replay's fall, on the floor: the last 40 s of the fast reading, 60 Hz
+  // at the horizon and 1.2 Hz below it at the bottom, so the drop reads as a cliff.
+  if (stageReplaying && replayFell) {
+    const tf = (state && state.trace_fast) || [], tEnd = tf.length ? tf[tf.length - 1][0] : 0, span = 40;
+    const yOf = v => horizon + 10 + (h - horizon - 30) * Math.min(1, Math.max(0, (NOMINAL - v) / 1.2));
+    const pts = tf.filter(p => p[1] != null && p[0] >= tEnd - span).map(p => [14 + (w - 28) * (p[0] - (tEnd - span)) / span, yOf(p[1])]);
+    g.fillStyle = rgba(SON.void, 0.6); g.fillRect(0, horizon + 2, w, h - horizon);
+    if (pts.length > 1) neon(g, pts, "#FFC53D", 3.5);
+    g.font = "18px " + (MONO || css("--mono")); g.textBaseline = "middle"; g.fillStyle = SON.ink;
+    g.textAlign = "left"; g.fillText("60 Hz", 20, yOf(NOMINAL) - 2);
+    if (replayLow != null) { g.textAlign = "right"; g.fillStyle = "#FFC53D"; g.fillText("lowest " + replayLow.toFixed(3) + " Hz", w - 20, yOf(replayLow) - 30); }
+    g.textAlign = "left"; g.fillStyle = SON.dim; g.fillText("the last 40 seconds", 20, h - 14);
+  }
   // Scope: the hum itself, three cycles, standing still while the grid is steady.
   const mid = horizon * 0.52, amp = horizon * 0.42, sc = n.scope && n.scope.length > 1 ? n.scope : null;
   if (sc) {
@@ -1056,9 +1073,9 @@ const show = [
   ["rush hour", null, "A jam you can see coming: tomorrow's rush hour", () => tomorrow(),
     "EIA's hourly data shows PacifiCorp East's demand peaking from noon to 4 PM this week. At tomorrow's 12:30 PM the model runs the building on its battery, keeping 300 kW off the grid, and recharges when power is cleaner."],
   ["replay", null, "A jam you can only hear: a real failure, replayed", () => replay(),
-    "On 9 August 2019, two power plants in Britain dropped off within a second and the frequency fell. This is that day's recorded frequency, replayed at 60 Hz. The flywheel pushes within a second; software reading hourly data would wait an hour."],
+    "On 9 August 2019, two power plants in Britain dropped off within a second and the frequency fell. This is that day's recorded frequency, replayed at 60 Hz. The flywheel starts pushing about 0.4 seconds after the fall shows and is at full power within 0.75 seconds. Hourly data never sees this coming."],
   ["dark", null, "When the grid goes dark", () => island(),
-    "That evening a million people in Britain lost power. Here the hum is cut, as if the grid went dark, and the model's battery keeps the building running on its own."],
+    "That evening a million people in Britain lost power. Here the hum is cut, as if the grid went dark. The model's flywheel carries the first seconds, then its battery runs the building on its own."],
   ["proven", "ovProof"],
   ["refused", "ovRefused"],
   ["why it matters", 2],
