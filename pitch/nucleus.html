@@ -75,11 +75,11 @@
     <tr><th>The controller's rule</th><th>Status</th></tr>
     <tr><td>No network, file, clock or other call outside the program while it decides</td><td class="yes">Proven by the compiler through every call</td></tr>
     <tr><td>No memory allocated while it decides</td><td class="yes">Proven</td></tr>
-    <tr><td>The flywheel within 100 kW, the battery within 300 kW</td><td class="part">Clamped in code; some claims are still open</td></tr>
-    <tr><td>It never crashes</td><td class="no">Not claimed; the compiler says it can</td></tr>
+    <tr><td>The flywheel within 100 kW, the battery within 300 kW</td><td class="yes">Proven: each machine answers a command with a power inside its rating, and the compiler checks the answer</td></tr>
+    <tr><td>The decision never stops with an error</td><td class="yes">Proven. One library call in the loop around it, the one that copies the timestamp, is not proven yet</td></tr>
     <tr><td>Its decisions are good</td><td class="no">Tested on recordings, not proven</td></tr>
   </table>
-  <p class="note">The compiler is written in Mentl, and the pinned binary rebuilds itself byte for byte. The first two rows are checked through every call, and a copy that breaks one does not build.</p>
+  <p class="note">The compiler is written in Mentl, and the pinned binary rebuilds itself byte for byte. The first four rows are checked through every call, and a copy that breaks one does not build.</p>
   <div class="foot"><span>mentl why examples/grid/station.mn decide WASI</span><span>Backup</span></div>
 </section>
 
@@ -90,10 +90,10 @@
     <tr><th>What stands in the way</th><th>Measured today</th><th>The fix</th></tr>
     <tr><td>No WebAssembly engine on the pedal's chip</td><td>The controller is a 37 KB WebAssembly file</td><td>Embed an interpreter written in Rust, or compile the file to C</td></tr>
     <tr><td>Built for threads</td><td>Shared memory and atomic instructions</td><td>A single-threaded build; the controller uses no threads</td></tr>
-    <tr><td>Memory</td><td>The reading loop keeps 8 KB per reading</td><td>A reading loop that allocates nothing</td></tr>
+    <tr><td>Memory</td><td>Fixed: the same peak after 300,000 readings as after one</td><td>Done; each reading runs in an arena that is reclaimed when it ends</td></tr>
     <tr><td>Speed</td><td>About 291,000 instructions per reading</td><td>Pass numbers instead of text</td></tr>
   </table>
-  <p class="note">The decision itself already allocates nothing. The work is in the loop around it and in the engine on the chip.</p>
+  <p class="note">The decision allocates nothing and the loop reclaims each reading's memory. The work left is the engine on the chip.</p>
   <div class="foot"><span>Daisy Seed: a 480 MHz Cortex-M7 with 64 MB of external memory</span><span>Backup</span></div>
 </section>
 

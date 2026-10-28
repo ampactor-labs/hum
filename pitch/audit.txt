@@ -1,83 +1,79 @@
-severs module-wide: Network — unlocks Sandbox (proven no network access)
-  10 declared effect(s) sever module-wide with no capability named — naming one unlocks it everywhere
-clamp_spin : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-  referenced in comments by: droop
-clamp_pulse : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-clamp_soc : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-spin_soc_m : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-pulse_soc_m : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-magnitude : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-  pending: 1 undischarged proof obligation(s) — the field ranks them
-droop : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-reflex : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-facility_w : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-spin_tick : Memory + Trap + Mutate
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-  pending: 1 undischarged proof obligation(s) — the field ranks them
-pulse_tick : Memory + Trap + Mutate
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-decide : Mutate + Memory + Trap
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-  referenced in comments by: node 12815, node 13742
-  verb-shape: 2-step let-chain reads as a |> pipe
-  anonymity: 2 effectful lambda(s) — a named stage carries the row; intent is lossless, name the stage
-  pending: 2 undischarged proof obligation(s) — the field ranks them
-mode_word : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-tenths : Memory + Alloc
-  severs beyond the module: Trap — unlocks Trap-free (nothing it reaches can trap; termination unproven)
-off_words : Memory + Alloc
-  severs beyond the module: Trap — unlocks Trap-free (nothing it reaches can trap; termination unproven)
-reason_text : Memory + Alloc
-  severs beyond the module: Trap — unlocks Trap-free (nothing it reaches can trap; termination unproven)
-  referenced in comments by: node 13742
-  pending: 1 undischarged proof obligation(s) — the field ranks them
-find_key : Memory + Alloc + Trap
-  pending: 2 undischarged proof obligation(s) — the field ranks them
-find_from : Memory + Trap
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
-matches_at : Memory + Trap
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
-is_digit : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-skip_spaces : Memory + Trap
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
-milli_at : Memory + Trap
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-whole_end : Memory + Trap
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
-digits_value : Memory + Trap
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
-frac_value : Memory + Trap
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
-number_end : Memory + Trap
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-  iteration-shape: a self-call threads an incremented index — the loop in recursion's costume; a fold/each/iterate stage serves
-exponent_scale : Memory + Trap
-  severs beyond the module: Alloc — unlocks Real-time safe (proven zero allocation)
-shrink : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-grow : Pure
-  severs beyond the module: Alloc + Trap — unlocks Real-time safe (proven zero allocation), Trap-free (nothing it reaches can trap; termination unproven)
-field : Memory + Alloc + Trap
-field_or : Memory + Alloc + Trap
-  pending: 1 undischarged proof obligation(s) — the field ranks them
-stamp : Memory + Alloc + Trap
-step : Mutate + Alloc + Memory + WASI + Trap
-main : Trap + Alloc + Memory + Mutate + WASI
-  pending: 4 undischarged proof obligation(s) — the field ranks them
+Nothing in this module uses Network, so it is sandboxed (it never reaches the network)
+  It also never uses 10 other effect(s) that the program declares.
+clamp_spin performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+  mentioned in comments: droop
+clamp_pulse performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+clamp_soc performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+spin_soc_m performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+pulse_soc_m performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+magnitude performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+droop performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+reflex performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+facility_w performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+settle performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+decide uses Mutate + Station
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+  mentioned in comments: the comment at line 1
+mode_word performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+tenths uses Memory + Alloc
+  never uses Trap, so it is trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+off_words uses Memory + Alloc
+  never uses Trap, so it is trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+reason_text uses Memory + Alloc
+  never uses Trap, so it is trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+  mentioned in comments: Reason, decide
+at uses Memory
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+find_key uses Memory + Alloc
+  never uses Trap, so it is trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+find_from uses Memory
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+  could be a fold, each or iterate stage: it calls itself with an index one higher, which is a loop written as recursion
+matches_at uses Memory
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+  could be a fold, each or iterate stage: it calls itself with an index one higher, which is a loop written as recursion
+is_digit performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+skip_spaces uses Memory
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+  could be a fold, each or iterate stage: it calls itself with an index one higher, which is a loop written as recursion
+milli_at uses Memory
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+whole_end uses Memory
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+  could be a fold, each or iterate stage: it calls itself with an index one higher, which is a loop written as recursion
+digits_value uses Memory
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+  could be a fold, each or iterate stage: it calls itself with an index one higher, which is a loop written as recursion
+frac_value uses Memory
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+  could be a fold, each or iterate stage: it calls itself with an index one higher, which is a loop written as recursion
+number_end uses Memory
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+  could be a fold, each or iterate stage: it calls itself with an index one higher, which is a loop written as recursion
+exponent_scale uses Memory
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+shrink performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+grow performs no effect (Pure)
+  never uses Alloc, Trap, so it is real-time safe (it never allocates memory) and trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+field uses Memory + Alloc
+  never uses Trap, so it is trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+field_or uses Memory + Alloc
+  never uses Trap, so it is trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+stamp uses Memory + Alloc + Trap
+reading uses Mutate + Alloc + Memory + WASI + Station + Trap
+step uses Memory + Alloc + Arena + Mutate + WASI + Station + Trap
+main uses Memory + Alloc + Mutate + Arena + WASI + Trap
+  mentioned in comments: the comment at line 1

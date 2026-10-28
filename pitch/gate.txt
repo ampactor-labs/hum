@@ -7,7 +7,7 @@ $ mentl mcp    # the proof gate on stdio: a program is proposed, the gate answer
     fn reflex(dev: Int) -> Int with !Network =
       if dev < -36 { 100000 } else if dev > 36 { -100000 } else { 0 }
     fn main() = reflex(-129)
-< PROVEN — every claim discharged; artifact: .build/mcp/last.wat
+< PROVEN — every claim in the program is proven, and it was built to .build/mcp/last.wat
 
 > propose
     // The reflex with one price read inside it, the way an agent asked to make
@@ -18,7 +18,6 @@ $ mentl mcp    # the proof gate on stdio: a program is proposed, the gate answer
       if dev < -36 { 100000 } else if dev > 36 { -100000 } else { 0 }
     }
     fn main() = reflex(-129)
-< REFUSED — 2 error(s) the medium reported; nothing was emitted
-< effects: E_EffectMismatch error: effect row mismatch: !Network vs Network — at 4:1-7:2: declared as reflex; Network enters at <stdin>:5:15 through `fetch_param` → declared as fetch_param, an op of Network declared at <stdin>:3:1 at <stdin>:4:1-7:2
-< effects: E_EffectUnhandled error: effect Network reaches the executable root with no absorbing handler — calling one of its ops would read garbage evidence at runtime; nothing executes unproven. No handler in scope handles Network — declare one and install it with ~> over the performing chain. declared as main; Network enters at <stdin>:8:13 through `reflex` → at <stdin>:5:15 through `fetch_param` → declared as fetch_param, an op of Network declared at <stdin>:3:1 at <stdin>:8:1-8:25
-
+< REFUSED — 2 error(s), so nothing was built
+< effects: E_EffectMismatch error: reflex is declared `with !Network`, which does not allow Network, and reflex uses Network: reflex calls `fetch_param` at <stdin>:5:15 → `fetch_param` is an operation of Network, declared at <stdin>:3:1 at <stdin>:4:1-7:2
+< effects: E_EffectUnhandled error: nothing handles Network either: it reaches the top of the program through `reflex`, whose error above names the path. Declare a handler for Network and install it with `~>` around the code that uses it. at <stdin>:8:1-8:25

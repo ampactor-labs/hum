@@ -249,28 +249,29 @@ body:not(.dash) .help { display: none; }
       <li><span class="g no">⊘</span> touch the filesystem while deciding</li>
       <li><span class="g no">⊘</span> make any call outside the program while deciding: no socket, no file, no clock</li>
       <li><span class="g no">⊘</span> allocate memory while deciding</li>
+      <li><span class="g no">⊘</span> stop with an error while deciding</li>
       <li><span class="g no">⊘</span> ask Spin for more than 100 kW, or Pulse for more than 300 kW</li>
       <li><span class="g no">⊘</span> accept a frequency outside 55 to 65 Hz as real</li>
     </ul></div>
   </div>
   <pre id="certWhy">$ mentl why examples/grid/station.mn decide Network
-<b>the row of decide carries no Network</b>
+<b>decide never uses Network: nothing in decide, and nothing it calls, performs an operation of Network</b>
 $ mentl why examples/grid/station.mn decide WASI
-<b>the row of decide carries no WASI</b></pre>
+<b>decide never uses WASI: nothing in decide, and nothing it calls, performs an operation of WASI</b></pre>
   <pre id="certRaw" style="display:none"></pre>
-  <div class="caption">The compiler proves these through every call the program makes. <code>mentl audit</code> lists claims it could not decide. <span class="sim">Press A for the compiler's own words.</span></div>
+  <div class="caption">The compiler proves these through every call the program makes. <code>mentl check</code> finds no claim in this controller that it could not prove. <span class="sim">Press A for the compiler's own words.</span></div>
 </div></div>
 
 <div class="overlay" id="ovRefuse"><div class="card">
   <h2>The same program, with one price lookup added inside the decision <span class="tag" style="border-color:var(--alarm);color:var(--alarm)">REFUSED</span></h2>
-  <pre id="leakSrc"><b>fn</b> decide(valid, hz, rocof, level, hour, rush, clean, out) -> Mode <b>with</b> !Alloc + !Network + !Filesystem + !WASI = {
+  <pre id="leakSrc"><b>fn</b> decide(valid, hz: Int, rocof, level, hour, rush, clean) <b>with</b> !Alloc + !Network + !Filesystem + !WASI + !Trap = {
   ...
   <span class="hi">let price = price_m("https://api.eia.gov/v2/electricity/rto/region-data/…")</span>
   let pulse_ask = if rush == 1 { <span class="hi">if price > 50000 { 300000 } else { 200000 }</span> } else { … }
   ...
 }</pre>
   <div class="path"><span class="node">decide</span><span class="arrow">→</span><span class="node">price_m</span><span class="arrow">→</span><span class="node">fetch_param</span><span class="arrow">→</span><span class="node">Network</span><span class="note">the path from the decision to the network, one call at a time</span></div>
-  <pre id="refuseRaw" style="display:none">E_EffectMismatch: declared as decide; Network enters through `price_m` → through `fetch_param` → declared as fetch_param, an op of Network.</pre>
+  <pre id="refuseRaw" style="display:none">E_EffectMismatch: decide uses Network: decide calls `price_m` → price_m calls `fetch_param` → `fetch_param` is an operation of Network.</pre>
   <div class="caption">The compiler refuses to build the program and names the line that broke the rule. The price belongs in the hour's plan, read before the fast decision runs. A lookup inside the decision is the bug. <span class="sim">Press A for the compiler's own words.</span></div>
 </div></div>
 
@@ -917,7 +918,7 @@ async function loadCaptures() {
   const audit = await get("pitch/audit.txt"), why = await get("pitch/why.txt");
   $("certRaw").textContent = (audit ? "$ mentl audit examples/grid/station.mn\n" + audit : "mentl audit examples/grid/station.mn — capture pending") + (why ? "\n" + why : "");
   const refusal = await get("pitch/refusal.txt"); if (refusal) { $("refuseRaw").textContent = refusal; $("refusedRaw").textContent = "$ mentl check examples/grid/station-leak.mn\n" + refusal; }
-  if (why) $("proofRaw").textContent = why.split("\n\n").filter(b => /Network|WASI|Alloc|Filesystem/.test(b)).join("\n\n");
+  if (why) $("proofRaw").textContent = why.split("\n\n").filter(b => /Network|WASI|Alloc|Filesystem|Trap/.test(b)).join("\n\n");
   const gate = await get("pitch/gate.txt");
   if (gate) { $("gateRaw").innerHTML = gate.split("\n").map(l => { const e = l.replace(/&/g, "&amp;").replace(/</g, "&lt;"); return /^< PROVEN/.test(l) ? "<b>" + e + "</b>" : /^< REFUSED/.test(l) ? "<span class='hi'>" + e + "</span>" : e; }).join("\n"); }
 }

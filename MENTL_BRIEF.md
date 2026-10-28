@@ -4,9 +4,9 @@ Three programs in the Mentl repository, under `examples/grid/`, do HUM's decidin
 
 ## station.mn: the controller
 
-It reads one line per reading from the director and answers each with one decision line. The function that decides, `decide`, declares four restrictions in its signature: no memory allocation, no network, no file system, and no call outside the program at all (`!Alloc + !Network + !Filesystem + !WASI`). The compiler proves all four through every function `decide` calls.
+It reads one line per reading from the director and answers each with one decision line. The function that decides, `decide`, declares five restrictions in its signature: no memory allocation, no network, no file system, no call outside the program at all, and no way to stop the program with an error (`!Alloc + !Network + !Filesystem + !WASI + !Trap`). The compiler proves all five through every function `decide` calls.
 
-Power commands are clamped in code, the flywheel to ±100 kW and the battery to ±300 kW, and their types state those ranges. The frequency the fast rules act on must lie between 55 and 65 Hz. Every number is an integer in thousandths, read from the line's text, so the decision never rounds a floating-point number.
+The decision commands each machine through an operation of the effect `Station`, and the machine answers with the power it gives, typed to its rating: ±100 kW for the flywheel, ±300 kW for the battery. The compiler proves every answer stays inside that range. The frequency the fast rules act on must lie between 55 and 65 Hz. Every number is an integer in thousandths, read from the line's text, so the decision never rounds a floating-point number.
 
 The rules:
 
@@ -24,7 +24,7 @@ Measured on the pinned compiler:
 - `samples/ear_tone.ndjson`: no event, and the flywheel tops up from the battery at 20 kW.
 - In the bundled recording, the median decision takes 0.6 ms, counting the line's trip from the director to the controller and back. 97 in 100 take under 1 ms, and the slowest took 33 ms. The times move with the machine's load: an earlier recording had a median of 0.1 ms. The first line also waits for the controller to start.
 
-What is not proven. Some refinement claims are still open. `mentl audit` lists claims it could not settle, but its count per function moves with the file's layout, a Mentl bug recorded in Mentl's PLAN, so no count is quoted here. The program can trap. The loop that reads and writes text around the decision keeps about 8 KB per reading: harmless on the laptop for hours, but on the pedal's 64 MB it would last about seven minutes. That, together with the pedal having no WebAssembly engine, is why the pedal does not run the controller yet.
+What is not proven. Every claim in the controller is proven, the power limits included: `mentl check examples/grid/station.mn` prints nothing, and it would print any claim it could not prove. The decision is proven never to stop the program with an error. One library call in the loop around it, `str_slice`, which copies the reading's timestamp into the decision line, still carries the compiler's bounds check, because the compiler cannot yet prove an explicit call of a sequence primitive in bounds; Mentl's PLAN names that step. Memory no longer grows: each reading runs inside an arena, and the peak is the same after 300,000 readings as after 60,000. The pedal does not run the controller yet because its chip has no WebAssembly engine.
 
 ## station-leak.mn: the copy the compiler refuses
 
@@ -40,5 +40,5 @@ Measured: within 5 mHz of the zero-crossing reading on a hum that wobbles ±20 m
 
 - `refusal.txt`: `mentl check examples/grid/station-leak.mn`.
 - `audit.txt`: `mentl audit examples/grid/station.mn`.
-- `why.txt`: `mentl why examples/grid/station.mn decide`, then the same question about `Network`, `Alloc`, `Filesystem` and `WASI`. Each answer says `decide` carries none of them.
+- `why.txt`: `mentl why examples/grid/station.mn decide`, then the same question about `Network`, `Alloc`, `Filesystem`, `WASI` and `Trap`. Each answer says `decide` never uses it.
 - `gate.txt`: a `mentl mcp` session. A clean decision is proposed and proven, then the same decision with a price lookup is refused and nothing is built.

@@ -1,17 +1,19 @@
 $ mentl why examples/grid/station.mn decide
-at 142:1-263:2: declared as decide
-declared as decide; Mutate enters at examples/grid/station:143:11, the tick, a store into the feedback line its record owns
-declared as decide; Memory enters at examples/grid/station:209:16, the tick, a store into the feedback line its record owns
-declared as decide; Trap enters at examples/grid/station:209:16, the tick, a store into the feedback line its record owns
+at 183:1-282:2: declared as decide
+decide uses Mutate: at examples/grid/station:186:19, the `<~` line, which runs its function and keeps the result for the next call
+decide uses Station: decide calls `spin` at examples/grid/station:238:16 → `spin` is an operation of Station, declared at examples/grid/station:107:1
 
 $ mentl why examples/grid/station.mn decide Network
-error: the row of decide carries no Network
+decide never uses Network: nothing in decide, and nothing it calls, performs an operation of Network
 
 $ mentl why examples/grid/station.mn decide Alloc
-error: the row of decide carries no Alloc
+decide never uses Alloc: nothing in decide, and nothing it calls, performs an operation of Alloc
 
 $ mentl why examples/grid/station.mn decide Filesystem
-error: the row of decide carries no Filesystem
+decide never uses Filesystem: nothing in decide, and nothing it calls, performs an operation of Filesystem
 
 $ mentl why examples/grid/station.mn decide WASI
-error: the row of decide carries no WASI
+decide never uses WASI: nothing in decide, and nothing it calls, performs an operation of WASI
+
+$ mentl why examples/grid/station.mn decide Trap
+decide never uses Trap: nothing in decide, and nothing it calls, performs an operation of Trap
