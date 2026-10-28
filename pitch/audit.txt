@@ -72,8 +72,11 @@ field uses Memory + Alloc
   never uses Trap, so it is trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
 field_or uses Memory + Alloc
   never uses Trap, so it is trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
-stamp uses Memory + Alloc + Trap
-reading uses Mutate + Alloc + Memory + WASI + Station + Trap
-step uses Memory + Alloc + Arena + Mutate + WASI + Station + Trap
+stamp uses Memory + Alloc
+  never uses Trap, so it is trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+reading uses Mutate + Alloc + Memory + WASI + Station
+  never uses Trap, so it is trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
+step uses Memory + Alloc + Arena + Mutate + WASI + Station
+  never uses Trap, so it is trap-free (nothing it reaches can stop with an error; that it always finishes is not proven)
 main uses Memory + Alloc + Mutate + Arena + WASI + Trap
   mentioned in comments: the comment at line 1

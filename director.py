@@ -429,7 +429,7 @@ class State:
             r["hour_set"] = self.hour_set
         r["rush"] = self.pace.rush(h)
         r["clean"] = self.pace.clean_at(h)
-        live = r.get("source") in ("live", "pedal")
+        live = r.get("source") in ("live", "pedal", "wav")
         if live:
             self.steady(r)
         r["offset_mhz"] = self.bias_mhz if live else 0.0
@@ -440,7 +440,8 @@ class State:
     # 100 ms reading wandered by tens of millihertz and jumped by hundreds,
     # while the grid itself moves by a few, so the controller read the noise
     # as the grid falling and the flywheel pushed in 78 percent of readings.
-    # A live line's frequency is therefore the median of the last 1.5 s of
+    # A live line's frequency (and a recording's, which came through the
+    # same pickup) is therefore the median of the last 1.5 s of
     # sonido's tuner readings, less the session's mean of that median, which
     # is the pickup's bias against the grid's long-run average of exactly
     # 60 Hz. The rate of change is the slope of the steadied reading over

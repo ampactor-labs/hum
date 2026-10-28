@@ -37,7 +37,7 @@ The director adds four fields before the controller sees a line, and the pedal's
 - `clean` the hour's clean share of generation, 0 to 1.
 - `offset_mhz` the pickup's bias that the director has subtracted from a live line, in millihertz: the session's mean of the steadied reading minus 60.000. Zero on every other line, and zero for the first five seconds of a live hum.
 
-On a live or pedal line the director also steadies the reading before anyone sees it, because a pickup's reading carries the pickup's own noise: `hz_fast`, `hz` and `tuner_hz` all become the median of the last 1.5 s of `tuner_hz` less `offset_mhz`, `tuner_cents` is recomputed from it, and `rocof` is the slope of that steadied reading over the last second. `hz_stft` stays the ear's own. The 2019 replay, recordings, samples and the tone pass through untouched, so their timing stays as the ear measured it.
+On a live, pedal or wav line the director also steadies the reading before anyone sees it, because a pickup's reading carries the pickup's own noise, whether it is heard now or was recorded: `hz_fast`, `hz` and `tuner_hz` all become the median of the last 1.5 s of `tuner_hz` less `offset_mhz`, `tuner_cents` is recomputed from it, and `rocof` is the slope of that steadied reading over the last second. `hz_stft` stays the ear's own. The 2019 replay, the samples and the tone pass through untouched, so their timing stays as the ear measured it.
 
 The director never sends an empty line.
 

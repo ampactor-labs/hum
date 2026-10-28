@@ -193,7 +193,7 @@ body:not(.dash) .help { display: none; }
 .tour button { font: inherit; font-size: clamp(26px, 2.4vw, 42px); line-height: 1; width: clamp(44px, 3.6vw, 64px); height: clamp(44px, 3.6vw, 64px); border-radius: 50%; border: 1px solid var(--line); background: #1A1730; color: var(--ink); cursor: pointer; padding: 0 0 0.2em; }
 .tour button:hover { background: #262245; }
 #stage.touring .st-note { bottom: 100px; }
-#stage.tall.touring .st-note { bottom: 120px; }
+#stage.tall.touring .st-note { bottom: 36px; }
 /* The Nucleus slides, shown over the stage in a frame; the deck's own script scales them to the window. */
 #ovDeck { background: var(--void); }
 #ovDeck iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
@@ -414,7 +414,10 @@ async function startPlayback(path) {
   }
   // At the end the session starts over, so the hosted copy never stops on a still frame.
   function again() { i = 0; t0 = performance.now(); fresh(); step(); }
-  // The tour jumps the recording to a chapter's start, in seconds from its first line.
+  // The tour jumps the recording to a chapter's start, in seconds from its first line. The chapters' moments come from the recording itself: the first line with the clock set, the first of the replay, and the first of the silence.
+  const at = pred => { const k = rows.findIndex(pred); return k < 0 ? null : rows[k].ear.t - base; };
+  const rushAt = at(r => r.ear.hour_set != null), replayAt = at(r => r.ear.source === "replay"), darkAt = at(r => r.ear.source === "silence");
+  chapters[1][1] = rushAt != null ? rushAt + 1.0 : null; chapters[2][1] = replayAt != null ? replayAt + 2.0 : null; chapters[3][1] = darkAt != null ? darkAt - 1.0 : null;
   tour = { seek(sec) { clearTimeout(timer); i = Math.max(0, rows.findIndex(r => r.ear.t - base >= sec)); t0 = performance.now() - sec / speed * 1000; fresh(); step(); } };
   $("stage").classList.add("touring"); $("tour").classList.add("show"); tourShow(0);
   function step() {
@@ -449,9 +452,9 @@ async function startPlayback(path) {
 // While the recording plays on its own, the counter follows it.
 const chapters = [
   ["The hum", 1.0],
-  ["Rush hour", 12.0],
-  ["The 2019 event", 44.0],
-  ["The grid goes dark", 201.5],
+  ["Rush hour", null],
+  ["The 2019 event", null],
+  ["The grid goes dark", null],
   ["Proven", null, "ovProof"],
   ["Refused", null, "ovRefused"],
   ["Replay it", null, "ovThanks"],
@@ -462,7 +465,7 @@ function tourGo(n) {
   if (!tour) return;
   chapter = (n + chapters.length) % chapters.length;
   const [, sec, card] = chapters[chapter];
-  if (card) showCard(card); else { closeAll(); tour.seek(sec); }
+  if (card) showCard(card); else { closeAll(); if (sec != null) tour.seek(sec); }
   tourShow(chapter);
 }
 function tourFollow(elapsed) {
