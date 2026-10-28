@@ -2,44 +2,38 @@
 
 **The format, from the judging sheet.** Each team gets one 5-minute slot per bounty, back to back with the next team, so there is no time for questions: everything the judges learn, they learn from the pitch. Nucleus is judged in groups 1 to 3 and Torus in groups 4 to 6, in different rooms, and a team in both pitches Nucleus first with 15 minutes to move. Finalists present again to the full panel between 6:15 and 6:45 PM, and winners are announced Thursday at 9:00 AM at the Zero Gravity Summit. Arrive by 5:00 PM; judging starts at 5:15. Upload the three PDFs in `pitch/` to the submission Drive folder before then.
 
-**Before you start, in both rooms.** The page is up in kiosk mode and the number is moving. The guitar is plugged in, with the gain at the rehearsed mark, and its neck pickup rests against the power adapter on the power strip, so the number is steady and the tuner reads B. The speaker is at a quarter. Never touch the cable tip on stage: the ear reads that buzz a full hertz high, and the flywheel would fire. Press `1` for the Torus flow or `2` for the Nucleus flow; that resets the page and shows a small timer at the bottom right. Then press nothing until the first row below.
+**Before you start, in both rooms.** The page is up in kiosk mode and the number is moving. The guitar is plugged in, with the gain at the rehearsed mark, and its neck pickup rests against the power adapter on the power strip, so the number is steady and the tuner reads B. The speaker is at a quarter. Never touch the cable tip on stage: the ear reads that buzz a full hertz high, and the flywheel would fire. The page opens on the show's title. If it isn't on the title, press `0`. Then press nothing until the judges are ready.
 
-**One key.** Each flow is a list of beats. Space, Enter, the right arrow or Page Down runs the next beat, so a presenter's clicker works. The left arrow steps back one beat. The timer shows the beat and the time since the first press, such as `T 4/9 · 1:52`. Every beat still has its own key, listed in each row, so you can leave the flow at any point: `H` tomorrow's noon and back, `E` the replay, `I` the hum cut and back, `P` proven, `R` refused, `K` thank you, `Esc` close a card, `0` reset.
+**One show, one key.** Both rooms and the finals get the same show, in the same order. Footswitch 1, Space, the right arrow or a clicker's Page Down runs the next beat. Footswitch 2 or the left arrow steps back one. `0` returns to the title. The timer at the bottom right shows the beat and the time since the first press, such as `5/15 · 0:52`. Every screen explains itself in writing, so a judge who looks away can catch up, and each beat sets the whole screen, so a step back or forward always lands on the right one.
 
 **What to say, and what not to.** Say "a model of Torus's Station", never "the Station" alone. Say "replayed", never that anyone tripped a plant. Say "can't reach the internet while it decides", never "proven" alone. Never say a function name, "WASI", "row" or "first light".
 
-## Torus, 5:40 PM, group 4: no slides, four minutes
+## The show: fifteen beats, four and a quarter minutes, every room
 
-| Time | Press | On screen | Say |
+| Time | Beat | On screen | Say |
 | --- | --- | --- | --- |
-| 0:00 | Next (start). Lift the guitar, hold its pickup to the power adapter, and set it back. | The number and sonido's tuner. | "That hum is the power grid. Every power adapter in this room sings it, and a guitar pickup hears it. This is my audio library's tuner reading it: sixty hertz, the note B. The whole Western grid, from Alberta to Baja, hums this one note." |
-| 0:40 | Nothing. | The tuner holding steady. | "Your brief asks for software that knows when the grid is jammed and stays out of traffic. The grid jams in two ways." |
-| 0:50 | Next (`H`) | Tomorrow 12:30 PM. The battery lights up. | "You can see the first kind coming. This is tomorrow at noon, from EIA's data for PacifiCorp East: rush hour. A model of your Station runs the building on its battery, three hundred kilowatts kept off the grid, and recharges when the power is clean." Then Next (`H` again). |
-| 1:30 | Next (`E`) | REPLAY. The number falls, the needle swings flat, the flywheel lights. | "You can only hear the second kind. On the ninth of August 2019, two power plants in Britain tripped within a second. This is that day's real frequency, replayed at our grid's pitch. Watch the tuner." When the flywheel lights: "The flywheel was pushing within a second. Software reading hourly data would still be waiting for the next hour." |
-| 2:20 | Roll the guitar's volume to zero, then Next. | THE HUM IS CUT. "The grid went dark. The building is still on." | "That evening in Britain, a million people lost power. When the grid goes dark here, the building stays on. That is the two-way Station Torus described on Monday." Roll the volume back up, then Next. (The ear reports the island itself within half a second of the knob; the two Next presses only keep the count, and `I` remains the backup if the knob does nothing.) |
-| 2:45 | Next (`P`) | Proven. | "One more thing for your engineers. The software making these decisions can't reach the internet while it decides. The compiler proves that by checking every function the decision calls." |
-| 3:05 | Next (`R`) | Refused. | "Watch me break it. One line that reads a price online, and the compiler won't build the program. I built that compiler. It's called Mentl." |
-| 3:30 | Next (`K`) | Thank you, Torus. The QR code. | "This explains a Station to anyone in thirty seconds. I'd love to bring it to a Torus event, and to show your engineers the compiler's proof. Scan the code to replay this on your phone." Stop, by 4:00. |
+| before | 1 title | Name, the sentence, the picture. Up while the room changes over. | Nothing until the judges are ready. |
+| 0:00 | (still the title) | | "I'm Morgan Espitia. I build a programming language called Mentl, here in Salt Lake City." Next. |
+| 0:05 | 2 how to read it | The grid, the ear, the Station, the software. | Let them read it for three seconds. "Here's how to read what you're about to see." Next. |
+| 0:10 | 3 live | The live number and sonido's tuner. Top line: "Live in this room". | Don't touch the guitar: the pickup stays taped to the adapter. "That hum is the power grid. Every power adapter in this room sings it, and a guitar pickup hears it. Sixty hertz, the note B. The whole Western grid, from Alberta to Baja, hums this one note. It jams in two ways." Next. |
+| 0:30 | 4 rush hour | TOMORROW · 12:30 PM. The battery runs the building. | "You can see the first kind coming. This is tomorrow at noon, from EIA's data for PacifiCorp East: rush hour. A model of Torus's Station runs the building on its battery, three hundred kilowatts kept off the grid." Next. |
+| 0:50 | 5 replay | REPLAY. The number falls, the needle swings flat, the flywheel lights. | "You can only hear the second kind. On the ninth of August 2019, two power plants in Britain tripped within a second. This is that day's real frequency, replayed at our grid's pitch." When the flywheel lights: "The flywheel was pushing within a second. Software reading hourly data would still be waiting for the next hour." Next. |
+| 1:35 | 6 dark | THE HUM IS CUT. "The grid went dark. The building is still on." | "That evening a million people in Britain lost power. When the grid goes dark here, the building stays on." Next (the hum comes back by itself). |
+| 1:50 | 7 proven | Proven. | "The software making these decisions is written in Mentl, and it can't reach the internet while it decides. The compiler proves that by checking every function the decision calls." Next. |
+| 2:05 | 8 refused | Refused. | "Say an AI assistant adds one line that checks electricity prices online. The compiler won't build it." Next. |
+| 2:15 | 9 why it matters | AI now helps write the software that runs machines. | "That matters because AI now helps write the software that runs batteries, flywheels and flight controls, and no mainstream language can prove what that software will never do." Next. |
+| 2:30 | 10 Mentl | Mentl proves what software can never do. | "Mentl can. You write a rule into the code, the compiler checks it through every function the code calls, and code that breaks it won't build. Seven months, twenty-six hundred commits, and the compiler is written in its own language." Next. |
+| 2:45 | 11 Mentl's code | Five operators as real code, and the `with !Network` rule. | "This is what it looks like. Five operators draw the program's shape, and the rule on the last line is what the compiler checks." Next. |
+| 2:55 | 12 built this week | Built this week. | "Everything you just saw was built since Monday at four. The repository prints every commit with its time." Next. |
+| 3:00 | 13 who needs it | Torus, and Hill AFB's 309th. | "Who needs it here: Torus, for the software inside each Station, and Hill Air Force Base's 309th, which maintains flight software for the F-16, the F-35 and the missile fleet." Next. |
+| 3:20 | 14 the $10,000 | Day 30, 60, 90 and three asks. | "Ten thousand dollars puts a proven controller on a real machine in Utah within ninety days: on my bench by day thirty, beside a real battery at a Utah site by day sixty, and a pilot agreement and an SBIR proposal with Nucleus Grow by day ninety. Three asks: a Utah operator who will host it, an introduction to the 309th, and a co-founder who knows power electronics." Next. |
+| 3:55 | 15 thank you | The QR code and ampactor.dev/hum. | "Scan the code to replay this on your phone. Thank you." Stop, by 4:15. |
 
-**If the room is slow to start,** skip the 0:40 row. **Never add** the pedal or the event hum: the slot has no room for them.
-
-## Nucleus, 5:25 PM, group 1: five slides around the demo, four and a quarter minutes
-
-| Time | Press | On screen | Say |
-| --- | --- | --- | --- |
-| 0:00 | Next (start). Lift the guitar, hold its pickup to the power adapter, and set it back. | The live page. | "That hum is the power grid, heard by a guitar pickup from a power adapter, and this number is its frequency." |
-| 0:15 | Next (slide 1) | The problem. | "AI now helps write the software that runs machines: batteries, flywheels, flight controls. No mainstream language can prove what that software will never do. So people test it, review it, and then trust it." |
-| 0:40 | Next (slide 2) | Mentl. | "I built a language whose compiler proves it. You write a rule into the code, like 'this never touches the internet'. The compiler checks it through every function the code calls. Break the rule, and the program won't build. Seven months, twenty-six hundred commits, and the compiler is written in its own language." |
-| 1:20 | Next (`E`) | The page. The replay; the flywheel lights. | "This week I pointed it at the grid. This is a model of a Torus Station: a flywheel for the milliseconds, a battery for the hours. Here is a real 2019 grid failure, replayed. The decision you just watched was made by software written in Mentl, typically in under a millisecond." |
-| 2:00 | Next (`R`) | Refused. | "Say an AI assistant suggests one line that checks electricity prices online, inside that decision. The compiler refuses to build it." |
-| 2:20 | Next (slide 3) | Built this week. | "Everything on this slide was built since Monday at four. The language and my audio library existed before. The repository prints every commit with its time." |
-| 2:45 | Next (slide 4) | Who needs it in Utah. | "Torus, here in Salt Lake: the software inside each Station is where a proof would matter first, and Torus judges this demo at 5:40. And Hill Air Force Base's 309th, which maintains flight software for the F-16, the F-35 and the missile fleet." |
-| 3:20 | Next (slide 5) | What $10,000 unlocks. | "Ten thousand dollars puts a proven controller on a real machine in Utah within ninety days. Day thirty, I form the company and run it on a battery inverter on my bench. Day sixty, beside a real battery at one Utah site. Day ninety, a pilot agreement, and an SBIR proposal with Nucleus Grow. Two asks this room can answer: a Utah operator who will host it, and an introduction to the 309th." |
-| 4:00 | Stay on slide 5. | | "I've built the language since March and the audio library since January, and I'll keep going in November either way. Your bounty decides whether the first real machine is a battery in Utah or my bench." Stop, by 4:15. |
+**If the room is slow to start,** skip beat 2's line and cut the last sentence of beat 3. **If you run long,** drop the second sentence of beat 10, beat 11's line, and the day-by-day list in beat 14 ("within ninety days, then three asks"). **Never add** anything to the show on stage: the slot has no room.
 
 ## The finals, 6:15 PM, if called
 
-The full panel, both bounties, five minutes. Run the Nucleus flow. On slide 4 say "Torus judged this demo an hour ago" instead of "judges this demo at 5:40". Nothing else changes.
+The full panel, both bounties, five minutes. Run the same show. Nothing changes.
 
 ## If anyone asks, in the hallway or after the finals
 

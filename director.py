@@ -450,21 +450,28 @@ class State:
     # touched, so their timing stays as measured. The bias is applied only
     # after BIAS_AFTER readings, and the history starts over whenever the hum
     # is lost, so an island still shows within half a second.
-    STEADY_WINDOW = 30   # readings, 1.5 s at 20 per second
+    STEADY_WINDOW = 60   # readings, 3 s at 20 per second
     SLOPE_WINDOW = 20    # readings, 1 s
     BIAS_AFTER = 100     # readings, 5 s
 
     def steady(self, r):
         v = r.get("tuner_hz")
-        if v is None or r.get("hz_fast") is None:
+        # A tuner reading outside 59 to 61 Hz is the pickup hearing noise, not
+        # the grid (a pickup too far from the adapter reads 8 kHz or 57 Hz), so
+        # the line says no hum, the same as the ear's own silence.
+        if v is None or not 59.0 < v < 61.0 or r.get("hz_fast") is None:
             self.tuner_hist.clear()
             self.median_hist.clear()
+            for k in ("hz_fast", "hz", "rocof", "tuner_hz", "tuner_cents"):
+                r[k] = None
             return
         self.tuner_hist.append(v)
         del self.tuner_hist[:-self.STEADY_WINDOW]
         m = statistics.median(self.tuner_hist)
-        self.bias_sum += m - NOMINAL
-        self.bias_n += 1
+        # Only a reading near 60 Hz teaches the bias, so a noisy minute can't skew the rest of the session.
+        if abs(m - NOMINAL) < 0.25:
+            self.bias_sum += m - NOMINAL
+            self.bias_n += 1
         bias = self.bias_sum / self.bias_n if self.bias_n >= self.BIAS_AFTER else 0.0
         self.bias_mhz = round(1000.0 * bias, 1)
         hz = round(m - bias, 4)

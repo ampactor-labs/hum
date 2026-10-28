@@ -124,11 +124,25 @@ body:not(.dash) .help { display: none; }
 .st-chip.replay .dot { background: #FFC53D; box-shadow: 0 0 14px #FFC53D; }
 .st-chip.cut .dot { background: #FF2D55; box-shadow: 0 0 14px #FF2D55; }
 .st-chip.rec .dot { background: transparent; border: 3px solid var(--ink-2); }
-.st-clock { margin-left: auto; font-size: 26px; font-weight: 600; letter-spacing: 0.06em; color: #A27BFF; border: 2px solid #A27BFF; border-radius: 12px; padding: 6px 18px; }
+.st-step { margin-left: auto; font-size: 28px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.st-step:empty + .st-clock { margin-left: auto; }
+.st-clock { font-size: 26px; font-weight: 600; letter-spacing: 0.06em; color: #A27BFF; border: 2px solid #A27BFF; border-radius: 12px; padding: 6px 18px; }
 .st-left { position: absolute; left: 64px; top: 112px; width: 1048px; height: 690px; }
 .st-hz { font-size: 168px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; height: 168px; white-space: nowrap; }
 .st-hz small { font-size: 56px; font-weight: 400; color: var(--ink-2); margin-left: 18px; letter-spacing: 0; }
-.st-hz.off { color: #FFC53D; }
+.st-hz.off { color: #FFC53D; text-shadow: 0 0 40px rgba(255,197,61,0.55); }
+/* The screen's edge glows with what the grid is doing: amber while it falls and the flywheel pushes, violet at rush hour, red when it goes dark. Only opacity animates, so it stays smooth. */
+#stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .35s; z-index: 6; }
+#stage.ev::after { box-shadow: inset 0 0 180px 40px rgba(255,197,61,0.55); opacity: 1; animation: evpulse 0.8s ease-in-out infinite alternate; }
+#stage.rushing::after { box-shadow: inset 0 0 160px 30px rgba(162,123,255,0.45); opacity: 1; }
+#stage.dark::after { box-shadow: inset 0 0 260px 80px rgba(255,45,85,0.40); opacity: 1; }
+#stage.dark .st-left { opacity: 0.45; transition: opacity .4s; }
+@keyframes evpulse { from { opacity: 0.45; } to { opacity: 1; } }
+#stage.ev .st-hz { animation: jolt 0.09s linear 6; }
+@keyframes jolt { 0% { transform: translate(0,0); } 25% { transform: translate(-6px,3px); } 50% { transform: translate(5px,-3px); } 75% { transform: translate(-3px,-2px); } 100% { transform: translate(0,0); } }
+#stage.ev .st-tuner { border-color: #FFC53D; }
+.st-unit.spin.on, .st-unit.pulse.on { box-shadow: 0 0 60px rgba(255,197,61,0.30); }
+.st-unit.pulse.on { box-shadow: 0 0 60px rgba(162,123,255,0.35); }
 .st-hz.quiet { color: var(--ink-3); font-size: 120px; line-height: 168px; }
 .st-cap { font-size: 26px; color: var(--ink-2); margin: 14px 0 0 6px; }
 .st-tuner { position: absolute; left: 0; right: 0; top: 240px; bottom: 0; border-radius: 20px; overflow: hidden; border: 2px solid var(--line); background: var(--void); }
@@ -152,6 +166,15 @@ body:not(.dash) .help { display: none; }
 @keyframes rotor { to { transform: rotate(360deg); } }
 .st-head { position: absolute; left: 64px; right: 64px; top: 834px; font-size: 62px; font-weight: 600; line-height: 1.16; letter-spacing: -0.01em; }
 .st-head.cut { color: #FF6B86; }
+/* In the show, the live screen also carries its story in writing, so it reads without the presenter. */
+.st-words { position: absolute; left: 64px; right: 64px; top: 834px; }
+.st-words .st-head { position: static; }
+.st-story { font-size: 30px; line-height: 1.32; color: var(--ink-2); margin-top: 12px; }
+.st-story:empty { display: none; }
+#stage.timing .st-left, #stage.timing .st-right { height: 652px; }
+#stage.timing .st-words { top: 786px; }
+#stage.timing .st-head { font-size: 46px; }
+#stage.tall .st-words { left: 56px; right: 56px; top: 980px; }
 .st-note { position: absolute; left: 64px; right: 64px; bottom: 32px; font-size: 22px; color: var(--ink-3); }
 /* Held upright: the number and the tuner on top, then the sentence, then the Station. */
 #stage.tall #stageInner { width: 1080px; height: 1920px; }
@@ -179,6 +202,7 @@ body:not(.dash) .help { display: none; }
 .scard h1 { font-size: 4.4vw; font-weight: 700; letter-spacing: -0.02em; line-height: 1.06; margin: 1.6vw 0 1.4vw; }
 .scard p { font-size: 1.9vw; line-height: 1.38; color: var(--ink-2); margin: 0 0 0.8vw; max-width: 66vw; }
 .scard code { display: block; font-family: var(--mono); font-size: 2vw; color: var(--ink); background: #1A0C14; border: 0.15vw solid #FF2D55; border-radius: 1vw; padding: 1.2vw 1.8vw; margin: 1.4vw 0 1.6vw; }
+.scard p.src { font-size: 1vw; color: var(--ink-3); margin: 1.6vw 0 0; font-family: var(--mono); }
 .scard pre { font-size: 0.9vw; max-height: 22vh; overflow: auto; }
 .scard .qrrow { display: flex; gap: 3.4vw; align-items: center; margin-top: 1vw; }
 .scard .qr { width: 17vw; height: 17vw; border-radius: 1vw; background: #fff; padding: 0.6vw; }
@@ -193,6 +217,12 @@ body:not(.dash) .help { display: none; }
 .tour button { font: inherit; font-size: clamp(26px, 2.4vw, 42px); line-height: 1; width: clamp(44px, 3.6vw, 64px); height: clamp(44px, 3.6vw, 64px); border-radius: 50%; border: 1px solid var(--line); background: #1A1730; color: var(--ink); cursor: pointer; padding: 0 0 0.2em; }
 .tour button:hover { background: #262245; }
 #stage.touring .st-note { bottom: 100px; }
+.tour.corner { left: auto; right: 1vw; bottom: 1.2vh; transform: none; padding: 0.3vh 0.4vw; gap: 0.4vw; opacity: 0.55; }
+.tour.corner:hover { opacity: 1; }
+.tour.corner button { width: clamp(34px, 2.4vw, 46px); height: clamp(34px, 2.4vw, 46px); font-size: clamp(22px, 1.7vw, 32px); }
+.tour.corner #tourText { display: none; }
+#stage.timing .st-timer { right: 200px; }
+#stage.timing .st-note { right: 440px; }
 #stage.tall.touring .st-note { bottom: 36px; }
 /* The Nucleus slides, shown over the stage in a frame; the deck's own script scales them to the window. */
 #ovDeck { background: var(--void); }
@@ -303,6 +333,7 @@ $ mentl why examples/grid/station.mn decide WASI
   <div class="st-top">
     <div class="st-brand">HUM</div>
     <div class="st-chip" id="stChip"><span class="dot"></span><b id="stChipWord">WAITING</b><span id="stChipLabel">for a signal</span></div>
+    <div class="st-step" id="stStep"></div>
     <div class="st-clock" id="stClock" style="display:none"></div>
   </div>
   <div class="st-left">
@@ -321,7 +352,7 @@ $ mentl why examples/grid/station.mn decide WASI
       <div><div class="name">Battery · Pulse</div><div class="state">Holding</div><div class="kw"></div><div class="charge"><i></i></div><div class="pct"></div></div>
     </div>
   </div>
-  <div class="st-head" id="stHead">Listening for the grid.</div>
+  <div class="st-words"><div class="st-head" id="stHead">Listening for the grid.</div><div class="st-story" id="stStory"></div></div>
   <div class="st-note" id="stNote">The Station is a model built from Torus's published figures. Simulated.</div>
   <div class="st-timer" id="stTimer"></div>
 </div></div>
@@ -329,7 +360,8 @@ $ mentl why examples/grid/station.mn decide WASI
 <div class="ov2" id="ovProof"><div class="scard">
   <div class="mark">✓ Proven</div>
   <h1>This software can't reach the internet while it decides.</h1>
-  <p>The compiler checks this through every function the decision calls. The decision can't touch a file or the clock either, and it never allocates memory while it decides.</p>
+  <p>Every decision you just watched was made by software written in Mentl, a language I built. Its compiler checks every function the decision calls, and proves the decision can't reach the internet, a file or the clock, and never allocates memory. The decision itself can't send anything out or take instructions from outside, whatever is added to it later.</p>
+  <p class="src">Checked by Mentl's compiler: mentl check examples/grid/station.mn</p>
   <pre id="proofRaw" hidden></pre>
 </div></div>
 
@@ -337,7 +369,8 @@ $ mentl why examples/grid/station.mn decide WASI
   <div class="mark">✕ Refused</div>
   <h1>One line broke the rule.</h1>
   <code>let price = price_m("https://api.eia.gov/…")</code>
-  <p>This decision is marked as never reaching the internet. Add one line that reads a price online, and the compiler won't build it. Its error names the path the price lookup took.</p>
+  <p>Say an AI assistant adds one line to the decision that checks electricity prices online. The decision is marked as never reaching the internet, so the compiler refuses to build the program, and its error names the path the price lookup took.</p>
+  <p class="src">The compiler's own output: mentl check examples/grid/station-leak.mn</p>
   <pre id="refusedRaw" hidden></pre>
 </div></div>
 
@@ -352,7 +385,7 @@ $ mentl why examples/grid/station.mn decide WASI
 
 <div class="tour" id="tour"><button id="tourPrev" title="The previous step">‹</button><span id="tourText"></span><button id="tourNext" title="The next step">›</button></div>
 
-<div class="help">1 Torus flow · 2 Nucleus flow · Space next · ← back · D stage · H tomorrow's noon · E replay · I island · P proven · R refused · K thank you · A compiler text · G gate · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
+<div class="help">Space, → or footswitch 1: next · ←  or footswitch 2: back · 0 the title · D stage · H tomorrow's noon · E replay · I island · P proven · R refused · K thank you · A compiler text · G gate · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
 
 <script>
 (() => {
@@ -474,7 +507,7 @@ function tourFollow(elapsed) {
   let n = 0; chapters.forEach((c, k) => { if (c[1] != null && elapsed >= c[1]) n = k; });
   if (n !== chapter) { chapter = n; tourShow(n); }
 }
-$("tourPrev").onclick = () => tourGo(chapter - 1); $("tourNext").onclick = () => tourGo(chapter + 1);
+$("tourPrev").onclick = () => tour ? tourGo(chapter - 1) : runBeat(beat - 1); $("tourNext").onclick = () => tour ? tourGo(chapter + 1) : runBeat(beat + 1);
 
 // ---------- the chip ----------
 function setChip(kind, text, label) {
@@ -799,7 +832,10 @@ function stageUpdate() {
   const rec = !!state.playback, said = n.source || "";
   const src = rec ? said || state.source || "" : state.source === "sample" && said === "tone" ? "tone" : state.source || "";
   const heard = n.hz != null || n.hz_fast != null;
-  const replaying = src === "replay", cut = mode === "ISLAND" || src === "silence", room = src === "live" || src === "pedal";
+  const replaying = src === "replay", room = src === "live" || src === "pedal";
+  // During the show a live room with no hum is the pickup off its adapter, not a blackout: only the show's own cut says the grid went dark.
+  const waiting = !rec && room && !heard && beat >= 0;
+  const cut = !waiting && (mode === "ISLAND" || src === "silence");
   replayFell = replaying && (replayFell || mode === "EVENT" || Math.abs((n.hz_fast ?? NOMINAL) - NOMINAL) > DEADBAND);
   const chips = { live: rec ? ["rec", "RECORDED", "live, from a room's wiring"] : ["live", "LIVE", "this room's wiring"], pedal: rec ? ["rec", "RECORDED", "live, through the pedal"] : ["live", "LIVE", "through the pedal"], replay: ["replay", "REPLAY", "Great Britain, 9 August 2019, at our grid's pitch"], silence: ["cut", "THE HUM IS CUT", ""], tone: ["rec", "TEST HUM", "synthesized at 60 Hz"], sample: ["rec", "SAMPLE", state.source_label || ""], wav: ["rec", "RECORDING", state.source_label || ""] };
   const [kind, word, label] = chips[src] || ["rec", src.toUpperCase(), state.source_label || ""];
@@ -814,7 +850,7 @@ function stageUpdate() {
   const el = $("stHz");
   if (hz == null) { el.textContent = cut ? "no hum" : "listening"; el.className = "st-hz quiet"; }
   else { el.innerHTML = hz.toFixed(3) + "<small>Hz</small>"; el.className = "st-hz" + (Math.abs(hz - NOMINAL) > DEADBAND ? " off" : ""); }
-  $("stHzCap").textContent = replaying ? "Great Britain's grid on 9 August 2019, replayed at our grid's pitch" : cut ? "the hum is cut, as if the grid went dark" : room ? (rec ? "the Western grid's frequency, recorded from a room's wiring" : "the frequency of the whole Western grid, read in this room") : src === "tone" ? "a synthesized hum, standing in for the grid" : src === "sample" ? "from a sample file, not a live reading" : "the grid's frequency, from a recording";
+  $("stHzCap").textContent = waiting ? "listening for the hum in this room's wiring" : replaying ? "Great Britain's grid on 9 August 2019, replayed at our grid's pitch" : cut ? "the hum is cut, as if the grid went dark" : room ? (rec ? "the Western grid's frequency, recorded from a room's wiring" : "the frequency of the whole Western grid, read in this room") : src === "tone" ? "a synthesized hum, standing in for the grid" : src === "sample" ? "from a sample file, not a live reading" : "the grid's frequency, from a recording";
   // The Station's two machines.
   const sw = n.spin_w || 0, pw = n.pulse_w || 0;
   unit("stSpin", sw > 500, sw > 500 ? "Pushing" : "Ready", sw > 500 ? sw : null, n.spin_soc_m);
@@ -825,18 +861,22 @@ function stageUpdate() {
   // typically takes under a millisecond.
   const dev = n.hz_fast != null ? n.hz_fast - NOMINAL : 0;
   let head;
-  if (mode === "ISLAND") head = "The grid went dark. The building is still on.";
+  if (waiting) head = "No hum yet: the guitar's pickup needs to rest on the power adapter.";
+  else if (mode === "ISLAND") head = "The grid went dark. The building is still on.";
   else if (!heard) head = cut ? "The hum is cut." : "Listening for the grid.";
   else if (mode === "EVENT") head = replaying ? "Two power plants tripped. The flywheel was pushing within a second." : "The grid is falling fast. The flywheel is pushing " + kw(sw) + "\u00a0kW.";
   else if (mode === "RUSH") head = "Rush hour. The Station runs the building on its battery: " + kw(pw) + "\u00a0kW kept off a jammed grid.";
   else if (sw > 500) head = "The grid is " + Math.round(Math.abs(dev) * 1000) + "\u00a0millihertz " + (dev < 0 ? "low" : "high") + ". The flywheel is pushing " + kw(sw) + "\u00a0kW.";
   else if (replaying) head = !replayFell ? "Two power plants are about to trip." : Math.abs(dev) > DEADBAND ? "The grid is still " + Math.round(Math.abs(dev) * 1000) + " millihertz " + (dev < 0 ? "low." : "high.") : "The grid is back in tune.";
   else head = room && !rec ? "Every wire in this room hums the grid's note. Right now, it's in tune." : "The whole Western grid hums one note: 60 hertz.";
-  $("stHead").textContent = head; $("stHead").classList.toggle("cut", mode === "ISLAND");
+  $("stHead").textContent = head; $("stHead").classList.toggle("cut", cut);
+  const stg = $("stage"), falling = mode === "EVENT" || (replaying && replayFell && Math.abs(dev) > DEADBAND);
+  stg.classList.toggle("ev", falling && !cut); stg.classList.toggle("rushing", mode === "RUSH" && !falling); stg.classList.toggle("dark", cut);
   const notes = [];
-  if (replaying) notes.push("Frequency: National Grid ESO one-second data, 9 August 2019, transposed to 60 Hz.");
-  if (mode === "RUSH") notes.push("Rush hour: PacifiCorp East hourly demand, from EIA.");
-  notes.push("The Station is a model built from Torus's published figures. Simulated.");
+  if (replaying) notes.push("Frequency: NESO open data at one second, Great Britain, 9 August 2019, transposed to 60 Hz.");
+  if (mode === "RUSH" || n.hour_set != null) notes.push("Rush hour: EIA-930 hourly demand for PacifiCorp East, 19–26 Oct 2026; tomorrow is the mean of the last seven days.");
+  if (room && !rec && !replaying) notes.push("Frequency: this room's wiring, read live by sonido's tuner.");
+  notes.push("The Station: a model from Torus's published figures, simulated.");
   $("stNote").textContent = notes.join(" ");
   // The scope's gain, as the cabinet sets it: quick to shrink, slow to grow.
   if (n.scope && n.scope.length && n.scope !== scopeSeen) {
@@ -856,8 +896,9 @@ function hash3(i) { const f = x => { const v = Math.sin(x) * 43758.5453; return 
 function poly(g, pts) { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); }
 function neon(g, pts, color, width) {
   g.save(); g.lineJoin = "round"; g.lineCap = "round";
-  g.strokeStyle = rgba(color, 0.22); g.lineWidth = width * 4; g.shadowColor = color; g.shadowBlur = 16; poly(g, pts);
-  g.shadowBlur = 0; g.strokeStyle = color; g.lineWidth = width; poly(g, pts);
+  g.strokeStyle = rgba(color, 0.10); g.lineWidth = width * 7; poly(g, pts);
+  g.strokeStyle = rgba(color, 0.22); g.lineWidth = width * 3.5; poly(g, pts);
+  g.strokeStyle = color; g.lineWidth = width; poly(g, pts);
   g.strokeStyle = "rgba(255,255,255,0.55)"; g.lineWidth = Math.max(1, width * 0.35); poly(g, pts); g.restore();
 }
 function plate(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); g.fill(); }
@@ -865,13 +906,12 @@ function drawTuner(now) {
   const [g, w, h] = stageSetup($("cTuner"));
   const dt = Math.min(0.1, (now - lastTuner) / 1000); lastTuner = now;
   const t = now / 1000, n = (state && state.now) || {};
-  const horizon = h * 0.62, cx = w / 2, mono = css("--mono");
-  g.fillStyle = SON.void; g.fillRect(0, 0, w, h);
-  // Sky: the void warming to the partner color at the horizon, and its stars.
-  let gr = g.createLinearGradient(0, 0, 0, horizon); gr.addColorStop(0, SON.void); gr.addColorStop(1, rgba(SON.partner, 0.22)); g.fillStyle = gr; g.fillRect(0, 0, w, horizon);
+  const horizon = h * 0.62, cx = w / 2, mono = MONO || (MONO = css("--mono"));
+  const layers = tunerLayers(w, h, horizon);
+  g.drawImage(layers.back, 0, 0, w, h);
+  // Sky: the void warming to the partner color at the horizon (drawn once), and its stars.
   for (let i = 0; i < 42; i++) { const [a, b, c] = hash3(i); const tw = 0.35 + 0.65 * Math.abs(Math.sin(t * (0.6 + c * 2.2) + a * 40)); g.fillStyle = rgba(SON.ink, tw * 0.7); g.beginPath(); g.arc(a * w, b * horizon * 0.85, c > 0.85 ? 1.7 : 1.1, 0, Math.PI * 2); g.fill(); }
   // Floor: a perspective grid rushing toward the viewer.
-  gr = g.createLinearGradient(0, horizon, 0, h); gr.addColorStop(0, rgba(SON.partner, 0.10)); gr.addColorStop(1, SON.void); g.fillStyle = gr; g.fillRect(0, horizon, w, h - horizon);
   gridPhase = (gridPhase + dt * 0.25) % 1;
   for (let i = 0; i < 9; i++) { const d = (i + gridPhase) / 9, y = horizon + (h - horizon) * d * d; g.strokeStyle = rgba(SON.accent, 0.75 * (0.25 + 0.75 * d)); g.lineWidth = 1 + d; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
   g.strokeStyle = rgba(SON.accent, 0.45); g.lineWidth = 1;
@@ -891,7 +931,8 @@ function drawTuner(now) {
   const own = n.tuner_hz != null && n.tuner_cents != null;
   const hz = own ? n.tuner_hz : shownHz, cents = own ? n.tuner_cents : (shownHz != null ? 1200 * Math.log2(shownHz / NOMINAL) : null);
   const locked = hz != null && cents != null;
-  const inTune = locked && Math.abs(cents) < 2, color = inTune ? SON.green : SON.accent;
+  const inTune = locked && Math.abs(cents) < 2, far = locked && Math.abs(cents) > 15, color = inTune ? SON.green : far ? "#FF2D55" : "#FFC53D";
+  if (locked && !inTune) { g.fillStyle = rgba(far ? "#FF2D55" : "#FFC53D", Math.min(0.28, Math.abs(cents) / 70)); g.fillRect(0, 0, w, h); }
   const px = cx, py = horizon - 6, r = Math.min(horizon - 18, w * 0.32), span = 1.0;
   const note = locked ? noteName(hz) : "--", size = Math.max(40, Math.min(132, horizon * 0.30));
   const ny = py - r * 0.55;
@@ -903,18 +944,32 @@ function drawTuner(now) {
     g.strokeStyle = i === 0 ? SON.green : SON.dim; g.lineWidth = i === 0 ? 4 : 2;
     g.beginPath(); g.moveTo(px + dx * r, py + dy * r); g.lineTo(px + dx * (r - len), py + dy * (r - len)); g.stroke();
   }
-  if (locked) { const a = -Math.PI / 2 + Math.max(-1, Math.min(1, cents / 50)) * span, dx = Math.cos(a), dy = Math.sin(a); neon(g, [[px + dx * r * 0.35, py + dy * r * 0.35], [px + dx * (r - 4), py + dy * (r - 4)]], color, 4); }
-  g.save(); g.lineWidth = 3; g.strokeStyle = color; g.shadowColor = color; g.shadowBlur = 18; g.strokeText(note, cx, ny); g.restore();
+  needleCents = !locked ? null : needleCents == null ? cents : needleCents + (cents - needleCents) * (1 - Math.exp(-dt * 9));
+  if (locked) { const a = -Math.PI / 2 + Math.max(-1, Math.min(1, needleCents / 50)) * span, dx = Math.cos(a), dy = Math.sin(a); neon(g, [[px + dx * r * 0.35, py + dy * r * 0.35], [px + dx * (r - 4), py + dy * (r - 4)]], color, 4); }
+  g.save(); g.lineJoin = "round"; g.lineWidth = 12; g.strokeStyle = rgba(color, 0.18); g.strokeText(note, cx, ny); g.lineWidth = 3; g.strokeStyle = color; g.strokeText(note, cx, ny); g.restore();
   g.font = Math.round(size * 0.26) + "px " + mono; g.fillStyle = SON.ink; g.textBaseline = "top";
   g.fillText(locked ? (inTune ? "in tune" : Math.abs(cents).toFixed(1) + " cents " + (cents < 0 ? "flat" : "sharp")) : "no hum", cx, ny + size * 0.66);
   // The label a sonido plugin wears, and the glass: scanlines and a vignette.
   g.font = "20px " + mono; g.textAlign = "left"; g.textBaseline = "top"; g.fillStyle = "#7A74A3"; g.fillText("SONIDO · TUNER", 20, 16);
-  g.fillStyle = "rgba(0,0,0,0.13)"; for (let y = 0; y < h; y += 3) g.fillRect(0, y, w, 1);
-  const vg = g.createRadialGradient(cx, h / 2, Math.min(w, h) * 0.35, cx, h / 2, Math.max(w, h) * 0.75); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,0.45)"); g.fillStyle = vg; g.fillRect(0, 0, w, h);
+  g.drawImage(layers.glass, 0, 0, w, h);
+}
+// The tuner's still layers, drawn once for each size: the sky and floor behind, the scanlines and vignette in front.
+let MONO = "", tunerCache = null, needleCents = null;
+function tunerLayers(w, h, horizon) {
+  const dpr = (window.devicePixelRatio || 1) * stageScale, key = w + "x" + h + "x" + dpr;
+  if (tunerCache && tunerCache.key === key) return tunerCache;
+  const make = () => { const c = document.createElement("canvas"); c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); return [c, g]; };
+  const [back, b] = make(), [glass, f] = make(), cx = w / 2;
+  b.fillStyle = SON.void; b.fillRect(0, 0, w, h);
+  let gr = b.createLinearGradient(0, 0, 0, horizon); gr.addColorStop(0, SON.void); gr.addColorStop(1, rgba(SON.partner, 0.22)); b.fillStyle = gr; b.fillRect(0, 0, w, horizon);
+  gr = b.createLinearGradient(0, horizon, 0, h); gr.addColorStop(0, rgba(SON.partner, 0.10)); gr.addColorStop(1, SON.void); b.fillStyle = gr; b.fillRect(0, horizon, w, h - horizon);
+  f.fillStyle = "rgba(0,0,0,0.13)"; for (let y = 0; y < h; y += 3) f.fillRect(0, y, w, 1);
+  const vg = f.createRadialGradient(cx, h / 2, Math.min(w, h) * 0.35, cx, h / 2, Math.max(w, h) * 0.75); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,0.45)"); f.fillStyle = vg; f.fillRect(0, 0, w, h);
+  tunerCache = { key, back, glass }; return tunerCache;
 }
 
 function frame() {
-  if (stageOn) drawTuner(performance.now()); else { drawHeart(); drawStation(); drawRush(); }
+  if (stageOn) { if (!document.querySelector(".ov2.show")) drawTuner(performance.now()); else lastTuner = performance.now(); } else { drawHeart(); drawStation(); drawRush(); }
   if ($("ovMesh").classList.contains("show")) drawMesh();
   requestAnimationFrame(frame);
 }
@@ -948,11 +1003,13 @@ const sound = {
 };
 
 // ---------- commands and keys ----------
-async function cmd(q) { try { await fetch("/cmd?" + q + "&ts=" + Date.now(), { cache: "no-store" }); } catch (e) {} }
+// Commands go out one at a time, so a beat that cuts the hum and then replays the event reaches the director in that order.
+let cmdQ = Promise.resolve();
+function cmd(q) { cmdQ = cmdQ.then(() => fetch("/cmd?" + q + "&ts=" + Date.now(), { cache: "no-store" })).catch(() => {}); return cmdQ; }
 function replay() { if (sessionFile) return; cmd("src=replay"); }
 function tomorrow() { if (sessionFile) return; hourOn = !hourOn; cmd(hourOn ? "hour=12.5" : "hour="); }
 function island() { if (sessionFile) return; islandOn = !islandOn; $("btnIsland").classList.toggle("on", islandOn); cmd(islandOn ? "src=silence" : "src=back"); }
-function reset() { closeAll(); hourOn = false; if (islandOn) island(); if (sound.on) sound.toggle(); if (!sessionFile) { cmd("src=back"); cmd("reset=1"); } document.body.classList.remove("bright"); beat = -1; flowT0 = 0; }
+function reset() { closeAll(); hourOn = false; if (islandOn) island(); if (sound.on) sound.toggle(); if (!sessionFile) { cmd("src=back"); cmd("reset=1"); } document.body.classList.remove("bright"); }
 const overlays = ["ovCert", "ovRefuse", "ovGate", "ovTable", "ovMesh", "ovProof", "ovRefused", "ovThanks", "ovDeck"];
 function closeAll() { overlays.forEach(id => $(id).classList.remove("show")); }
 function toggleOverlay(id) { const was = $(id).classList.contains("show"); closeAll(); if (!was) { $(id).classList.add("show"); if (id === "ovTable") fillTable(); if (id === "ovMesh") meshT0 = performance.now(); } }
@@ -969,51 +1026,58 @@ async function loadCaptures() {
   const gate = await get("pitch/gate.txt");
   if (gate) { $("gateRaw").innerHTML = gate.split("\n").map(l => { const e = l.replace(/&/g, "&amp;").replace(/</g, "&lt;"); return /^< PROVEN/.test(l) ? "<b>" + e + "</b>" : /^< REFUSED/.test(l) ? "<span class='hi'>" + e + "</span>" : e; }).join("\n"); }
 }
-// ---------- the pitch, one key at a time ----------
-// A flow lists one room's beats in order. Space, Enter, the right arrow and
-// Page Down run the next beat, so a presenter's clicker drives the whole
-// pitch; the left arrow and Page Up step back one beat. `1` selects the Torus
-// flow and `2` the Nucleus flow, and each selection resets the page. Every
-// beat keeps its own key, so the presenter can leave the flow at any point.
-// The timer at the bottom right starts at the first beat and counts the slot.
-// A beat's third field is the letter key that does the same thing, so a
-// stomp on the pedal (which types `e`, `i` or `h`) or a letter pressed from
-// habit moves the flow along instead of leaving it a beat behind.
-const flows = {
-  torus: [
-    ["start", () => {}],
-    ["tomorrow's noon", () => { if (!hourOn) tomorrow(); }, "h"],
-    ["back to now", () => { if (hourOn) tomorrow(); }, "h"],
-    ["replay the 2019 event", replay, "e"],
-    // Rolling the guitar's volume off cuts the hum for real, and the ear reports the island itself; these two beats then send nothing.
-    ["the grid goes dark", () => { if (!islandOn && modeShown !== "ISLAND") island(); }, "i"],
-    ["the grid is back", () => { if (islandOn) island(); }, "i"],
-    ["proven", () => showCard("ovProof"), "p"],
-    ["refused", () => showCard("ovRefused"), "r"],
-    ["thank you", () => showCard("ovThanks"), "k"],
-  ],
-  nucleus: [
-    ["start", () => {}],
-    ["slide 1, the problem", () => slide(0)],
-    ["slide 2, Mentl", () => slide(1)],
-    ["replay the 2019 event", () => { closeAll(); replay(); }, "e"],
-    ["refused", () => showCard("ovRefused"), "r"],
-    ["slide 3, built this week", () => slide(2)],
-    ["slide 4, who needs it", () => slide(3)],
-    ["slide 5, the $10,000", () => slide(4)],
-  ],
-};
-function syncBeat(k) { if (flow && beat + 1 < flow.length && flow[beat + 1][2] === k) { beat += 1; if (!flowT0) flowT0 = performance.now(); } }
-let flow = null, flowName = "", beat = -1, flowT0 = 0;
+// ---------- the pitch: one show, one key ----------
+// The pitch is one show in a fixed order, the same in every room. Space,
+// Enter, the right arrow, a clicker's Page Down and the pedal's footswitch 1
+// (which types `e`) run the next beat; the left arrow, Page Up and footswitch
+// 2 (`i`) step back one. Each beat sets the whole page (the slide or card on
+// top, tomorrow's noon on or off, the hum cut or not), so stepping either way
+// from anywhere lands on the same screen. `0` returns to the title. Shift+E
+// and Shift+I still replay the event and cut the hum outside the show.
+// A beat: its name, the slide (a number) or card (an id) it shows, the line
+// the live screen wears above its number, and what it starts.
+const show = [
+  ["title", 0],
+  ["how to read it", 1],
+  ["live", null, "Live in this room: a guitar pickup hears the grid", null,
+    "A guitar pickup rests on a power adapter in this room. The adapter hums at the grid's frequency, and sonido measures it. At 60 Hz the tuner reads the note B, in tune. If the grid ran short of power, the number would fall."],
+  ["rush hour", null, "A jam you can see coming: tomorrow's rush hour", () => tomorrow(),
+    "EIA's hourly data shows PacifiCorp East's demand peaking from noon to 4 PM this week. At tomorrow's 12:30 PM the model runs the building on its battery, keeping 300 kW off the grid, and recharges when power is cleaner."],
+  ["replay", null, "A jam you can only hear: a real failure, replayed", () => replay(),
+    "On 9 August 2019, two power plants in Britain dropped off within a second and the frequency fell. This is that day's recorded frequency, replayed at 60 Hz. The flywheel pushes within a second; software reading hourly data would wait an hour."],
+  ["dark", null, "When the grid goes dark", () => island(),
+    "That evening a million people in Britain lost power. Here the hum is cut, as if the grid went dark, and the model's battery keeps the building running on its own."],
+  ["proven", "ovProof"],
+  ["refused", "ovRefused"],
+  ["why it matters", 2],
+  ["Mentl", 3],
+  ["Mentl's code", 4],
+  ["built this week", 5],
+  ["who needs it", 6],
+  ["the $10,000", 7],
+  ["thank you", 8],
+];
+let beat = -1, flowT0 = 0;
 function showCard(id) { closeAll(); $(id).classList.add("show"); }
-// The Nucleus slides are the deck itself in a frame over the stage; the deck's script shows the slide the hash names.
-function slide(n) { const f = $("deckFrame"); if (!f.src) f.src = "pitch/nucleus.html?embed#" + n; else f.contentWindow.location.hash = "#" + n; showCard("ovDeck"); }
-function selectFlow(name) {
-  flow = flows[name]; flowName = name === "torus" ? "T" : "N"; reset();
-  if (!$("deckFrame").src) $("deckFrame").src = "pitch/nucleus.html?embed#0";
-  $("stage").classList.add("timing"); $("stTimer").style.display = "block";
+// The slides are the show's deck in a frame over the live screen; the deck's script shows the slide the hash names.
+function slide(n) { const f = $("deckFrame"); if (!f.src) f.src = "pitch/show.html?embed#" + n; else f.contentWindow.location.hash = "#" + n; showCard("ovDeck"); }
+function runBeat(n) {
+  if (n < 0 || n >= show.length) return;
+  beat = n; if (n > 0 && !flowT0) flowT0 = performance.now();
+  const [name, view, line, act, story] = show[n];
+  closeAll();
+  if (hourOn) tomorrow();
+  if (islandOn) island();
+  if (typeof view === "number") slide(view); else if (view) showCard(view);
+  $("stStep").textContent = line || ""; $("stStory").textContent = story || "";
+  if (act) act();
 }
-function runBeat(n) { if (!flow || n < 0 || n >= flow.length) return; beat = n; if (!flowT0) flowT0 = performance.now(); flow[n][1](); }
+function startShow() {
+  reset(); beat = -1; flowT0 = 0;
+  $("stage").classList.add("timing"); $("stTimer").style.display = "block";
+  $("tour").classList.add("show", "corner"); $("tourText").textContent = "";
+  runBeat(0);
+}
 function flowKey(e) {
   if (tour) {
     if (["Enter", " ", "ArrowRight", "PageDown"].includes(e.key)) { e.preventDefault(); tourGo(chapter + 1); return true; }
@@ -1021,30 +1085,21 @@ function flowKey(e) {
     return false;
   }
   if (sessionFile || (state && state.playback)) return false;
-  if (e.key === "1") { selectFlow("torus"); return true; }
-  if (e.key === "2") { selectFlow("nucleus"); return true; }
-  if (!flow) return false;
-  if (["Enter", " ", "ArrowRight", "PageDown"].includes(e.key)) { e.preventDefault(); runBeat(beat + 1); return true; }
-  if (["ArrowLeft", "PageUp"].includes(e.key)) {
-    e.preventDefault(); closeAll(); beat = Math.max(-1, beat - 1);
-    // Stepping back onto a card or a slide shows it again; stepping back onto a change of state only closes what is open.
-    if (beat >= 0 && /^(slide|proven|refused|thank)/.test(flow[beat][0])) flow[beat][1]();
-    return true;
-  }
+  if (["0", "1", "2", "Home"].includes(e.key)) { startShow(); return true; }
+  if (["Enter", " ", "ArrowRight", "PageDown", "e"].includes(e.key)) { e.preventDefault(); runBeat(beat + 1); return true; }
+  if (["ArrowLeft", "PageUp", "i"].includes(e.key)) { e.preventDefault(); runBeat(beat - 1); return true; }
   return false;
 }
 setInterval(() => {
-  if (!flow) return;
-  if (!flowT0) { $("stTimer").textContent = flowName + " · ready"; return; }
-  const s = Math.floor((performance.now() - flowT0) / 1000);
-  $("stTimer").textContent = flowName + " " + (beat + 1) + "/" + flow.length + " · " + Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+  if (beat < 0 || sessionFile) return;
+  const s = flowT0 ? Math.floor((performance.now() - flowT0) / 1000) : 0;
+  $("stTimer").textContent = (beat + 1) + "/" + show.length + " · " + Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
 }, 250);
 
 document.addEventListener("keydown", e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (flowKey(e)) return;
   const k = e.key.toLowerCase();
-  if (!e.shiftKey) syncBeat(k);
   if (e.shiftKey && k === "p") { toggleOverlay("ovCert"); return; }
   if (e.shiftKey && k === "r") { toggleOverlay("ovRefuse"); return; }
   if (k === "escape") closeAll();
@@ -1072,7 +1127,7 @@ document.addEventListener("mousemove", () => { document.body.classList.add("curs
 
 loadCaptures();
 setStage(stageOn); stageFit(); window.addEventListener("resize", stageFit);
-if (sessionFile) startPlayback(sessionFile); else startLive();
+if (sessionFile) startPlayback(sessionFile); else { startLive(); startShow(); }
 requestAnimationFrame(frame);
 })();
 </script>

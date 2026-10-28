@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HUM · the pitch</title>
+<link rel="stylesheet" href="deck.css">
+</head>
+<body>
+<div class="deck">
+
+<section class="slide">
+  <div class="kick">Hard Tech Week 2026 · Torus bounty · Nucleus × Startup State open call</div>
+  <h1 class="small">HUM hears the power grid through a guitar, and a model of a Torus Station answers it.</h1>
+  <div class="two">
+    <div>
+      <p class="lead">The software that decides is written in Mentl, a programming language I built. Its compiler proves that this software can't reach the internet while it decides.</p>
+      <p class="lead"><b>Morgan Espitia</b>, Salt Lake City. I have built Mentl since March and my audio library, sonido, since January.</p>
+    </div>
+    <div class="pic"><img src="hero.png" alt="The live screen during a replayed 2019 grid failure: the frequency falls and the flywheel pushes 100 kW"></div>
+  </div>
+  <div class="foot"><span>Everything on the screens that follow is live in this room, except the replayed 2019 event.</span><span>ampactor.dev/hum</span></div>
+  <div class="src">Data: grid frequency, NESO open data at 1 s, 9 Aug 2019, moved to 60 Hz · rush hour, EIA-930 hourly demand, PacifiCorp East, 19–26 Oct 2026 · Station: a simulated model of Torus's published figures</div>
+</section>
+
+<section class="slide">
+  <div class="kick">How to read this demo</div>
+  <h1 class="small">The power grid's frequency shows whether it has enough power. A guitar can hear it.</h1>
+  <div class="rows" style="gap:26px">
+    <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The grid</b><span>The whole Western grid, from Alberta to Baja, runs at one frequency: 60 hertz. When demand outruns supply, the frequency falls.</span></div>
+    <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The ear</b><span>Every power adapter hums at that frequency. A guitar pickup resting on one hears it, and my audio library, sonido, measures it to a thousandth of a hertz.</span></div>
+    <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The Station</b><span>A model of a Torus Station: a flywheel for the first seconds (100 kW for six minutes) and a battery for the hours (300 kW for four hours). Simulated.</span></div>
+    <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The software</b><span>Decides what the Station does. It is written in Mentl, a language I built, whose compiler proves the decision can't reach the internet.</span></div>
+    <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>Next</b><span>The grid, live in this room. Then tomorrow's rush hour, a real grid failure from 2019, and a blackout.</span></div>
+  </div>
+  <div class="foot"><span>HUM</span><span>ampactor.dev/hum</span></div>
+  <div class="src">Station figures: Torus's published specifications, modeled and simulated. Frequency: read live from this room's wiring.</div>
+</section>
+
+<section class="slide">
+  <div class="kick">Why it matters</div>
+  <h1>AI now helps write the software that runs machines. No mainstream language can prove what that software will never do.</h1>
+  <p class="lead">Batteries, flywheels and flight controls run on code that people test and review, and then trust.</p>
+  <p class="lead"><b>Mentl is a programming language whose compiler proves it.</b></p>
+  <div class="foot"><span>The problem</span><span>ampactor.dev/hum</span></div>
+</section>
+
+<section class="slide">
+  <div class="kick">The hard tech</div>
+  <h1>Mentl proves what software can never do.</h1>
+  <div class="two">
+    <div>
+      <p class="lead">You write a rule into the code, such as "this never touches the internet" or "this never writes a file".</p>
+      <p class="lead">The compiler checks the rule through every function the code calls. <b>Break it, and the program won't build.</b></p>
+      <p class="note">Seven months and 2,600 commits since March. The compiler is written in Mentl and compiles itself. Open source: github.com/ampactor-labs/mentl</p>
+    </div>
+    <div class="pic"><img src="img/card-refused.png" alt="The compiler refusing a program that broke its rule against reaching the internet"></div>
+  </div>
+  <div class="foot"><span>The hard tech</span><span>ampactor.dev/hum</span></div>
+  <div class="src">Counts: the git history of github.com/ampactor-labs/mentl.</div>
+</section>
+
+<section class="slide">
+  <div class="kick">What Mentl code looks like</div>
+  <h1 class="small">Five operators draw the shape of a program. The compiler checks each rule along that shape.</h1>
+  <table class="verbs">
+    <tr><td class="code">fn read(hz) = hz <b class="v">|&gt;</b> fast</td><td class="verb">|&gt;</td><td>pipe: one stage feeds the next</td></tr>
+    <tr><td class="code">fn fork(hz) = (hz) <b class="v">&lt;|</b> (fast, slow)</td><td class="verb">&lt;|</td><td>split: one value goes to two branches</td></tr>
+    <tr><td class="code">fn pair(a, b) = (a |&gt; fast) <b class="v">&gt;&lt;</b> (b |&gt; slow)</td><td class="verb">&gt;&lt;</td><td>parallel: two branches run side by side</td></tr>
+    <tr><td class="code">fn trend(hz) = ((prev) =&gt; prev + hz) <b class="v">&lt;~</b> Delay(1)</td><td class="verb">&lt;~</td><td>feedback: each step sees the step before</td></tr>
+    <tr><td class="code">fn act(hz) <b class="r">with !Network</b> = spin(hz) <b class="v">~&gt;</b> flywheel</td><td class="verb">~&gt;</td><td>handler: names who answers the request</td></tr>
+  </table>
+  <p class="note" style="font-size:30px;color:var(--ink-2)">The last line carries a rule, <span class="mono">with !Network</span>: if anything <span class="mono">act</span> calls could reach the network, the compiler refuses to build it. Four of the operators come from Faust, the audio language; <span class="mono">~&gt;</span> is Mentl's own.</p>
+  <div class="foot"><span>The hard tech</span><span>ampactor.dev/hum</span></div>
+  <div class="src">These lines pass mentl check as written, 28 Oct 2026. The language: github.com/ampactor-labs/mentl</div>
+</section>
+
+<section class="slide">
+  <div class="kick">Show it working</div>
+  <h1>Built this week: software that measures the power grid from a wall's wiring.</h1>
+  <div class="two">
+    <ul class="plain">
+      <li><b>A guitar pickup picks up the grid's hum</b> in any room, and my audio library, sonido, measures its frequency to a thousandth of a hertz.</li>
+      <li><b>A model of a Torus Station decides</b> what to do, typically in under a millisecond, with software written in Mentl.</li>
+      <li><b>That software is proven</b> unable to reach the internet while it decides.</li>
+    </ul>
+    <div class="pic"><img src="img/stage-trip.png" alt="The live screen while a replayed 2019 grid failure pulls the frequency down and the flywheel answers"></div>
+  </div>
+  <div class="foot"><span>Before Monday 4 PM: the language, 2,610 commits since March 15, and sonido, 461 commits since January 25. Since then: everything on this slide.</span><span>ampactor.dev/hum</span></div>
+  <div class="src">Counts: each repository's git history, printed in pitch/ledger.txt. Picture: the 2019 replay, NESO open data at one second.</div>
+</section>
+
+<section class="slide">
+  <div class="kick">Who needs it</div>
+  <h1>Who needs it in Utah</h1>
+  <div class="cards">
+    <div class="card"><h3>Torus · Salt Lake City</h3><p>Builds flywheel-and-battery Stations that steady the grid. The software inside each Station is where a proof would matter first. Torus judges this demo today.</p></div>
+    <div class="card"><h3>Hill AFB · 309th Software Engineering Group</h3><p>Maintains flight software for the F-16, the F-35 and the missile fleet, where every claim about the software needs evidence.</p></div>
+  </div>
+  <p class="lead" style="margin-top:56px">First conversation I'm asking for: Torus engineering, this month.<br>First hires: a controls engineer and a compiler engineer, in Salt Lake City.</p>
+  <div class="foot"><span>Utah impact</span><span>ampactor.dev/hum</span></div>
+</section>
+
+<section class="slide">
+  <div class="kick">What $10,000 unlocks</div>
+  <h1 class="small">$10,000 puts a proven controller on a real machine in Utah within ninety days.</h1>
+  <div class="rows">
+    <div class="row"><b>Day 30</b><span>Form the Utah company. Run the controller on a battery inverter on my bench.</span></div>
+    <div class="row"><b>Day 60</b><span>Run it beside a real battery at one Utah site.</span></div>
+    <div class="row"><b>Day 90</b><span>A pilot agreement with that site, and an SBIR proposal with Nucleus Grow.</span></div>
+  </div>
+  <p class="money"><b>$7,000</b> for the inverter and battery bench. <b>$3,000</b> to form the company, register for federal grants and install at the site.</p>
+  <div class="asks"><b>Three asks.</b> A Utah operator who will host it. An introduction to Hill AFB's 309th. A co-founder who knows power electronics.</div>
+  <div class="foot"><span>Path to reality · the code: github.com/ampactor-labs/hum and github.com/ampactor-labs/mentl</span><span>ampactor.dev/hum</span></div>
+</section>
+
+<section class="slide">
+  <div class="kick">Thank you, Torus and Nucleus</div>
+  <h1>Replay this demo on your phone.</h1>
+  <div style="display:flex;gap:72px;align-items:center;margin-top:12px">
+    <img class="qr" style="width:400px;height:400px" src="img/qr-hum.png" alt="QR code for ampactor.dev/hum">
+    <div>
+      <p class="lead mono" style="color:var(--ink);font-size:64px;margin-bottom:36px">ampactor.dev/hum</p>
+      <p class="lead"><b>Morgan Espitia</b> · sonofagoose@pm.me</p>
+      <p class="lead">The demo: github.com/ampactor-labs/hum<br>The language: github.com/ampactor-labs/mentl</p>
+    </div>
+  </div>
+  <div class="foot"><span>Three asks: a Utah operator who will host the pilot, an introduction to Hill AFB's 309th, and a co-founder who knows power electronics.</span><span></span></div>
+</section>
+
+</div>
+<script src="deck.js"></script>
+</body>
+</html>
