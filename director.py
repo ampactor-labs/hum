@@ -535,6 +535,16 @@ class State:
             self.ledger = {"events": 0, "kwh_moved": 0.0, "spin_cycles": 0.0, "pulse_cycles_saved": 0.0}
             self.latency_ms = None
 
+    def now_snapshot(self):
+        """The latest line and its source alone: what the stage redraws from, read 20 times a second."""
+        with self.lock:
+            return json.dumps({
+                "now": self.now,
+                "source": self.source,
+                "source_label": SOURCE_LABELS.get(self.source, self.source),
+                "connected": self.connected,
+            }, separators=(",", ":"))
+
     def snapshot(self):
         with self.lock:
             t = self.now.get("t", time.time())
@@ -653,8 +663,9 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         url = urllib.parse.urlparse(self.path)
-        if url.path == "/state.json":
-            body = self.director.state.snapshot().encode()
+        if url.path in ("/state.json", "/now.json"):
+            st = self.director.state
+            body = (st.snapshot() if url.path == "/state.json" else st.now_snapshot()).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.send_header("Cache-Control", "no-store")
@@ -666,6 +677,16 @@ class Handler(SimpleHTTPRequestHandler):
             q = urllib.parse.parse_qs(url.query, keep_blank_values=True)
             if "src" in q:
                 self.director.request(q["src"][0])
+            if "quit" in q:
+                # The page's Shift+Q: the answer goes out first, then the director stops its
+                # source and exits. The controller and the learner end with it.
+                def quit_soon():
+                    time.sleep(0.3)
+                    log("quit from the page")
+                    if self.director.source:
+                        self.director.source.stop()
+                    os._exit(0)
+                threading.Thread(target=quit_soon, daemon=True).start()
             if "reset" in q:
                 self.director.state.reset()
             if "hour" in q:

@@ -422,6 +422,24 @@ async function poll() {
   lastFetch = performance.now();
   onState();
 }
+// The stage's line, 20 times a second, the ear's own rate: the full state
+// with its traces still comes four times a second. A director without
+// /now.json answers 404, and the stage then moves with the full state alone.
+let nowBusy = false;
+async function pollNow() {
+  if (nowBusy || !state) return;
+  nowBusy = true;
+  try {
+    const r = await fetch("/now.json?ts=" + Date.now(), { cache: "no-store" });
+    if (r.ok) {
+      const d = await r.json(), tf = state.trace_fast;
+      Object.assign(state, d); lastGood = performance.now(); connected = !!d.connected;
+      if (tf && d.now && d.now.t && (!tf.length || d.now.t > tf[tf.length - 1][0])) tf.push([d.now.t, d.now.hz_fast]);
+      if (stageOn) stageUpdate();
+    }
+  } catch (e) {}
+  nowBusy = false;
+}
 async function startLive() {
   // With no director answering, a bundled session plays instead: the hosted copy.
   try {
@@ -436,7 +454,7 @@ async function startLive() {
       if (d.ok) { startPlayback("sessions/default.ndjson"); return; }
     } catch (e2) {}
   }
-  poll(); setInterval(poll, 250);
+  poll(); setInterval(poll, 250); setInterval(pollNow, 50);
   startShow();
 }
 
@@ -902,8 +920,10 @@ function stageUpdate() {
     scopeGain += (target - scopeGain) * (target < scopeGain ? 0.5 : 0.1);
   }
 }
+// The tuner's pixels per CSS pixel, capped at 1.5: a sharper canvas costs every frame and shows no more.
+function stageDpr() { return Math.min(1.5, (window.devicePixelRatio || 1) * stageScale); }
 function stageSetup(c) {
-  const dpr = (window.devicePixelRatio || 1) * stageScale;
+  const dpr = stageDpr();
   const w = c.clientWidth, h = c.clientHeight, bw = Math.round(w * dpr), bh = Math.round(h * dpr);
   if (c.width !== bw || c.height !== bh) { c.width = bw; c.height = bh; }
   const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); return [g, w, h];
@@ -930,9 +950,6 @@ function drawTuner(now) {
   // Floor: a perspective grid rushing toward the viewer.
   gridPhase = (gridPhase + dt * 0.25) % 1;
   for (let i = 0; i < 9; i++) { const d = (i + gridPhase) / 9, y = horizon + (h - horizon) * d * d; g.strokeStyle = rgba(SON.accent, 0.75 * (0.25 + 0.75 * d)); g.lineWidth = 1 + d; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
-  g.strokeStyle = rgba(SON.accent, 0.45); g.lineWidth = 1;
-  for (let k = -14; k <= 14; k++) { const s = k / 14; g.beginPath(); g.moveTo(cx + s * w * 0.08, horizon); g.lineTo(cx + s * w * 1.6, h); g.stroke(); }
-  neon(g, [[0, horizon], [w, horizon]], SON.partner, 1.5);
   // The replay's fall, on the floor: the last 40 s of the fast reading, 60 Hz
   // at the horizon and 1.2 Hz below it at the bottom, so the drop reads as a cliff.
   if (stageReplaying && replayFell) {
@@ -985,13 +1002,17 @@ function drawTuner(now) {
 // The tuner's still layers, drawn once for each size: the sky and floor behind, the scanlines and vignette in front.
 let MONO = "", tunerCache = null, needleCents = null;
 function tunerLayers(w, h, horizon) {
-  const dpr = (window.devicePixelRatio || 1) * stageScale, key = w + "x" + h + "x" + dpr;
+  const dpr = stageDpr(), key = w + "x" + h + "x" + dpr;
   if (tunerCache && tunerCache.key === key) return tunerCache;
   const make = () => { const c = document.createElement("canvas"); c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); return [c, g]; };
   const [back, b] = make(), [glass, f] = make(), cx = w / 2;
   b.fillStyle = SON.void; b.fillRect(0, 0, w, h);
   let gr = b.createLinearGradient(0, 0, 0, horizon); gr.addColorStop(0, SON.void); gr.addColorStop(1, rgba(SON.partner, 0.22)); b.fillStyle = gr; b.fillRect(0, 0, w, horizon);
   gr = b.createLinearGradient(0, horizon, 0, h); gr.addColorStop(0, rgba(SON.partner, 0.10)); gr.addColorStop(1, SON.void); b.fillStyle = gr; b.fillRect(0, horizon, w, h - horizon);
+  // The floor's lines toward the viewer and the horizon never move, so they are drawn here once.
+  b.strokeStyle = rgba(SON.accent, 0.45); b.lineWidth = 1;
+  for (let k = -14; k <= 14; k++) { const s = k / 14; b.beginPath(); b.moveTo(cx + s * w * 0.08, horizon); b.lineTo(cx + s * w * 1.6, h); b.stroke(); }
+  neon(b, [[0, horizon], [w, horizon]], SON.partner, 1.5);
   f.fillStyle = "rgba(0,0,0,0.13)"; for (let y = 0; y < h; y += 3) f.fillRect(0, y, w, 1);
   const vg = f.createRadialGradient(cx, h / 2, Math.min(w, h) * 0.35, cx, h / 2, Math.max(w, h) * 0.75); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,0.45)"); f.fillStyle = vg; f.fillRect(0, 0, w, h);
   tunerCache = { key, back, glass }; return tunerCache;
@@ -1054,6 +1075,14 @@ async function loadCaptures() {
   if (why) $("proofRaw").textContent = why.split("\n\n").filter(b => /Network|WASI|Alloc|Filesystem|Trap/.test(b)).join("\n\n");
   const gate = await get("pitch/gate.txt");
   if (gate) { $("gateRaw").innerHTML = gate.split("\n").map(l => { const e = l.replace(/&/g, "&amp;").replace(/</g, "&lt;"); return /^< PROVEN/.test(l) ? "<b>" + e + "</b>" : /^< REFUSED/.test(l) ? "<span class='hi'>" + e + "</span>" : e; }).join("\n"); }
+}
+// Shift+Q ends HUM: the director stops its ear and exits, and the window closes.
+// The desktop launcher also closes the window once the director has stopped.
+function quitShow() {
+  if (sessionFile) return;
+  fetch("/cmd?quit=1&ts=" + Date.now(), { cache: "no-store" }).catch(() => {});
+  closeAll(); $("stHead").textContent = "HUM has stopped. The window closes by itself."; $("stStory").textContent = "";
+  setTimeout(() => window.close(), 600);
 }
 // ---------- the pitch: one show, one key ----------
 // The pitch is one show in a fixed order, the same in every room. Space,
@@ -1129,6 +1158,7 @@ document.addEventListener("keydown", e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (flowKey(e)) return;
   const k = e.key.toLowerCase();
+  if (e.shiftKey && k === "q") { quitShow(); return; }
   if (e.shiftKey && k === "p") { toggleOverlay("ovCert"); return; }
   if (e.shiftKey && k === "r") { toggleOverlay("ovRefuse"); return; }
   if (k === "escape") closeAll();

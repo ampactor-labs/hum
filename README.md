@@ -36,7 +36,7 @@ python3 -I record.py --mode live                  # re-record the bundled sessio
 
 The page is at http://127.0.0.1:8787/. It opens on the stage: the frequency, sonido's tuner, the Station's two machines, and one sentence about what is happening.
 
-Keys: the page opens on the pitch, one show for both rooms. Space, a clicker's Page Down or the pedal's footswitch 1 runs the next beat, and the left arrow or footswitch 2 steps back one · `0` the title · `H` tomorrow's noon · `Shift+E` replay the 2019 event · `Shift+I` cut the hum · `P` proven · `R` refused · `K` thank you · `A` the compiler's own text on a card · `D` the engineers' dashboard · `Esc` close. The dashboard adds `G` the gate, `T` the raw lines, `M` the mesh, `S` sound and `B` a bright-room palette; `Shift+P` and `Shift+R` open the detailed proof and refusal. The venue drill is `setup.md`, and the pitch itself is `pitch/script.md`.
+Keys: the page opens on the pitch, one show for both rooms. Space, a clicker's Page Down or the pedal's footswitch 1 runs the next beat, and the left arrow or footswitch 2 steps back one · `0` the title · `H` tomorrow's noon · `Shift+E` replay the 2019 event · `Shift+I` cut the hum · `P` proven · `R` refused · `K` thank you · `A` the compiler's own text on a card · `D` the engineers' dashboard · `Esc` close · `Shift+Q` quit: the director stops and the window closes. The dashboard adds `G` the gate, `T` the raw lines, `M` the mesh, `S` sound and `B` a bright-room palette; `Shift+P` and `Shift+R` open the detailed proof and refusal. The venue drill is `setup.md`, and the pitch itself is `pitch/script.md`.
 
 Served as plain files with no director, the page plays `sessions/default.ndjson` and starts it over at the end. The session is about four minutes recorded with the real controller by `python3 -I record.py`. On a phone held upright the stage stacks into one column. `samples/event_gb.wav` is the 2019 event rendered as sound: 95 seconds at 8 kHz.
 
@@ -52,7 +52,7 @@ The Mentl programs live in the Mentl repository under `examples/grid/`. `station
 | The director | `director.py` | Starts the ear and the controller, adds the hour, the rush window and the clean share to each line, serves the page, and records each session. |
 | The page | `index.html` | The stage, the three cards and the engineers' dashboard. It plays a recorded session when no director answers. One file with no dependencies. |
 | The data | `build_data.py`, `data/` | PacifiCorp East's demand, day-ahead forecast and clean share by hour; the event. |
-| The pitch | `pitch/` | The Nucleus deck, the Torus leave-behind, the one-page plan, the script with its answers to likely questions, `shots.js`, which takes the slides' pictures from the bundled session, and `export.js`, which writes the PDFs. |
+| The pitch | `pitch/` | The show's slides, the Nucleus deck, the Torus leave-behind, the one-page plan, the script with its answers to likely questions, `shots.js`, which takes the slides' pictures from the bundled session, `export.js`, which writes the PDFs, and `submission.sh`, which gathers everything to upload into `submission/`. |
 | The contracts | `CONTRACTS.md` | The line formats the ear, the director, the controller and the page use. |
 
 ## Measured
