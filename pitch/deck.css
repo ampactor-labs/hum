@@ -51,7 +51,8 @@ td.yes { color: var(--green); } td.no { color: var(--red); } td.part { color: va
 @media screen {
   html, body { height: 100%; overflow: hidden; }
   body { display: flex; align-items: center; justify-content: center; }
-  .deck { position: relative; width: 1920px; height: 1080px; transform-origin: center; }
+  /* flex-shrink: 0 keeps the deck at 1920 px in a narrower window, so the scale centers it instead of shifting it right. */
+  .deck { position: relative; width: 1920px; height: 1080px; transform-origin: center; flex-shrink: 0; }
   .slide { position: absolute; inset: 0; display: none; }
   .slide.current { display: flex; }
   .nav { position: fixed; right: 24px; bottom: 16px; font-size: 14px; color: var(--ink-3); z-index: 5; }
