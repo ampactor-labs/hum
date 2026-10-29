@@ -192,7 +192,7 @@ body:not(.dash) .help { display: none; }
 #stage.tall .st-unit .pct { font-size: 24px; }
 #stage.tall .st-note { left: 56px; right: 56px; bottom: 36px; font-size: 24px; }
 /* the plain cards: proven, refused, thank you */
-.ov2 { position: fixed; inset: 0; background: rgba(7,6,14,0.95); display: none; align-items: center; justify-content: center; z-index: 10; font-family: var(--sans); }
+.ov2 { position: fixed; inset: 0; background: #07060E; display: none; align-items: center; justify-content: center; z-index: 10; font-family: var(--sans); }
 .ov2.show { display: flex; }
 .scard { width: 80vw; border: 0.2vw solid #3DFF9A; border-radius: 2.2vw; padding: 4vw 5vw; background: #0B0A16; }
 .scard.no { border-color: #FF2D55; }
@@ -233,12 +233,20 @@ body.capture .tour, body.capture .turn, body.capture .st-timer { display: none !
 #stage.touring.timing .st-left, #stage.touring.timing .st-right { height: 630px; }
 #stage.touring.timing .st-words { top: 764px; }
 #stage.touring .st-timer { display: none !important; }
-/* In the tour the words sit a little higher and smaller, so a three-line story clears the note and the note clears the bar. */
-#stage.touring.timing .st-left, #stage.touring.timing .st-right { height: 610px; }
-#stage.touring.timing .st-words { top: 740px; }
-#stage.touring .st-head { font-size: 50px; }
+/* In the tour the panels are shorter and the words smaller, so a two-line
+   headline and a three-line story end above the note, the note (two lines
+   at most) ends above the bar, and "Running the building" fits on one line
+   of its card. */
+#stage.touring.timing .st-left, #stage.touring.timing .st-right { height: 560px; }
+#stage.touring.timing .st-words { top: 688px; }
+#stage.touring .st-head { font-size: 44px; }
 #stage.touring .st-story { font-size: 26px; }
-#stage.touring.timing .st-note { bottom: 96px; right: 64px; }
+#stage.touring.timing .st-note { top: 916px; bottom: auto; right: 64px; }
+#stage.touring .st-unit { grid-template-columns: 110px 1fr; gap: 24px; padding: 18px 30px; }
+#stage.touring .st-unit svg { width: 110px; height: 110px; }
+#stage.touring .st-unit .state { font-size: 38px; }
+#stage.touring .st-unit .kw { font-size: 34px; min-height: 38px; margin-bottom: 10px; }
+#stage.touring .st-unit .pct { margin-top: 6px; }
 #stage.tall.timing .st-words { top: 960px; }
 #stage.tall.timing .st-head { font-size: 44px; }
 #stage.tall .st-story { font-size: 24px; }
@@ -250,10 +258,26 @@ body.capture .tour, body.capture .turn, body.capture .st-timer { display: none !
 .tour.corner #tourText { display: none; }
 #stage.timing .st-timer { right: 200px; }
 #stage.timing .st-note { right: 440px; }
-#stage.tall.touring .st-note, #stage.tall.touring.timing .st-note { bottom: 36px; right: 56px; }
+#stage.tall.touring .st-note, #stage.tall.touring.timing .st-note { top: auto; bottom: 36px; right: 56px; }
 /* The Nucleus slides, shown over the stage in a frame; the deck's own script scales them to the window. */
 #ovDeck { background: var(--void); }
 #ovDeck iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
+/* A phone held upright: the stage is one column that flows, so a line that
+   wraps pushes the next block down instead of covering it. The column is
+   1080 wide and at least 1920 tall, and stageFit scales it by its real
+   height. These rules come last so they win over the fixed positions above. */
+#stage.tall #stageInner { display: flex; flex-direction: column; gap: 28px; padding: 40px 56px 48px; height: auto; min-height: 1920px; box-sizing: border-box; }
+#stage.tall.touring #stageInner { padding-bottom: 230px; }
+#stage.tall #stageInner > div { position: static; left: auto; right: auto; top: auto; bottom: auto; width: auto; height: auto; }
+#stage.tall #stageInner > .st-top { order: 1; }
+#stage.tall #stageInner > .st-left { order: 2; }
+#stage.tall #stageInner > .st-words { order: 3; }
+#stage.tall #stageInner > .st-right { order: 4; }
+#stage.tall #stageInner > .st-note { order: 5; }
+#stage.tall #stageInner > .st-timer { order: 6; }
+#stage.tall #stageInner .st-tuner { position: relative; top: auto; bottom: auto; height: 620px; margin-top: 24px; }
+#stage.tall .st-unit { flex: none; min-height: 240px; }
+#stage.tall .st-step { white-space: normal; flex-basis: 100%; order: 4; margin-left: 0; }
 </style>
 </head>
 <body>
@@ -884,8 +908,10 @@ let stageScale = 1, scopeGain = 1, scopeSeen = null, gridPhase = 0, lastTuner = 
 // Whether the replay has reached the fall yet: its first seconds are the calm before it.
 let replayFell = false, stageReplaying = false, replayLow = null;
 function stageFit() {
-  const tall = window.innerHeight > window.innerWidth, W = tall ? 1080 : 1920, H = tall ? 1920 : 1080;
+  const tall = window.innerHeight > window.innerWidth, W = tall ? 1080 : 1920;
   $("stage").classList.toggle("tall", tall);
+  // Upright, the column's height follows its content, so the scale reads it back.
+  const H = tall ? Math.max(1920, $("stageInner").offsetHeight) : 1080;
   stageScale = Math.min(window.innerWidth / W, window.innerHeight / H);
   $("stageInner").style.transform = "translate(" + (window.innerWidth - W * stageScale) / 2 + "px," + (window.innerHeight - H * stageScale) / 2 + "px) scale(" + stageScale + ")";
 }
@@ -1275,6 +1301,8 @@ document.addEventListener("mousemove", () => { document.body.classList.add("curs
 
 loadCaptures();
 setStage(stageOn); stageFit(); window.addEventListener("resize", stageFit);
+// Upright, a step's longer words make the column taller; the scale follows.
+if (window.ResizeObserver) new ResizeObserver(stageFit).observe($("stageInner"));
 if (sessionFile) startPlayback(sessionFile); else startLive();
 requestAnimationFrame(frame);
 })();
