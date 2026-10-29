@@ -7,11 +7,11 @@
   @font-face { font-family: "Inter"; src: url("../fonts/Inter-Regular.woff2") format("woff2"); font-weight: 400; }
   @font-face { font-family: "Inter"; src: url("../fonts/Inter-SemiBold.woff2") format("woff2"); font-weight: 600; }
   @font-face { font-family: "Inter"; src: url("../fonts/Inter-Bold.woff2") format("woff2"); font-weight: 700; }
-  @page { size: Letter; margin: 0.5in 0.6in; }
-  body { font-family: Inter, Cantarell, "Noto Sans", system-ui, sans-serif; color: #111; margin: 0; font-size: 10.2pt; line-height: 1.34; }
+  @page { size: Letter; margin: 0.45in 0.6in; }
+  body { font-family: Inter, Cantarell, "Noto Sans", system-ui, sans-serif; color: #111; margin: 0; font-size: 9.5pt; line-height: 1.28; }
   h1 { font-size: 18pt; font-weight: 700; margin: 0 0 3pt; letter-spacing: -0.01em; }
-  .sub { color: #555; margin: 0 0 10pt; font-size: 9.6pt; }
-  h2 { font-size: 9.4pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #333; margin: 10pt 0 3pt; border-bottom: 1px solid #bbb; padding-bottom: 2pt; }
+  .sub { color: #555; margin: 0 0 7pt; font-size: 9.6pt; }
+  h2 { font-size: 9.4pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #333; margin: 8pt 0 3pt; border-bottom: 1px solid #bbb; padding-bottom: 2pt; }
   p { margin: 0 0 5pt; }
   ul { margin: 0 0 4pt 15pt; padding: 0; }
   li { margin: 0 0 3pt; }
@@ -19,7 +19,7 @@
   table { border-collapse: collapse; width: 100%; }
   th, td { text-align: left; vertical-align: top; padding: 3pt 6pt 3pt 0; border-bottom: 1px solid #ddd; }
   th { font-weight: 600; color: #333; width: 17%; }
-  .foot { margin-top: 12pt; color: #555; font-size: 9.4pt; border-top: 1px solid #bbb; padding-top: 5pt; }
+  .foot { margin-top: 8pt; color: #555; font-size: 9.4pt; border-top: 1px solid #bbb; padding-top: 5pt; }
   .fill { background: #fff3b0; }
 </style>
 </head>
@@ -30,7 +30,7 @@
 <div class="two">
 <div>
 <h2>The problem</h2>
-<p>AI now helps write the software that runs machines: batteries, flywheels, flight controls. People test that code and review it, and then they trust it. No mainstream language lets a team write "this never touches the internet" or "this never writes a file" and have the compiler prove it.</p>
+<p>AI now helps write the software that runs machines: batteries, flywheels, flight controls. People test that code and review it, and then they trust it. C and C++, the languages most of that code is written in, give a team no way to write "this never touches the internet" or "this never writes a file" and have the compiler check it.</p>
 
 <h2>What exists</h2>
 <p><b>Mentl</b> is a programming language I have built since March 15, 2026: 2,610 commits before this week, open source. You write a rule into the code, and the compiler checks it through every function the code calls. Break the rule and the program won't build. The compiler is written in Mentl and compiles itself. It runs in a browser at space.ampactor.dev, and ampactor.dev/wasatch plays a piece of music, written from Salt Lake weather readings, whose per-sample code it proves never allocates memory or reaches the network.</p>
@@ -42,36 +42,36 @@
   <li>A model of a Torus Station decides, typically in under a millisecond, what its flywheel and battery should do: ride out tomorrow's rush hour, catch a real 2019 grid failure, keep the building on when the grid goes dark.</li>
   <li>That decision is written in Mentl and proven unable to reach the internet. Add one line that reads a price online and the compiler refuses to build it.</li>
 </ul>
+<h2>What I need</h2>
+<ul>
+  <li>A Utah battery or flywheel operator who will host the pilot.</li>
+  <li>An introduction to Hill AFB's 309th, through 47G.</li>
+  <li>A co-founder who knows power electronics.</li>
+</ul>
 </div>
 <div>
 <h2>Who needs it in Utah</h2>
 <ul>
-  <li><b>Torus</b>, Salt Lake City: its Stations steady the grid, and the software inside each one is where a proof would matter first. Torus is judging this demo. The first conversation I'm asking for: Torus engineering, this month.</li>
+  <li><b>Torus</b>, Salt Lake City: its Stations steady the grid, and the software inside each one is where a proof would matter first. Torus is judging this demo. The sites I'll ask to host the pilot: Torus, Rocky Mountain Power's Wattsmart Battery program, and Utah State University's ASPIRE center.</li>
   <li><b>Hill AFB, 309th Software Engineering Group</b>: maintains flight software for the F-16, the F-35 and the missile fleet, where every claim about the software needs evidence.</li>
 </ul>
 
 <h2>Ninety days</h2>
 <table>
-  <tr><th>Day 30</th><td>Form the Utah company and register for federal grants, which takes weeks. Run the controller on a battery inverter on my bench.</td></tr>
-  <tr><th>Day 60</th><td>Run it beside a real battery at one Utah site, alongside the site's own controls.</td></tr>
-  <tr><th>Day 90</th><td>A pilot agreement with that site, and an SBIR proposal drafted with Nucleus Grow.</td></tr>
+  <tr><th>Day 30</th><td>Form the Utah company and register for federal grants, which takes weeks. Run the controller on a 3 kW inverter and 10 kWh of batteries on my bench.</td></tr>
+  <tr><th>Day 60</th><td>With a site's written consent, run it read-only beside a real battery: it logs its decisions next to the site's own controls and sends no commands. Done: 14 days logged and compared.</td></tr>
+  <tr><th>Day 90</th><td>A pilot agreement that lets it send commands, and an SBIR proposal drafted with Nucleus Grow.</td></tr>
 </table>
 
 <h2>The $10,000</h2>
 <table>
-  <tr><th>$7,000</th><td>a battery inverter and battery for the bench, so the controller drives real power hardware</td></tr>
-  <tr><th>$3,000</th><td>forming the company, federal grant registration, and installing at the pilot site</td></tr>
+  <tr><th>$7,000</th><td>the bench: a 3 kW Victron inverter and its control unit ($1,470), 10 kWh of batteries ($2,400), a meter, load, wiring, computer and electrician's check ($2,150), shipping and spares ($980)</td></tr>
+  <tr><th>$3,000</th><td>the Utah LLC ($59), a lawyer for the pilot agreement ($1,000), a year of insurance ($1,500), the site's read-only kit ($250), travel ($191); grant registration is free</td></tr>
 </table>
 
-<h2>What I need</h2>
-<ul>
-  <li>A Utah battery or flywheel operator who will host the pilot.</li>
-  <li>An introduction to the 309th, through 47G, and Nucleus Grow's help with the SBIR proposal.</li>
-  <li>A co-founder who knows power electronics.</li>
-</ul>
 </div>
 </div>
 
-<p class="foot">The first business is paid pilots with operators of batteries and flywheels. The second is a hosted check that stops AI-written control code that breaks a rule from merging. The Utah company is not formed yet; that comes first. The demo: ampactor.dev/hum, and its source at github.com/ampactor-labs/hum. Morgan Espitia has built Mentl since March and sonido since January, alone, in Salt Lake City, and wrote this week's controller in the language.</p>
+<p class="foot">The first business is paid pilots with operators of batteries and flywheels. The second is a hosted check that stops AI-written control code that breaks a rule from merging. The Utah company is not formed yet; that comes first. I have no other job: Mentl is my full-time work. The demo: ampactor.dev/hum, and its source at github.com/ampactor-labs/hum. Morgan Espitia has built Mentl since March and sonido since January, alone, in Salt Lake City, and wrote this week's controller in the language.</p>
 </body>
 </html>

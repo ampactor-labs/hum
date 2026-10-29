@@ -197,6 +197,11 @@ body:not(.dash) .help { display: none; }
 .scard { width: 80vw; border: 0.2vw solid #3DFF9A; border-radius: 2.2vw; padding: 4vw 5vw; background: #0B0A16; }
 .scard.no { border-color: #FF2D55; }
 .scard.plain { border-color: var(--line); }
+.scard.plan { border-color: var(--pulse); padding-top: 3vw; padding-bottom: 3vw; }
+.scard.plan .mark { color: var(--pulse); font-size: 2.2vw; }
+.scard.plan h1 { font-size: 3vw; margin: 1vw 0 0.6vw; }
+.planchart { height: 30vh; margin: 0 0 1vw; }
+.planchart canvas { display: block; width: 100%; height: 100%; }
 .scard .path { font-family: var(--mono); font-size: 1.45vw; line-height: 1.4; color: #FF8FA6; margin: 0.4vw 0 1vw; }
 .scard .mark { font-size: 4.6vw; font-weight: 700; line-height: 1; color: #3DFF9A; }
 .scard.no .mark { color: #FF2D55; }
@@ -369,9 +374,18 @@ $ mentl why examples/grid/station.mn decide WASI
 <div class="ov2" id="ovProof"><div class="scard">
   <div class="mark">✓ Proven</div>
   <h1>This software can't reach the internet while it decides.</h1>
-  <p>Every decision you just watched was made by software written in Mentl, a language I built. Its compiler checks every function the decision calls, and proves the decision can't reach the internet, a file or the clock, and never allocates memory. The decision itself can't send anything out or take instructions from outside, whatever is added to it later.</p>
+  <p>Every decision you just watched was made by software written in Mentl, a language I built. Its compiler checks every function the decision calls, and proves the decision can't reach the internet, a file or the clock, and never allocates memory. It acts only on the numbers it is handed. Code added later that tries to reach the internet won't build, as long as the rule stays on the function.</p>
+  <p><b>Not proven:</b> that its decisions are good. They are tested on recordings.</p>
   <p class="src">Checked by Mentl's compiler: mentl check examples/grid/station.mn</p>
   <pre id="proofRaw" hidden></pre>
+</div></div>
+
+<div class="ov2" id="ovPlan"><div class="scard plan">
+  <div class="mark">Tomorrow, hour by hour</div>
+  <h1>Through rush hour the battery carries the building. In cleaner hours it recharges.</h1>
+  <div class="planchart"><canvas id="cPlan"></canvas></div>
+  <p>PacifiCorp East is the balancing area that covers most of Utah. EIA's hourly data puts tomorrow's highest demand from noon to 4 PM. In those hours the model's battery carries the building's whole 300 kW. Outside them, in any hour when at least 40 percent of the power is clean, it recharges. These are the controller's own rules.</p>
+  <p class="src">Demand: EIA-930 hourly data for PacifiCorp East; tomorrow is the mean of the last seven days. Clean share: EIA-930 generation by fuel (nuclear, hydro, solar, wind and geothermal). The Station is a model, simulated.</p>
 </div></div>
 
 <div class="ov2" id="ovRefused"><div class="scard no">
@@ -1060,7 +1074,7 @@ function replay() { if (sessionFile) return; cmd("src=replay"); }
 function tomorrow() { if (sessionFile) return; hourOn = !hourOn; cmd(hourOn ? "hour=12.5" : "hour="); }
 function island() { if (sessionFile) return; islandOn = !islandOn; $("btnIsland").classList.toggle("on", islandOn); cmd(islandOn ? "src=silence" : "src=back"); }
 function reset() { closeAll(); hourOn = false; if (islandOn) island(); if (sound.on) sound.toggle(); if (!sessionFile) { cmd("src=back"); cmd("reset=1"); } document.body.classList.remove("bright"); }
-const overlays = ["ovCert", "ovRefuse", "ovGate", "ovTable", "ovMesh", "ovProof", "ovRefused", "ovThanks", "ovDeck"];
+const overlays = ["ovCert", "ovRefuse", "ovGate", "ovTable", "ovMesh", "ovProof", "ovRefused", "ovPlan", "ovThanks", "ovDeck"];
 function closeAll() { overlays.forEach(id => $(id).classList.remove("show")); }
 function toggleOverlay(id) { const was = $(id).classList.contains("show"); closeAll(); if (!was) { $(id).classList.add("show"); if (id === "ovTable") fillTable(); if (id === "ovMesh") meshT0 = performance.now(); } }
 function fillTable() {
@@ -1100,23 +1114,63 @@ const show = [
   ["live", null, "Live in this room: a guitar pickup hears the grid", null,
     "A guitar pickup rests on a power adapter in this room. The adapter hums at the grid's frequency, and sonido measures it. At 60 Hz the tuner reads the note B, in tune. If the grid ran short of power, the number would fall."],
   ["rush hour", null, "A jam you can see coming: tomorrow's rush hour", () => tomorrow(),
-    "EIA's hourly data shows PacifiCorp East's demand peaking from noon to 4 PM this week. At tomorrow's 12:30 PM the model runs the building on its battery, keeping 300 kW off the grid, and recharges when power is cleaner."],
+    "EIA's hourly data shows PacifiCorp East's demand peaking from noon to 4 PM this week. At tomorrow's 12:30 PM the model's building draws its rush-hour 300 kW, and the battery carries all of it, so none of it comes from the grid."],
+  ["tomorrow's plan", "ovPlan"],
   ["replay", null, "A jam you can only hear: a real failure, replayed", () => replay(),
-    "On 9 August 2019, two power plants in Britain dropped off within a second and the frequency fell. This is that day's recorded frequency, replayed at 60 Hz. The flywheel starts pushing about 0.4 seconds after the fall shows and is at full power within 0.75 seconds. Hourly data never sees this coming."],
+    "On 9 August 2019, two power plants in Britain dropped off within a second and the frequency fell. This is that day's recorded frequency, replayed at 60 Hz. The flywheel starts pushing about 0.4 seconds after the fall shows and is at full power within 0.75 seconds. In this model the flywheel answers the seconds, and the battery keeps its charge for the hours."],
   ["dark", null, "When the grid goes dark", () => island(),
-    "That evening a million people in Britain lost power. Here the hum is cut, as if the grid went dark. The model's flywheel carries the first seconds, then its battery runs the building on its own."],
+    "That evening a million people in Britain lost power. Here the hum is cut, as if the grid went dark. The model's flywheel carries the first seconds, then its battery runs the building's 200 kW, its load outside rush hour. A real building also needs a transfer switch; the model assumes one."],
   ["proven", "ovProof"],
   ["refused", "ovRefused"],
   ["why it matters", 2],
   ["Mentl", 3],
-  ["Mentl's code", 4],
-  ["built this week", 5],
-  ["who needs it", 6],
-  ["the $10,000", 7],
-  ["thank you", 8],
+  ["built this week", 4],
+  ["who needs it", 5],
+  ["the $10,000", 6],
+  ["thank you", 7],
 ];
 let beat = -1, flowT0 = 0;
-function showCard(id) { closeAll(); $(id).classList.add("show"); }
+function showCard(id) { closeAll(); $(id).classList.add("show"); if (id === "ovPlan") requestAnimationFrame(drawPlan); }
+// Tomorrow's 24 hours as the controller meets them (station.mn): in the rush
+// window the battery carries the building; outside it, in an hour at least
+// 40 percent clean, the battery charges. The demand is EIA's, by hour.
+function drawPlan() {
+  const c = $("cPlan"), dpr = window.devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+  if (!w || !h) return;
+  c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+  const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+  const p = (state && state.pace) || {}, win = p.window || [17, 21], clean = p.clean || [];
+  const fTm = p.forecast_tomorrow || [], dem = fTm.some(v => v != null) ? fTm : (p.shape || []);
+  const ink = css("--ink"), ink3 = css("--ink-3"), line = css("--line"), pulse = css("--pulse"), green = "#3DFF9A", mono = css("--mono");
+  const fs = Math.max(13, w / 72), pad = { l: fs * 4.2, r: fs, t: fs * 2.2, b: fs * 2 };
+  const vals = dem.filter(v => v != null);
+  g.font = fs + "px " + mono;
+  if (!vals.length) { g.fillStyle = ink3; g.textAlign = "center"; g.fillText("no hours loaded", w / 2, h / 2); return; }
+  const lo = Math.min(...vals) * 0.92, hi = Math.max(...vals) * 1.04;
+  const xOf = hr => pad.l + (w - pad.l - pad.r) * hr / 24, yOf = v => pad.t + (h - pad.t - pad.b) * (1 - (v - lo) / (hi - lo));
+  const kind = hr => win[0] <= hr && hr < win[1] ? "rush" : clean[hr] != null && clean[hr] >= 0.4 ? "charge" : null;
+  // The hours' bands, each run labeled above its middle.
+  for (let hr = 0; hr < 24;) {
+    const k = kind(hr); let end = hr; while (end + 1 < 24 && kind(end + 1) === k) end++;
+    if (k) {
+      const col = k === "rush" ? pulse : green;
+      g.fillStyle = rgba(col, 0.2); g.fillRect(xOf(hr), pad.t, xOf(end + 1) - xOf(hr), h - pad.t - pad.b);
+      g.fillStyle = col; g.textAlign = "center"; g.textBaseline = "bottom"; g.fillText(k === "rush" ? "on battery" : "charging", (xOf(hr) + xOf(end + 1)) / 2, pad.t - fs * 0.35);
+    }
+    hr = end + 1;
+  }
+  // The axes: gigawatts up the side, the hours along the bottom.
+  g.strokeStyle = rgba(line, 0.9); g.lineWidth = 1; g.fillStyle = ink3; g.textAlign = "right"; g.textBaseline = "middle";
+  const step = (hi - lo) > 3000 ? 1000 : 500;
+  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) { g.beginPath(); g.moveTo(pad.l, yOf(v)); g.lineTo(w - pad.r, yOf(v)); g.stroke(); g.fillText((v / 1000).toFixed(1) + " GW", pad.l - fs * 0.4, yOf(v)); }
+  g.textAlign = "center"; g.textBaseline = "top";
+  [[0, "midnight"], [6, "6 AM"], [12, "noon"], [18, "6 PM"], [24, "midnight"]].forEach(([hr, t]) => { g.textAlign = hr === 24 ? "right" : "center"; g.fillText(t, xOf(hr), h - pad.b + fs * 0.4); });
+  // Tomorrow's demand, one point per hour at the hour's middle.
+  const pts = dem.map((v, hr) => v == null ? null : [xOf(hr + 0.5), yOf(v)]).filter(Boolean);
+  if (pts.length > 1) { g.strokeStyle = ink; g.lineWidth = 3; g.lineJoin = "round"; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); }
+  g.fillStyle = ink; g.textAlign = "left"; g.textBaseline = "bottom"; g.fillText("demand", pad.l + fs * 0.4, pad.t - fs * 0.35);
+}
+window.addEventListener("resize", () => { if ($("ovPlan").classList.contains("show")) drawPlan(); });
 // The slides are the show's deck in a frame over the live screen; the deck's script shows the slide the hash names.
 function slide(n) { const f = $("deckFrame"); if (!f.src) f.src = "pitch/show.html?embed#" + n; else f.contentWindow.location.hash = "#" + n; showCard("ovDeck"); }
 function runBeat(n) {

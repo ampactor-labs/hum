@@ -35,6 +35,10 @@ Files 2 to 4 are written to be read afterwards, not shown on stage.
   The live screen while the replayed 2019 event pulls the frequency down
   and the flywheel pushes 100 kW.
 
+6-Mentl-budget-for-the-10000.md
+  The $10,000, line by line, with what each item costs and where each
+  price comes from.
+
 
 SEE IT
 
@@ -57,8 +61,7 @@ WHAT IS REAL AND WHAT IS SIMULATED
   giving 100 kW for six minutes and a battery giving 300 kW for four
   hours. It is simulated, and every screen says so.
 - Proven by the compiler: the decision makes no network, file, clock or
-  other call outside the program, and allocates no memory. Not proven:
-  that its decisions are good. They are tested on recordings.
+  other call outside the program, and allocates no memory.
 
 
 BUILT THIS WEEK

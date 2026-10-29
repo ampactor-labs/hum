@@ -52,7 +52,7 @@ The Mentl programs live in the Mentl repository under `examples/grid/`. `station
 | The director | `director.py` | Starts the ear and the controller, adds the hour, the rush window and the clean share to each line, serves the page, and records each session. |
 | The page | `index.html` | The stage, the three cards and the engineers' dashboard. It plays a recorded session when no director answers. One file with no dependencies. |
 | The data | `build_data.py`, `data/` | PacifiCorp East's demand, day-ahead forecast and clean share by hour; the event. |
-| The pitch | `pitch/` | The show's slides, the Nucleus deck, the Torus leave-behind, the one-page plan, the script with its answers to likely questions, `shots.js`, which takes the slides' pictures from the bundled session, `export.js`, which writes the PDFs, and `submission.sh`, which gathers everything to upload into `submission/`. |
+| The pitch | `pitch/` | The show's slides, the Nucleus deck, the Torus leave-behind, the one-page plan, the script with its answers to likely questions, `shots.js`, which takes the slides' pictures from the bundled session, `export.js`, which writes the PDFs, and `submission.sh`, which gathers everything to upload into the folder `Mentl - Morgan Espitia`. |
 | The contracts | `CONTRACTS.md` | The line formats the ear, the director, the controller and the page use. |
 
 ## Measured

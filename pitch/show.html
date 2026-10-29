@@ -14,7 +14,7 @@
   <div class="two">
     <div>
       <p class="lead">The software that decides is written in Mentl, a programming language I built. Its compiler proves that this software can't reach the internet while it decides.</p>
-      <p class="lead"><b>Morgan Espitia</b>, Salt Lake City. I have built Mentl since March and my audio library, sonido, since January.</p>
+      <p class="lead"><b>Morgan Espitia</b>, Salt Lake City. My company is Mentl. Its first market: the people who run batteries and flywheels.</p>
     </div>
     <div class="pic"><img src="hero.png" alt="The live screen during a replayed 2019 grid failure: the frequency falls and the flywheel pushes 100 kW"></div>
   </div>
@@ -38,7 +38,7 @@
 
 <section class="slide">
   <div class="kick">Why it matters</div>
-  <h1>AI now helps write the software that runs machines. No mainstream language can prove what that software will never do.</h1>
+  <h1 class="small">AI now helps write the software that runs machines. C and C++, the languages most of it is written in, can't check what that software will never do.</h1>
   <p class="lead">Batteries, flywheels and flight controls run on code that people test and review, and then trust.</p>
   <div class="foot"><span>The problem</span><span>ampactor.dev/hum</span></div>
 </section>
@@ -65,21 +65,6 @@
 </section>
 
 <section class="slide">
-  <div class="kick">What Mentl code looks like</div>
-  <h1 class="small">Five operators draw the shape of a program. The compiler checks each rule along that shape.</h1>
-  <table class="verbs">
-    <tr><td class="code">fn read(hz) = hz <b class="v">|&gt;</b> fast</td><td class="verb">|&gt;</td><td>pipe: one stage feeds the next</td></tr>
-    <tr><td class="code">fn fork(hz) = (hz) <b class="v">&lt;|</b> (fast, slow)</td><td class="verb">&lt;|</td><td>split: one value goes to two branches</td></tr>
-    <tr><td class="code">fn pair(a, b) = (a |&gt; fast) <b class="v">&gt;&lt;</b> (b |&gt; slow)</td><td class="verb">&gt;&lt;</td><td>parallel: two branches run side by side</td></tr>
-    <tr><td class="code">fn trend(hz) = ((prev) =&gt; prev + hz) <b class="v">&lt;~</b> Delay(1)</td><td class="verb">&lt;~</td><td>feedback: each step sees the step before</td></tr>
-    <tr><td class="code">fn act(hz) <b class="r">with !Network</b> = spin(hz) <b class="v">~&gt;</b> flywheel</td><td class="verb">~&gt;</td><td>handler: names who answers the request</td></tr>
-  </table>
-  <p class="note" style="font-size:30px;color:var(--ink-2)">The last line carries a rule, <span class="mono">with !Network</span>: if anything <span class="mono">act</span> calls could reach the network, the compiler refuses to build it. Four of the operators come from Faust, the audio language; <span class="mono">~&gt;</span> is Mentl's own.</p>
-  <div class="foot"><span>The hard tech</span><span>ampactor.dev/hum</span></div>
-  <div class="src">These lines pass mentl check as written, 28 Oct 2026. The language: github.com/ampactor-labs/mentl</div>
-</section>
-
-<section class="slide">
   <div class="kick">Show it working</div>
   <h1 class="small">Everything you just saw was built since Monday at 4 PM, on two tools I built before it.</h1>
   <div class="rows">
@@ -98,7 +83,7 @@
     <div class="card"><h3>Torus · Salt Lake City</h3><p>Builds flywheel-and-battery Stations that steady the grid. The software inside each Station is where a proof would matter first. Torus is judging this demo.</p></div>
     <div class="card"><h3>Hill AFB · 309th Software Engineering Group</h3><p>Maintains flight software for the F-16, the F-35 and the missile fleet, where every claim about the software needs evidence.</p></div>
   </div>
-  <p class="lead" style="margin-top:56px">First conversation I'm asking for: Torus engineering, this month.<br>First hires: a controls engineer and a compiler engineer, in Salt Lake City.</p>
+  <p class="lead" style="margin-top:56px">The sites I'll ask to host the pilot: Torus, Rocky Mountain Power's Wattsmart Battery program, and Utah State University's ASPIRE center.<br>First hires: a controls engineer and a compiler engineer, in Salt Lake City.</p>
   <div class="foot"><span>Utah impact</span><span>ampactor.dev/hum</span></div>
 </section>
 
@@ -106,11 +91,11 @@
   <div class="kick">What $10,000 unlocks</div>
   <h1 class="small">$10,000 puts this controller beside a real battery in Utah within ninety days.</h1>
   <div class="rows">
-    <div class="row"><b>Day 30</b><span>Form the Utah company. Run the controller on a battery inverter on my bench.</span></div>
-    <div class="row"><b>Day 60</b><span>Run it beside a real battery at one Utah site.</span></div>
-    <div class="row"><b>Day 90</b><span>A pilot agreement with that site, and an SBIR proposal with Nucleus Grow.</span></div>
+    <div class="row" style="font-size:38px"><b>Day 30</b><span>Form the Utah company. Run the controller on a 3 kW inverter and 10 kWh of batteries on my bench.</span></div>
+    <div class="row" style="font-size:38px"><b>Day 60</b><span>With a site's written consent, run it read-only beside a real battery for 14 days, logging its decisions and sending no commands.</span></div>
+    <div class="row" style="font-size:38px"><b>Day 90</b><span>A pilot agreement that lets it send commands, and an SBIR proposal with Nucleus Grow.</span></div>
   </div>
-  <p class="money"><b>$7,000</b> for the inverter and battery bench. <b>$3,000</b> to form the company, register for federal grants and install at the site.</p>
+  <p class="money" style="margin-top:32px"><b>$7,000</b> for the bench. <b>$3,000</b> for the company, a lawyer for the pilot agreement, a year of insurance and the site's read-only kit. Every line is priced in the budget.</p>
   <div class="asks"><b>Three asks.</b> A Utah operator who will host it. An introduction to Hill AFB's 309th. A co-founder who knows power electronics.</div>
   <div class="foot"><span>Path to reality · the code: github.com/ampactor-labs/hum and github.com/ampactor-labs/mentl</span><span>ampactor.dev/hum</span></div>
 </section>
@@ -127,6 +112,21 @@
     </div>
   </div>
   <div class="foot"><span>Three asks: a Utah operator who will host the pilot, an introduction to Hill AFB's 309th, and a co-founder who knows power electronics.</span><span></span></div>
+</section>
+
+<section class="slide appendix">
+  <div class="kick">What Mentl code looks like</div>
+  <h1 class="small">Five operators draw the shape of a program. The compiler checks each rule along that shape.</h1>
+  <table class="verbs">
+    <tr><td class="code">fn read(hz) = hz <b class="v">|&gt;</b> fast</td><td class="verb">|&gt;</td><td>pipe: one stage feeds the next</td></tr>
+    <tr><td class="code">fn fork(hz) = (hz) <b class="v">&lt;|</b> (fast, slow)</td><td class="verb">&lt;|</td><td>split: one value goes to two branches</td></tr>
+    <tr><td class="code">fn pair(a, b) = (a |&gt; fast) <b class="v">&gt;&lt;</b> (b |&gt; slow)</td><td class="verb">&gt;&lt;</td><td>parallel: two branches run side by side</td></tr>
+    <tr><td class="code">fn trend(hz) = ((prev) =&gt; prev + hz) <b class="v">&lt;~</b> Delay(1)</td><td class="verb">&lt;~</td><td>feedback: each step sees the step before</td></tr>
+    <tr><td class="code">fn act(hz) <b class="r">with !Network</b> = spin(hz) <b class="v">~&gt;</b> flywheel</td><td class="verb">~&gt;</td><td>handler: names who answers the request</td></tr>
+  </table>
+  <p class="note" style="font-size:30px;color:var(--ink-2)">The last line carries a rule, <span class="mono">with !Network</span>: if anything <span class="mono">act</span> calls could reach the network, the compiler refuses to build it. Four of the operators come from Faust, the audio language; <span class="mono">~&gt;</span> is Mentl's own.</p>
+  <div class="foot"><span>The hard tech</span><span>ampactor.dev/hum</span></div>
+  <div class="src">These lines pass mentl check as written, 28 Oct 2026. The language: github.com/ampactor-labs/mentl</div>
 </section>
 
 </div>

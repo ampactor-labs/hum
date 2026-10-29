@@ -1,7 +1,11 @@
 ## This week (since Monday Oct 26, 4:00 PM MDT)
 
-### hum: 47 commits
+### hum: 51 commits
 
+- Wed 18:56  The upload README says which PDF is shown on stage, and beat 12's line fits its five seconds
+- Wed 18:55  The $10,000 slide fits its page again: its headline is two lines, so the three asks clear the footer
+- Wed 18:47  HUM quits with Shift+Q, the tuner moves 20 times a second, and one folder holds everything to upload
+- Wed 17:59  The replay draws its fall, the proof screens show the compiler's own words, and no slide repeats another
 - Wed 17:37  HUM starts from the desktop launcher, finds Mentl where it is checked out, and stops its ear and learner when the director stops
 - Wed 17:16  The hosted replay runs the same fifteen-beat show over the bundled recording
 - Wed 17:14  The pitch is one show for both rooms, and every screen explains itself
