@@ -222,10 +222,23 @@ body:not(.dash) .help { display: none; }
 .tour.show { display: flex; }
 .tour button { font: inherit; font-size: clamp(26px, 2.4vw, 42px); line-height: 1; width: clamp(44px, 3.6vw, 64px); height: clamp(44px, 3.6vw, 64px); border-radius: 50%; border: 1px solid var(--line); background: #1A1730; color: var(--ink); cursor: pointer; padding: 0 0 0.2em; }
 .tour button:hover { background: #262245; }
+.tour button:disabled { opacity: 0.3; cursor: default; }
+.tour button[hidden] { display: none; }
+/* On a phone held upright the slides are small; a line above the bar says to turn it. */
+.turn { display: none; position: fixed; left: 0; right: 0; bottom: calc(2vh + 74px); text-align: center; z-index: 11; font-family: var(--sans); font-size: 15px; color: var(--ink-3); }
+@media (orientation: portrait) and (max-width: 700px) { body.deckview .turn { display: block; } }
+/* `?capture` takes the pictures for the PDF: no bar, no hint, no timer. */
+body.capture .tour, body.capture .turn, body.capture .st-timer { display: none !important; }
 #stage.touring .st-note { bottom: 100px; }
 #stage.touring.timing .st-left, #stage.touring.timing .st-right { height: 630px; }
 #stage.touring.timing .st-words { top: 764px; }
 #stage.touring .st-timer { display: none !important; }
+/* In the tour the words sit a little higher and smaller, so a three-line story clears the note and the note clears the bar. */
+#stage.touring.timing .st-left, #stage.touring.timing .st-right { height: 610px; }
+#stage.touring.timing .st-words { top: 740px; }
+#stage.touring .st-head { font-size: 50px; }
+#stage.touring .st-story { font-size: 26px; }
+#stage.touring.timing .st-note { bottom: 96px; right: 64px; }
 #stage.tall.timing .st-words { top: 960px; }
 #stage.tall.timing .st-head { font-size: 44px; }
 #stage.tall .st-story { font-size: 24px; }
@@ -237,7 +250,7 @@ body:not(.dash) .help { display: none; }
 .tour.corner #tourText { display: none; }
 #stage.timing .st-timer { right: 200px; }
 #stage.timing .st-note { right: 440px; }
-#stage.tall.touring .st-note { bottom: 36px; }
+#stage.tall.touring .st-note, #stage.tall.touring.timing .st-note { bottom: 36px; right: 56px; }
 /* The Nucleus slides, shown over the stage in a frame; the deck's own script scales them to the window. */
 #ovDeck { background: var(--void); }
 #ovDeck iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
@@ -407,7 +420,8 @@ $ mentl why examples/grid/station.mn decide WASI
 
 <div class="ov2" id="ovDeck"><iframe id="deckFrame" title="The Nucleus slides"></iframe></div>
 
-<div class="tour" id="tour"><button id="tourPrev" title="The previous step">‹</button><span id="tourText"></span><button id="tourNext" title="The next step">›</button></div>
+<div class="turn" id="turn">Turn your phone sideways to read the slides.</div>
+<div class="tour" id="tour"><button id="tourPrev" title="The previous step">‹</button><span id="tourText"></span><button id="tourAgain" title="Play this step again" hidden>↻</button><button id="tourNext" title="The next step">›</button></div>
 
 <div class="help">Space, → or footswitch 1: next · ←  or footswitch 2: back · 0 the title · D stage · H tomorrow's noon · E replay · I island · P proven · R refused · K thank you · A compiler text · G gate · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
 
@@ -481,7 +495,8 @@ async function startPlayback(path) {
   const built = { trace_fast: [], trace: [], station_trace: [], ledger: { events: 0, kwh_moved: 0, spin_cycles: 0, pulse_cycles_saved: 0 }, latency_ms: null, learned: {}, pace: null, station: {} };
   try { built.pace = (await (await fetch("data/pace.json", { cache: "no-store" })).json()); } catch (e) {}
   if (built.pace) { built.pace = { today: built.pace.today, tomorrow: built.pace.tomorrow, window: built.pace.window, forecast_source: built.pace.forecast_source, as_of_local: built.pace.as_of_local, demand_today: (built.pace.for_today||{}).demand, forecast_today: (built.pace.for_today||{}).forecast, forecast_tomorrow: (built.pace.for_tomorrow||{}).forecast, shape: built.pace.shape, clean: built.pace.clean_mean, charge_hours: [] }; }
-  let i = 0, lastMode = "GRID", t0 = performance.now(), base = rows.length ? rows[0].ear.t : 0, timer = null;
+  // `stopAt` is where the recording holds, in seconds from its first line. Outside the tour it plays on and starts over.
+  let i = 0, lastMode = "GRID", t0 = performance.now(), base = rows.length ? rows[0].ear.t : 0, timer = null, stopAt = Infinity;
   const label = params.get("label") || (path.endsWith("default.ndjson") ? "a recorded run of the demo" : path.replace(/^.*\//, ""));
   function fresh() {
     lastMode = "GRID";
@@ -490,14 +505,26 @@ async function startPlayback(path) {
   }
   // At the end the session starts over, so the hosted copy never stops on a still frame.
   function again() { i = 0; t0 = performance.now(); fresh(); step(); }
-  // The tour jumps the recording to a chapter's start, in seconds from its first line. The chapters' moments come from the recording itself: the first line with the clock set, the first of the replay, and the first of the silence.
+  // Each live screen's step plays its own stretch of the recording once and
+  // holds the last frame; nothing moves to the next step by itself. The
+  // stretches come from the recording: the first line with the clock set,
+  // the first of the replay and of its event, and the first of the silence.
   const at = pred => { const k = rows.findIndex(pred); return k < 0 ? null : rows[k].ear.t - base; };
   const rushAt = at(r => r.ear.hour_set != null), replayAt = at(r => r.ear.source === "replay"), darkAt = at(r => r.ear.source === "silence");
-  chapterAt = { "live": 1.0, "rush hour": rushAt != null ? rushAt + 1.0 : null, "replay": replayAt != null ? replayAt + 2.0 : null, "dark": darkAt != null ? darkAt - 1.0 : null };
-  tour = { seek(sec) { clearTimeout(timer); i = Math.max(0, rows.findIndex(r => r.ear.t - base >= sec)); t0 = performance.now() - sec / speed * 1000; fresh(); step(); } };
+  const eventAt = at(r => r.ear.source === "replay" && r.station && r.station.mode === "EVENT");
+  chapterAt = {
+    "live": [1.0, 9.0],
+    "rush hour": rushAt != null ? [rushAt + 0.5, rushAt + 12] : null,
+    "replay": replayAt != null ? [replayAt + 1, (eventAt != null ? eventAt : replayAt + 6) + 12] : null,
+    "dark": darkAt != null ? [darkAt - 1, darkAt + 7] : null,
+  };
+  tour = {
+    play([from, to]) { clearTimeout(timer); i = Math.max(0, rows.findIndex(r => r.ear.t - base >= from)); t0 = performance.now() - from / speed * 1000; stopAt = to; fresh(); step(); },
+  };
+  stopAt = 1.0;
   $("stage").classList.add("touring", "timing"); $("tour").classList.add("show"); tourGo(0);
   function step() {
-    const elapsed = (performance.now() - t0) / 1000 * speed;
+    const elapsed = Math.min((performance.now() - t0) / 1000 * speed, stopAt);
     while (i < rows.length && rows[i].ear.t - base <= elapsed) {
       const row = rows[i++];
       const { ear, station } = row;
@@ -515,45 +542,53 @@ async function startPlayback(path) {
       connected = true; lastGood = performance.now();
     }
     onState();
-    tourFollow(elapsed);
+    if (elapsed >= stopAt) return;
     timer = setTimeout(i < rows.length ? step : again, i < rows.length ? 50 : 4000);
   }
   step();
 }
 
 // ---------- the hosted replay's tour ----------
-// With no director, the page plays the bundled recording and a viewer steps
-// through the same show the presenter gives, with the arrows on screen or on
-// the keyboard. A live screen's beat jumps the recording to its moment, and
-// while the recording plays on, the counter follows it from one live screen
-// to the next. The slides and cards stay until the viewer moves on.
+// With no director, a viewer steps through the same show the presenter
+// gives, at their own pace: the arrows on screen, the keyboard's arrows, or
+// a swipe on a phone. A live screen's step plays its stretch of the bundled
+// recording once and holds, and ↻ plays it again. Slides and cards stay
+// until the viewer moves on. The first step cannot go back, and the last
+// one's › starts over.
 let tour = null, chapter = 0, chapterAt = {};
 // What a live screen says when it is a recording, not this room.
 const recorded = {
   "live": ["The grid's note: in this recording, a synthesized stand-in",
     "In the room, a guitar pickup rests on a power adapter, which hums at the grid's frequency, and sonido measures it. This recording uses a synthesized 60 Hz hum in its place. At 60 Hz the tuner reads the note B, in tune. If the grid ran short of power, the number would fall."],
 };
-function tourShow(n) { $("tourText").textContent = (n + 1) + " of " + show.length + " · " + show[n][0]; }
+function tourShow(n) {
+  const name = show[n][0], last = n === show.length - 1;
+  $("tourText").textContent = n === 0 ? "Start with › · " + show.length + " steps, at your own pace" : (n + 1) + " of " + show.length + " · " + name[0].toUpperCase() + name.slice(1);
+  $("tourPrev").disabled = n === 0;
+  $("tourNext").textContent = last ? "↺" : "›"; $("tourNext").title = last ? "Start over" : "The next step";
+  $("tourAgain").hidden = !(show[n][1] == null && chapterAt[name]);
+}
+function tourNext() { tourGo(chapter === show.length - 1 ? 0 : chapter + 1); }
 function tourText(n) {
   const [name, , line, , story] = show[n], r = recorded[name] || [line, story];
   $("stStep").textContent = r[0] || ""; $("stStory").textContent = r[1] || "";
 }
 function tourGo(n) {
   if (!tour) return;
-  chapter = (n + show.length) % show.length;
+  chapter = Math.max(0, Math.min(show.length - 1, n));
   const [name, view] = show[chapter];
   closeAll();
-  if (typeof view === "number") slide(view); else if (view) showCard(view); else if (chapterAt[name] != null) tour.seek(chapterAt[name]);
+  if (typeof view === "number") slide(view); else if (view) showCard(view); else if (chapterAt[name]) tour.play(chapterAt[name]);
+  document.body.classList.toggle("deckview", typeof view === "number");
   tourText(chapter); tourShow(chapter);
 }
-function tourFollow(elapsed) {
-  if (show[chapter][1] != null) return;
-  // When the recording starts over, the counter returns to the first live screen.
-  let n = show.findIndex(b => b[0] === "live");
-  show.forEach((b, k) => { const at = chapterAt[b[0]]; if (b[1] == null && at != null && elapsed >= at) n = k; });
-  if (n !== chapter) { chapter = n; tourText(n); tourShow(n); }
-}
-$("tourPrev").onclick = () => tour ? tourGo(chapter - 1) : runBeat(beat - 1); $("tourNext").onclick = () => tour ? tourGo(chapter + 1) : runBeat(beat + 1);
+$("tourPrev").onclick = () => tour ? tourGo(chapter - 1) : runBeat(beat - 1); $("tourNext").onclick = () => tour ? tourNext() : runBeat(beat + 1);
+$("tourAgain").onclick = () => { const s = chapterAt[show[chapter][0]]; if (tour && s) tour.play(s); };
+// A swipe on a phone: left for the next step, right for the one before.
+let touchX = null;
+document.addEventListener("touchstart", e => { if (tour && e.touches.length === 1) touchX = e.touches[0].clientX; }, { passive: true });
+document.addEventListener("touchend", e => { if (!tour || touchX == null) return; const dx = e.changedTouches[0].clientX - touchX; touchX = null; if (Math.abs(dx) > 60) { if (dx < 0) tourNext(); else tourGo(chapter - 1); } }, { passive: true });
+if (params.has("capture")) document.body.classList.add("capture");
 
 // ---------- the chip ----------
 function setChip(kind, text, label) {
@@ -1192,7 +1227,7 @@ function startShow() {
 }
 function flowKey(e) {
   if (tour) {
-    if (["Enter", " ", "ArrowRight", "PageDown"].includes(e.key)) { e.preventDefault(); tourGo(chapter + 1); return true; }
+    if (["Enter", " ", "ArrowRight", "PageDown"].includes(e.key)) { e.preventDefault(); tourNext(); return true; }
     if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); tourGo(chapter - 1); return true; }
     return false;
   }
