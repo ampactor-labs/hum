@@ -16,14 +16,16 @@ every function the decision calls.
 THE FILES
 
 1-HUM-pitch-deck.pdf
-  The slides of the show given in both rooms. On stage, the live screens
-  (the hum, rush hour, the 2019 replay and the blackout) run between them.
+  The slides shown on stage, the same in both rooms. The live screens (the
+  hum, rush hour, the 2019 replay and the blackout) run between them.
+
+Files 2 to 4 are written to be read afterwards, not shown on stage.
 
 2-HUM-Torus-leave-behind.pdf
   Four pages for Torus.
 
 3-Mentl-Nucleus-deck.pdf
-  The Nucleus deck, with two backup pages: what is proven, exactly, and
+  The Nucleus pages, with two backup pages: what is proven, exactly, and
   the engineering left before the controller runs on the guitar pedal.
 
 4-Mentl-Nucleus-one-page-plan.pdf
