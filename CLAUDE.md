@@ -39,8 +39,9 @@ engineer opening the README. Write for them.
   clock or other host call, allocates no memory and never stops the program
   with an error, and each machine answers a command within its rating. Do not
   claim more. One byte-range check inside the library's print routine is not
-  proven yet, the decisions are tested on recordings and not proven good, and
-  the memory is the same after 300,000 readings as after one.
+  proven yet, and the memory is the same after 300,000 readings as after one.
+  Never claim the decisions are good. Do not add a line saying they are not
+  proven good either: Morgan cut that line from every screen as filler.
 - Never open with "Mentl is a language that…". Open with the listener's
   situation, then the rule in the code, then the check through every call,
   then the refusal. Mentl's own CLAUDE.md, "How to talk about Mentl", is the

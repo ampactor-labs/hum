@@ -191,28 +191,38 @@ body:not(.dash) .help { display: none; }
 #stage.tall .st-unit .kw { margin-bottom: 12px; }
 #stage.tall .st-unit .pct { font-size: 24px; }
 #stage.tall .st-note { left: 56px; right: 56px; bottom: 36px; font-size: 24px; }
-/* the plain cards: proven, refused, thank you */
-.ov2 { position: fixed; inset: 0; background: #07060E; display: none; align-items: center; justify-content: center; z-index: 10; font-family: var(--sans); }
+/* the plain cards: proven, refused, tomorrow's plan, thank you. Each is laid
+   out in pixels at a fixed width, 1540 wide or 900 narrow to match the space it
+   has, and cardFit scales it so the whole card fits that space. */
+.ov2 { position: fixed; inset: 0; background: #07060E; display: none; align-items: center; justify-content: center; z-index: 10; font-family: var(--sans); overflow: hidden; }
 .ov2.show { display: flex; }
-.scard { width: 80vw; border: 0.2vw solid #3DFF9A; border-radius: 2.2vw; padding: 4vw 5vw; background: #0B0A16; }
+.scard { flex: none; width: 1540px; box-sizing: border-box; border: 4px solid #3DFF9A; border-radius: 42px; padding: 72px 96px; background: #0B0A16; transform-origin: center; }
+.scard.narrow { padding: 56px 56px; border-radius: 36px; }
 .scard.no { border-color: #FF2D55; }
 .scard.plain { border-color: var(--line); }
-.scard.plan { border-color: var(--pulse); padding-top: 3vw; padding-bottom: 3vw; }
-.scard.plan .mark { color: var(--pulse); font-size: 2.2vw; }
-.scard.plan h1 { font-size: 3vw; margin: 1vw 0 0.6vw; }
-.planchart { height: 30vh; margin: 0 0 1vw; }
+.scard.plan { border-color: var(--pulse); padding-top: 56px; padding-bottom: 56px; }
+.scard.plan .mark { color: var(--pulse); font-size: 42px; }
+.scard.plan h1 { font-size: 58px; margin: 18px 0 12px; }
+.planchart { height: 340px; margin: 0 0 18px; }
+.scard.narrow .planchart { height: 520px; }
 .planchart canvas { display: block; width: 100%; height: 100%; }
-.scard .path { font-family: var(--mono); font-size: 1.45vw; line-height: 1.4; color: #FF8FA6; margin: 0.4vw 0 1vw; }
-.scard .mark { font-size: 4.6vw; font-weight: 700; line-height: 1; color: #3DFF9A; }
+.scard .path { font-family: var(--mono); font-size: 28px; line-height: 1.4; color: #FF8FA6; margin: 8px 0 19px; }
+.scard .mark { font-size: 88px; font-weight: 700; line-height: 1; color: #3DFF9A; }
+.scard.narrow .mark { font-size: 72px; }
 .scard.no .mark { color: #FF2D55; }
-.scard h1 { font-size: 4.4vw; font-weight: 700; letter-spacing: -0.02em; line-height: 1.06; margin: 1.6vw 0 1.4vw; }
-.scard p { font-size: 1.9vw; line-height: 1.38; color: var(--ink-2); margin: 0 0 0.8vw; max-width: 66vw; }
-.scard code { display: block; font-family: var(--mono); font-size: 2vw; color: var(--ink); background: #1A0C14; border: 0.15vw solid #FF2D55; border-radius: 1vw; padding: 1.2vw 1.8vw; margin: 1.4vw 0 1.6vw; }
-.scard p.src { font-size: 1vw; color: var(--ink-3); margin: 1.6vw 0 0; font-family: var(--mono); }
-.scard pre { font-size: 0.9vw; max-height: 22vh; overflow: auto; }
-.scard .qrrow { display: flex; gap: 3.4vw; align-items: center; margin-top: 1vw; }
-.scard .qr { width: 17vw; height: 17vw; border-radius: 1vw; background: #fff; padding: 0.6vw; }
-.scard .url { font-family: var(--mono); color: var(--ink); font-size: 2.4vw; }
+.scard h1 { font-size: 84px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.06; margin: 31px 0 27px; }
+.scard.narrow h1 { font-size: 72px; }
+.scard.plan.narrow .mark { font-size: 40px; }
+.scard.plan.narrow h1 { font-size: 54px; }
+.scard p { font-size: 36px; line-height: 1.38; color: var(--ink-2); margin: 0 0 15px; max-width: 1270px; }
+.scard code { display: block; font-family: var(--mono); font-size: 38px; color: var(--ink); background: #1A0C14; border: 3px solid #FF2D55; border-radius: 19px; padding: 23px 35px; margin: 27px 0 31px; overflow-wrap: anywhere; }
+.scard.narrow code { font-size: 32px; padding: 20px 26px; }
+.scard p.src { font-size: 19px; color: var(--ink-3); margin: 31px 0 0; font-family: var(--mono); }
+.scard.narrow p.src { font-size: 24px; }
+.scard pre { font-size: 17px; max-height: 240px; overflow: auto; }
+.scard .qrrow { display: flex; flex-wrap: wrap; gap: 65px; align-items: center; margin-top: 19px; }
+.scard .qr { width: 326px; height: 326px; border-radius: 19px; background: #fff; padding: 12px; }
+.scard .url { font-family: var(--mono); color: var(--ink); font-size: 46px; }
 /* The presenter's timer and beat count, shown only while a pitch flow is selected (keys 1 and 2). */
 .st-timer { position: absolute; right: 64px; bottom: 32px; font-family: var(--mono); font-size: 22px; color: var(--ink-3); display: none; }
 #stage.timing .st-note { right: 300px; }
@@ -224,11 +234,25 @@ body:not(.dash) .help { display: none; }
 .tour button:hover { background: #262245; }
 .tour button:disabled { opacity: 0.3; cursor: default; }
 .tour button[hidden] { display: none; }
-/* On a phone held upright the slides are small; a line above the bar says to turn it. */
-.turn { display: none; position: fixed; left: 0; right: 0; bottom: calc(2vh + 74px); text-align: center; z-index: 11; font-family: var(--sans); font-size: 15px; color: var(--ink-3); }
-@media (orientation: portrait) and (max-width: 700px) { body.deckview .turn { display: block; } }
-/* `?capture` takes the pictures for the PDF: no bar, no hint, no timer. */
-body.capture .tour, body.capture .turn, body.capture .st-timer { display: none !important; }
+/* The tour's controls never cover what they control. Under the bar, `--room-b`
+   high, and beside the side buttons, `--room-x` wide, nothing is drawn: the
+   cards and the slides always fit above the bar, and so does the live screen
+   on a phone. On a wide screen the live screen leaves that space empty itself.
+   Held sideways, a phone has too little height for a bar, so the two buttons
+   sit in the side margins and the step number sits under the left one. */
+body.touring::before { content: ""; position: fixed; inset: 0; background: var(--void); z-index: 4; }
+body.touring .ov2 { bottom: var(--room-b, 0px); left: var(--room-x, 0px); right: var(--room-x, 0px); }
+/* While a card or a slide is up, the live screen under it is hidden, so its glow does not show around the bar. */
+body.touring:has(.ov2.show) #stage { visibility: hidden; }
+body.upright #stage, body.sideways #stage { bottom: var(--room-b, 0px); left: var(--room-x, 0px); right: var(--room-x, 0px); }
+body.sideways .tour.show { display: block; left: 0; right: 0; top: 0; bottom: 0; transform: none; padding: 0; border: 0; background: none; pointer-events: none; }
+body.sideways .tour button { position: fixed; top: 50%; margin-top: -22px; width: 44px; height: 44px; font-size: 26px; pointer-events: auto; }
+body.sideways #tourPrev { left: 8px; }
+body.sideways #tourNext { right: 8px; }
+body.sideways #tourText { position: fixed; left: 0; width: 60px; top: calc(50% + 30px); text-align: center; font-size: 0; }
+body.sideways #tourText::after { content: attr(data-short); font-size: 13px; color: var(--ink-3); }
+/* `?capture` takes the pictures for the PDF: no bar and no timer. */
+body.capture .tour, body.capture .st-timer { display: none !important; }
 #stage.touring .st-note { bottom: 100px; }
 #stage.touring.timing .st-left, #stage.touring.timing .st-right { height: 630px; }
 #stage.touring.timing .st-words { top: 764px; }
@@ -267,7 +291,6 @@ body.capture .tour, body.capture .turn, body.capture .st-timer { display: none !
    1080 wide and at least 1920 tall, and stageFit scales it by its real
    height. These rules come last so they win over the fixed positions above. */
 #stage.tall #stageInner { display: flex; flex-direction: column; gap: 28px; padding: 40px 56px 48px; height: auto; min-height: 1920px; box-sizing: border-box; }
-#stage.tall.touring #stageInner { padding-bottom: 230px; }
 #stage.tall #stageInner > div { position: static; left: auto; right: auto; top: auto; bottom: auto; width: auto; height: auto; }
 #stage.tall #stageInner > .st-top { order: 1; }
 #stage.tall #stageInner > .st-left { order: 2; }
@@ -278,6 +301,33 @@ body.capture .tour, body.capture .turn, body.capture .st-timer { display: none !
 #stage.tall #stageInner .st-tuner { position: relative; top: auto; bottom: auto; height: 620px; margin-top: 24px; }
 #stage.tall .st-unit { flex: none; min-height: 240px; }
 #stage.tall .st-step { white-space: normal; flex-basis: 100%; order: 4; margin-left: 0; }
+/* A phone held sideways: too short for the 1920 by 1080 frame, whose words
+   would shrink to a few pixels. The frame is 1920 wide and at least 900 tall,
+   in two columns: the number and the tuner on the left; the headline, the
+   story and the Station's two cards side by side on the right. The words are
+   larger than on a big screen, because the whole frame is drawn smaller. */
+#stage.short #stageInner { display: grid; grid-template-columns: 860px 1fr; grid-template-rows: auto auto 1fr auto; grid-template-areas: "top top" "left words" "left right" "note note"; gap: 18px 48px; padding: 26px 48px 22px; width: 1920px; height: auto; min-height: 900px; box-sizing: border-box; }
+#stage.short #stageInner > div { position: static; left: auto; right: auto; top: auto; bottom: auto; width: auto; height: auto; min-height: 0; }
+#stage.short .st-top { grid-area: top; gap: 32px; }
+#stage.short .st-chip, #stage.short .st-step { font-size: 30px; }
+#stage.short .st-left { grid-area: left; display: flex; flex-direction: column; }
+#stage.short .st-hz { font-size: 150px; height: 150px; }
+#stage.short .st-hz.quiet { font-size: 110px; line-height: 150px; }
+#stage.short .st-cap { font-size: 28px; }
+#stage.short #stageInner .st-tuner { position: relative; top: auto; bottom: auto; flex: 1; min-height: 300px; margin-top: 16px; }
+#stage.short .st-words { grid-area: words; }
+#stage.short .st-head, #stage.short.timing .st-head { font-size: 50px; }
+#stage.short .st-story { font-size: 36px; line-height: 1.3; }
+#stage.short .st-right { grid-area: right; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr; gap: 12px 20px; }
+#stage.short .st-title { grid-column: 1 / -1; height: auto; font-size: 28px; }
+#stage.short .st-unit, #stage.touring.short .st-unit { grid-template-columns: 96px 1fr; gap: 20px; padding: 18px 22px; border-radius: 24px; }
+#stage.short .st-unit svg { width: 96px; height: 96px; }
+#stage.short .st-unit .name { font-size: 28px; }
+#stage.short .st-unit .state, #stage.touring.short .st-unit .state { font-size: 40px; }
+#stage.short .st-unit .kw, #stage.touring.short .st-unit .kw { font-size: 38px; min-height: 42px; margin-bottom: 10px; }
+#stage.short .st-unit .pct { font-size: 26px; }
+#stage.short .st-note, #stage.short.touring.timing .st-note { grid-area: note; font-size: 26px; }
+#stage.short .st-timer { display: none !important; }
 </style>
 </head>
 <body>
@@ -412,7 +462,6 @@ $ mentl why examples/grid/station.mn decide WASI
   <div class="mark">✓ Proven</div>
   <h1>This software can't reach the internet while it decides.</h1>
   <p>Every decision you just watched was made by software written in Mentl, a language I built. Its compiler checks every function the decision calls, and proves the decision can't reach the internet, a file or the clock, and never allocates memory. It acts only on the numbers it is handed. Code added later that tries to reach the internet won't build, as long as the rule stays on the function.</p>
-  <p><b>Not proven:</b> that its decisions are good. They are tested on recordings.</p>
   <p class="src">Checked by Mentl's compiler: mentl check examples/grid/station.mn</p>
   <pre id="proofRaw" hidden></pre>
 </div></div>
@@ -444,8 +493,7 @@ $ mentl why examples/grid/station.mn decide WASI
 
 <div class="ov2" id="ovDeck"><iframe id="deckFrame" title="The Nucleus slides"></iframe></div>
 
-<div class="turn" id="turn">Turn your phone sideways to read the slides.</div>
-<div class="tour" id="tour"><button id="tourPrev" title="The previous step">‹</button><span id="tourText"></span><button id="tourAgain" title="Play this step again" hidden>↻</button><button id="tourNext" title="The next step">›</button></div>
+<div class="tour" id="tour"><button id="tourPrev" title="The previous step">‹</button><span id="tourText"></span><button id="tourNext" title="The next step">›</button></div>
 
 <div class="help">Space, → or footswitch 1: next · ←  or footswitch 2: back · 0 the title · D stage · H tomorrow's noon · E replay · I island · P proven · R refused · K thank you · A compiler text · G gate · T table · M mesh · S sound · B bright room · 0 reset · Esc close</div>
 
@@ -519,20 +567,25 @@ async function startPlayback(path) {
   const built = { trace_fast: [], trace: [], station_trace: [], ledger: { events: 0, kwh_moved: 0, spin_cycles: 0, pulse_cycles_saved: 0 }, latency_ms: null, learned: {}, pace: null, station: {} };
   try { built.pace = (await (await fetch("data/pace.json", { cache: "no-store" })).json()); } catch (e) {}
   if (built.pace) { built.pace = { today: built.pace.today, tomorrow: built.pace.tomorrow, window: built.pace.window, forecast_source: built.pace.forecast_source, as_of_local: built.pace.as_of_local, demand_today: (built.pace.for_today||{}).demand, forecast_today: (built.pace.for_today||{}).forecast, forecast_tomorrow: (built.pace.for_tomorrow||{}).forecast, shape: built.pace.shape, clean: built.pace.clean_mean, charge_hours: [] }; }
-  // `stopAt` is where the recording holds, in seconds from its first line. Outside the tour it plays on and starts over.
-  let i = 0, lastMode = "GRID", t0 = performance.now(), base = rows.length ? rows[0].ear.t : 0, timer = null, stopAt = Infinity;
+  // `stopAt` is where the current stretch of the recording ends, in seconds
+  // from its first line, and `lap` is that stretch while a live step loops it.
+  // Outside the tour the recording plays on and starts over.
+  let i = 0, lastMode = "GRID", t0 = performance.now(), base = rows.length ? rows[0].ear.t : 0, timer = null, stopAt = Infinity, lap = null;
   const label = params.get("label") || (path.endsWith("default.ndjson") ? "a recorded run of the demo" : path.replace(/^.*\//, ""));
   function fresh() {
     lastMode = "GRID";
     built.trace_fast = []; built.trace = []; built.station_trace = []; built.latency_ms = null;
     built.ledger = { events: 0, kwh_moved: 0, spin_cycles: 0, pulse_cycles_saved: 0 };
+    replayFell = false; replayLow = null;
   }
   // At the end the session starts over, so the hosted copy never stops on a still frame.
   function again() { i = 0; t0 = performance.now(); fresh(); step(); }
-  // Each live screen's step plays its own stretch of the recording once and
-  // holds the last frame; nothing moves to the next step by itself. The
-  // stretches come from the recording: the first line with the clock set,
-  // the first of the replay and of its event, and the first of the silence.
+  // Each live screen's step plays its own stretch of the recording, rests two
+  // seconds on the last frame and plays it again, for as long as the viewer
+  // stays; nothing moves to the next step by itself. `?capture`, which takes
+  // the PDF's pictures, holds the last frame instead. The stretches come from
+  // the recording: the first line with the clock set, the first of the replay
+  // and of its event, and the first of the silence.
   const at = pred => { const k = rows.findIndex(pred); return k < 0 ? null : rows[k].ear.t - base; };
   const rushAt = at(r => r.ear.hour_set != null), replayAt = at(r => r.ear.source === "replay"), darkAt = at(r => r.ear.source === "silence");
   const eventAt = at(r => r.ear.source === "replay" && r.station && r.station.mode === "EVENT");
@@ -540,13 +593,15 @@ async function startPlayback(path) {
     "live": [1.0, 9.0],
     "rush hour": rushAt != null ? [rushAt + 0.5, rushAt + 12] : null,
     "replay": replayAt != null ? [replayAt + 1, (eventAt != null ? eventAt : replayAt + 6) + 12] : null,
-    "dark": darkAt != null ? [darkAt - 1, darkAt + 7] : null,
+    "dark": darkAt != null ? [darkAt - 2.5, darkAt + 8] : null,
   };
   tour = {
-    play([from, to]) { clearTimeout(timer); i = Math.max(0, rows.findIndex(r => r.ear.t - base >= from)); t0 = performance.now() - from / speed * 1000; stopAt = to; fresh(); step(); },
+    play(seg) { const [from, to] = lap = seg; clearTimeout(timer); i = Math.max(0, rows.findIndex(r => r.ear.t - base >= from)); t0 = performance.now() - from / speed * 1000; stopAt = to; fresh(); step(); },
+    // A slide or a card covers the stage, so the loop under it stops.
+    stop() { clearTimeout(timer); lap = null; },
   };
   stopAt = 1.0;
-  $("stage").classList.add("touring", "timing"); $("tour").classList.add("show"); tourGo(0);
+  $("stage").classList.add("touring", "timing"); $("tour").classList.add("show"); document.body.classList.add("touring"); tourGo(0); layout();
   function step() {
     const elapsed = Math.min((performance.now() - t0) / 1000 * speed, stopAt);
     while (i < rows.length && rows[i].ear.t - base <= elapsed) {
@@ -566,7 +621,7 @@ async function startPlayback(path) {
       connected = true; lastGood = performance.now();
     }
     onState();
-    if (elapsed >= stopAt) return;
+    if (elapsed >= stopAt) { if (lap && !params.has("capture")) timer = setTimeout(() => tour.play(lap), 2000 / speed); return; }
     timer = setTimeout(i < rows.length ? step : again, i < rows.length ? 50 : 4000);
   }
   step();
@@ -575,10 +630,9 @@ async function startPlayback(path) {
 // ---------- the hosted replay's tour ----------
 // With no director, a viewer steps through the same show the presenter
 // gives, at their own pace: the arrows on screen, the keyboard's arrows, or
-// a swipe on a phone. A live screen's step plays its stretch of the bundled
-// recording once and holds, and ↻ plays it again. Slides and cards stay
-// until the viewer moves on. The first step cannot go back, and the last
-// one's › starts over.
+// a swipe on a phone. A live screen's step loops its stretch of the bundled
+// recording. Slides and cards stay until the viewer moves on. The first step
+// cannot go back, and the last one's › starts over.
 let tour = null, chapter = 0, chapterAt = {};
 // What a live screen says when it is a recording, not this room.
 const recorded = {
@@ -588,9 +642,9 @@ const recorded = {
 function tourShow(n) {
   const name = show[n][0], last = n === show.length - 1;
   $("tourText").textContent = n === 0 ? "Start with › · " + show.length + " steps, at your own pace" : (n + 1) + " of " + show.length + " · " + name[0].toUpperCase() + name.slice(1);
+  $("tourText").dataset.short = (n + 1) + "/" + show.length;
   $("tourPrev").disabled = n === 0;
   $("tourNext").textContent = last ? "↺" : "›"; $("tourNext").title = last ? "Start over" : "The next step";
-  $("tourAgain").hidden = !(show[n][1] == null && chapterAt[name]);
 }
 function tourNext() { tourGo(chapter === show.length - 1 ? 0 : chapter + 1); }
 function tourText(n) {
@@ -602,12 +656,12 @@ function tourGo(n) {
   chapter = Math.max(0, Math.min(show.length - 1, n));
   const [name, view] = show[chapter];
   closeAll();
-  if (typeof view === "number") slide(view); else if (view) showCard(view); else if (chapterAt[name]) tour.play(chapterAt[name]);
+  if (typeof view === "number") slide(view); else if (view) showCard(view);
+  if (view == null && chapterAt[name]) tour.play(chapterAt[name]); else tour.stop();
   document.body.classList.toggle("deckview", typeof view === "number");
   tourText(chapter); tourShow(chapter);
 }
 $("tourPrev").onclick = () => tour ? tourGo(chapter - 1) : runBeat(beat - 1); $("tourNext").onclick = () => tour ? tourNext() : runBeat(beat + 1);
-$("tourAgain").onclick = () => { const s = chapterAt[show[chapter][0]]; if (tour && s) tour.play(s); };
 // A swipe on a phone: left for the next step, right for the one before.
 let touchX = null;
 document.addEventListener("touchstart", e => { if (tour && e.touches.length === 1) touchX = e.touches[0].clientX; }, { passive: true });
@@ -907,13 +961,38 @@ let stageOn = params.get("view") !== "dashboard";
 let stageScale = 1, scopeGain = 1, scopeSeen = null, gridPhase = 0, lastTuner = performance.now(), shownHz = null;
 // Whether the replay has reached the fall yet: its first seconds are the calm before it.
 let replayFell = false, stageReplaying = false, replayLow = null;
+// The stage's frame for the space it has: 1080 wide and stacked when that
+// space is taller than wide, two columns when it is short and wide like a
+// phone held sideways, and otherwise the 1920 by 1080 frame.
 function stageFit() {
-  const tall = window.innerHeight > window.innerWidth, W = tall ? 1080 : 1920;
-  $("stage").classList.toggle("tall", tall);
-  // Upright, the column's height follows its content, so the scale reads it back.
-  const H = tall ? Math.max(1920, $("stageInner").offsetHeight) : 1080;
-  stageScale = Math.min(window.innerWidth / W, window.innerHeight / H);
-  $("stageInner").style.transform = "translate(" + (window.innerWidth - W * stageScale) / 2 + "px," + (window.innerHeight - H * stageScale) / 2 + "px) scale(" + stageScale + ")";
+  const box = $("stage"), bw = box.clientWidth, bh = box.clientHeight;
+  if (!bw || !bh) return;
+  const tall = bh > bw, short = !tall && bh < 560 && bw / bh > 1.25, W = tall ? 1080 : 1920;
+  box.classList.toggle("tall", tall); box.classList.toggle("short", short);
+  // Stacked or in columns, the frame's height follows its content, so the scale reads it back.
+  const H = tall ? Math.max(1920, $("stageInner").offsetHeight) : short ? Math.max(900, $("stageInner").offsetHeight) : 1080;
+  stageScale = Math.min(bw / W, bh / H);
+  $("stageInner").style.transform = "translate(" + (bw - W * stageScale) / 2 + "px," + (bh - H * stageScale) / 2 + "px) scale(" + stageScale + ")";
+}
+// Where the tour's controls go, and the space they leave: see the .tour rules.
+function layout() {
+  const b = document.body, w = window.innerWidth, h = window.innerHeight, on = !!tour && !b.classList.contains("capture");
+  const sideways = on && h < 560 && w / h > 1.25;
+  b.classList.toggle("sideways", sideways); b.classList.toggle("upright", on && h > w);
+  const bar = $("tour").getBoundingClientRect();
+  document.documentElement.style.setProperty("--room-b", on && !sideways ? Math.ceil(h - bar.top + 6) + "px" : "0px");
+  document.documentElement.style.setProperty("--room-x", sideways ? "60px" : "0px");
+  stageFit(); cardFit();
+}
+// The card on top, laid out at the width that suits its space and scaled so all of it fits.
+let cardScale = 1;
+function cardFit() {
+  const ov = document.querySelector(".ov2.show"), card = ov && ov.querySelector(".scard");
+  if (!card) return;
+  const bw = ov.clientWidth, bh = ov.clientHeight, narrow = bw / bh < 0.9;
+  card.classList.toggle("narrow", narrow); card.style.width = (narrow ? 900 : 1540) + "px"; card.style.transform = "none";
+  cardScale = Math.min(bw * 0.94 / card.offsetWidth, bh * 0.94 / card.offsetHeight);
+  card.style.transform = "scale(" + cardScale + ")";
 }
 function setStage(on) { stageOn = on; document.body.classList.toggle("dash", !on); }
 const kw = w => Math.round(Math.abs(w || 0) / 1000);
@@ -1137,7 +1216,7 @@ function island() { if (sessionFile) return; islandOn = !islandOn; $("btnIsland"
 function reset() { closeAll(); hourOn = false; if (islandOn) island(); if (sound.on) sound.toggle(); if (!sessionFile) { cmd("src=back"); cmd("reset=1"); } document.body.classList.remove("bright"); }
 const overlays = ["ovCert", "ovRefuse", "ovGate", "ovTable", "ovMesh", "ovProof", "ovRefused", "ovPlan", "ovThanks", "ovDeck"];
 function closeAll() { overlays.forEach(id => $(id).classList.remove("show")); }
-function toggleOverlay(id) { const was = $(id).classList.contains("show"); closeAll(); if (!was) { $(id).classList.add("show"); if (id === "ovTable") fillTable(); if (id === "ovMesh") meshT0 = performance.now(); } }
+function toggleOverlay(id) { const was = $(id).classList.contains("show"); closeAll(); if (!was) { $(id).classList.add("show"); cardFit(); if (id === "ovTable") fillTable(); if (id === "ovMesh") meshT0 = performance.now(); } }
 function fillTable() {
   const tb = $("tbl").querySelector("tbody"); tb.textContent = "";
   recent.slice().reverse().forEach(n => { const tr = document.createElement("tr"); const cells = [n.t ? new Date(n.t * 1000).toLocaleTimeString("en-US", { hour12: false }) + "." + String(Math.round((n.t % 1) * 100)).padStart(2, "0") : "", fmt(n.hz_fast, 4), fmt(n.hz, 4), fmt(n.hz_stft, 4), fmt(n.rocof, 3), fmt(n.level_db, 1), n.harmonic ?? "", n.rush ?? "", n.mode || "", n.spin_w ?? "", n.pulse_w ?? "", n.spin_soc_m != null ? (n.spin_soc_m / 10).toFixed(1) + "%" : "", n.pulse_soc_m != null ? (n.pulse_soc_m / 10).toFixed(1) + "%" : ""]; cells.forEach(c => { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); }); tb.appendChild(tr); });
@@ -1171,7 +1250,7 @@ function quitShow() {
 // the live screen wears above its number, and what it starts.
 const show = [
   ["title", 0],
-  ["how to read it", 1],
+  ["how it works", 1],
   ["live", null, "Live in this room: a guitar pickup hears the grid", null,
     "A guitar pickup rests on a power adapter in this room. The adapter hums at the grid's frequency, and sonido measures it. At 60 Hz the tuner reads the note B, in tune. If the grid ran short of power, the number would fall."],
   ["rush hour", null, "A jam you can see coming: tomorrow's rush hour", () => tomorrow(),
@@ -1191,7 +1270,7 @@ const show = [
   ["thank you", 7],
 ];
 let beat = -1, flowT0 = 0;
-function showCard(id) { closeAll(); $(id).classList.add("show"); if (id === "ovPlan") requestAnimationFrame(drawPlan); }
+function showCard(id) { closeAll(); $(id).classList.add("show"); cardFit(); if (id === "ovPlan") requestAnimationFrame(drawPlan); }
 // Tomorrow's 24 hours as the controller meets them (station.mn): in the rush
 // window the battery carries the building; outside it, in an hour at least
 // 40 percent clean, the battery charges. The demand is EIA's, by hour.
@@ -1203,21 +1282,18 @@ function drawPlan() {
   const p = (state && state.pace) || {}, win = p.window || [17, 21], clean = p.clean || [];
   const fTm = p.forecast_tomorrow || [], dem = fTm.some(v => v != null) ? fTm : (p.shape || []);
   const ink = css("--ink"), ink3 = css("--ink-3"), line = css("--line"), pulse = css("--pulse"), green = "#3DFF9A", mono = css("--mono");
-  const fs = Math.max(13, w / 72), pad = { l: fs * 4.2, r: fs, t: fs * 2.2, b: fs * 2 };
+  // The card is scaled to fit, so the type is sized for at least 11 pixels on the screen.
+  const fs = Math.max(18, 11 / cardScale), pad = { l: fs * 4.2, r: fs, t: fs * 2.2, b: fs * 2 };
   const vals = dem.filter(v => v != null);
   g.font = fs + "px " + mono;
   if (!vals.length) { g.fillStyle = ink3; g.textAlign = "center"; g.fillText("no hours loaded", w / 2, h / 2); return; }
   const lo = Math.min(...vals) * 0.92, hi = Math.max(...vals) * 1.04;
   const xOf = hr => pad.l + (w - pad.l - pad.r) * hr / 24, yOf = v => pad.t + (h - pad.t - pad.b) * (1 - (v - lo) / (hi - lo));
   const kind = hr => win[0] <= hr && hr < win[1] ? "rush" : clean[hr] != null && clean[hr] >= 0.4 ? "charge" : null;
-  // The hours' bands, each run labeled above its middle.
+  // The hours' bands, named once in the legend above the chart.
   for (let hr = 0; hr < 24;) {
     const k = kind(hr); let end = hr; while (end + 1 < 24 && kind(end + 1) === k) end++;
-    if (k) {
-      const col = k === "rush" ? pulse : green;
-      g.fillStyle = rgba(col, 0.2); g.fillRect(xOf(hr), pad.t, xOf(end + 1) - xOf(hr), h - pad.t - pad.b);
-      g.fillStyle = col; g.textAlign = "center"; g.textBaseline = "bottom"; g.fillText(k === "rush" ? "on battery" : "charging", (xOf(hr) + xOf(end + 1)) / 2, pad.t - fs * 0.35);
-    }
+    if (k) { g.fillStyle = rgba(k === "rush" ? pulse : green, 0.2); g.fillRect(xOf(hr), pad.t, xOf(end + 1) - xOf(hr), h - pad.t - pad.b); }
     hr = end + 1;
   }
   // The axes: gigawatts up the side, the hours along the bottom.
@@ -1225,13 +1301,24 @@ function drawPlan() {
   const step = (hi - lo) > 3000 ? 1000 : 500;
   for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) { g.beginPath(); g.moveTo(pad.l, yOf(v)); g.lineTo(w - pad.r, yOf(v)); g.stroke(); g.fillText((v / 1000).toFixed(1) + " GW", pad.l - fs * 0.4, yOf(v)); }
   g.textAlign = "center"; g.textBaseline = "top";
-  [[0, "midnight"], [6, "6 AM"], [12, "noon"], [18, "6 PM"], [24, "midnight"]].forEach(([hr, t]) => { g.textAlign = hr === 24 ? "right" : "center"; g.fillText(t, xOf(hr), h - pad.b + fs * 0.4); });
+  // The hours along the bottom, each skipped if it would touch the one before it.
+  let edge = -Infinity;
+  [[0, "midnight"], [6, "6 AM"], [12, "noon"], [18, "6 PM"]].forEach(([hr, t]) => {
+    const tw = g.measureText(t).width, x0 = hr === 0 ? xOf(hr) : xOf(hr) - tw / 2;
+    if (x0 < edge + fs) return;
+    g.textAlign = "left"; g.fillText(t, x0, h - pad.b + fs * 0.4); edge = x0 + tw;
+  });
   // Tomorrow's demand, one point per hour at the hour's middle.
   const pts = dem.map((v, hr) => v == null ? null : [xOf(hr + 0.5), yOf(v)]).filter(Boolean);
   if (pts.length > 1) { g.strokeStyle = ink; g.lineWidth = 3; g.lineJoin = "round"; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); }
-  g.fillStyle = ink; g.textAlign = "left"; g.textBaseline = "bottom"; g.fillText("demand", pad.l + fs * 0.4, pad.t - fs * 0.35);
+  // The legend: the demand line, then each band's color and what the battery does in it.
+  g.textAlign = "left"; g.textBaseline = "middle";
+  let lx = pad.l; const ly = pad.t - fs * 1.05, sw = fs * 1.1;
+  g.strokeStyle = ink; g.lineWidth = 3; g.beginPath(); g.moveTo(lx, ly); g.lineTo(lx + sw, ly); g.stroke(); lx += sw + fs * 0.4;
+  g.fillStyle = ink; g.fillText("demand", lx, ly); lx += g.measureText("demand").width + fs * 1.4;
+  [[pulse, "on battery"], [green, "charging"]].forEach(([col, t]) => { g.fillStyle = rgba(col, 0.55); g.fillRect(lx, ly - fs * 0.45, sw, fs * 0.9); lx += sw + fs * 0.4; g.fillStyle = col; g.fillText(t, lx, ly); lx += g.measureText(t).width + fs * 1.4; });
 }
-window.addEventListener("resize", () => { if ($("ovPlan").classList.contains("show")) drawPlan(); });
+window.addEventListener("resize", () => { if ($("ovPlan").classList.contains("show")) requestAnimationFrame(drawPlan); });
 // The slides are the show's deck in a frame over the live screen; the deck's script shows the slide the hash names.
 function slide(n) { const f = $("deckFrame"); if (!f.src) f.src = "pitch/show.html?embed#" + n; else f.contentWindow.location.hash = "#" + n; showCard("ovDeck"); }
 function runBeat(n) {
@@ -1300,7 +1387,7 @@ $("btnReplay").onclick = replay; $("btnIsland").onclick = island; $("btnSound").
 document.addEventListener("mousemove", () => { document.body.classList.add("cursor"); clearTimeout(window._cursorT); window._cursorT = setTimeout(() => document.body.classList.remove("cursor"), 2000); });
 
 loadCaptures();
-setStage(stageOn); stageFit(); window.addEventListener("resize", stageFit);
+setStage(stageOn); layout(); window.addEventListener("resize", layout);
 // Upright, a step's longer words make the column taller; the scale follows.
 if (window.ResizeObserver) new ResizeObserver(stageFit).observe($("stageInner"));
 if (sessionFile) startPlayback(sessionFile); else startLive();

@@ -77,7 +77,6 @@
     <tr><td>No memory allocated while it decides</td><td class="yes">Proven</td></tr>
     <tr><td>The flywheel within 100 kW, the battery within 300 kW</td><td class="yes">Proven: each machine answers a command with a power inside its rating, and the compiler checks the answer</td></tr>
     <tr><td>It never stops with an error</td><td class="yes">Proven for every function the controller defines; one byte-range check inside the library's print routine is not proven yet</td></tr>
-    <tr><td>Its decisions are good</td><td class="no">Tested on recordings, not proven</td></tr>
   </table>
   <p class="note">The compiler is written in Mentl, and the pinned binary rebuilds itself byte for byte. The first four rows are checked through every call, and a copy that breaks one does not build.</p>
   <div class="foot"><span>Checked by the compiler: mentl audit examples/grid/station.mn, and mentl why for each rule</span><span>Backup</span></div>

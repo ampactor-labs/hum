@@ -8,32 +8,35 @@
 <body>
 <div class="deck">
 
-<section class="slide">
-  <div class="kick">Hard Tech Week 2026 · Torus bounty · Nucleus × Startup State open call</div>
+<section class="slide intro">
+  <div class="kick">Morgan Espitia, Salt Lake City · Hard Tech Week 2026 · Torus bounty · Nucleus × Startup State open call</div>
   <h1 class="small">HUM hears the power grid through a guitar, and a model of a Torus Station answers it.</h1>
   <div class="two">
-    <div>
-      <p class="lead">The software that decides is written in Mentl, a language I built. Its rules are in the code, and the compiler checks them through every function the decision calls, so it can't reach the internet while it decides, and a version that breaks a rule does not build.</p>
-      <p class="lead"><b>Morgan Espitia</b>, Salt Lake City. My company is Mentl. Its first market: the people who run batteries and flywheels.</p>
-    </div>
-    <div class="pic"><img src="hero.png" alt="The live screen during a replayed 2019 grid failure: the frequency falls and the flywheel pushes 100 kW"></div>
+    <ol class="key">
+      <li><b>The number</b> is the grid's frequency in hertz. It holds near 60 while supply meets demand and falls when the grid runs short of power.</li>
+      <li><b>The tuner</b> shows the same hum as a musical note. At 60 Hz it reads B, in tune.</li>
+      <li><b>The two cards</b> are the model Station. Its flywheel answers in the first seconds, and its battery carries the building for hours.</li>
+      <li><b>The sentence</b> says what is happening and what the Station did about it.</li>
+      <li><b>The tag</b> says where the reading comes from. LIVE is a room's wiring, TEST HUM is a synthesized hum in its place, and REPLAY is Britain's real grid failure of 9 August 2019.</li>
+    </ol>
+    <div class="pic keypic"><img src="hero.png" alt="A live screen during the replayed 2019 grid failure, with numbered markers on the frequency, the tuner, the Station's two cards, the sentence and the tag"><span class="m" style="left:40.5%;top:21%">1</span><span class="m" style="left:55%;top:38%">2</span><span class="m" style="left:79.5%;top:11.5%">3</span><span class="m" style="left:21.2%;top:87%">4</span><span class="m" style="left:51.6%;top:5.8%">5</span></div>
   </div>
-  <div class="foot"><span>The live screens read the grid from a room's wiring, except the replayed 2019 event.</span><span>ampactor.dev/hum</span></div>
+  <p class="say">What comes next: the live screen in four situations (a steady grid, tomorrow's rush hour, a real grid failure and a blackout), then what the compiler proves about the software that decided, then the plan.</p>
+  <div class="foot"><span>What you will see</span><span>ampactor.dev/hum</span></div>
   <div class="src">Data: grid frequency, NESO open data at 1 s, 9 Aug 2019, moved to 60 Hz · rush hour, EIA-930 hourly demand, PacifiCorp East, 19–26 Oct 2026 · Station: a simulated model of Torus's published figures</div>
 </section>
 
 <section class="slide">
-  <div class="kick">How to read this demo</div>
+  <div class="kick">How it works</div>
   <h1 class="small">The power grid's frequency shows whether it has enough power. A guitar can hear it.</h1>
   <div class="rows" style="gap:26px">
     <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The grid</b><span>The whole Western grid, from Alberta to Baja, runs at one frequency: 60 hertz. When demand outruns supply, the frequency falls.</span></div>
     <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The ear</b><span>Every power adapter hums at that frequency. A guitar pickup resting on one hears it, and my audio library, sonido, measures it to a thousandth of a hertz.</span></div>
     <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The Station</b><span>A model of a Torus Station: a flywheel for the first seconds (100 kW for six minutes) and a battery for the hours (300 kW for four hours). Simulated.</span></div>
     <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The software</b><span>Decides what the Station does. It is written in Mentl, a language I built: its rule, never reach the internet, is in the code, and the compiler checks it through every function the decision calls.</span></div>
-    <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>Next</b><span>The grid's hum in a room's wiring. Then tomorrow's rush hour, a real grid failure from 2019, and a blackout.</span></div>
   </div>
   <div class="foot"><span>HUM</span><span>ampactor.dev/hum</span></div>
-  <div class="src">Station figures: Torus's published specifications, modeled and simulated. Frequency: read from a room's wiring.</div>
+  <div class="src">Station figures: Torus's published specifications, modeled and simulated. Frequency: a room's wiring when the demo runs live; the hosted recording uses a synthesized 60 Hz hum.</div>
 </section>
 
 <section class="slide">

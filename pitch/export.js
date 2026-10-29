@@ -35,14 +35,14 @@ const PORT = 8799;
     const steps = [];
     for (let k = 0; ; k++) {
       if (k > 0) { await tour.keyboard.press('ArrowRight'); }
-      const at = await tour.evaluate(() => ({ text: document.getElementById('tourText').textContent, deck: document.getElementById('ovDeck').classList.contains('show'), again: !document.getElementById('tourAgain').hidden }));
+      const at = await tour.evaluate(() => ({ text: document.getElementById('tourText').textContent, deck: document.getElementById('ovDeck').classList.contains('show'), live: !document.querySelector('.ov2.show') }));
       if (k > 0 && at.text.startsWith('Start')) break;
       if (at.deck) {
         await tour.waitForTimeout(300);
         steps.push({ slide: await tour.evaluate(() => parseInt(document.getElementById('deckFrame').contentWindow.location.hash.slice(1), 10) || 0) });
       } else {
         // A live screen plays its stretch of the recording at four times speed and holds; a card shows at once.
-        await tour.waitForTimeout(at.again ? 6000 : 600);
+        await tour.waitForTimeout(at.live ? 6000 : 600);
         steps.push({ picture: 'data:image/jpeg;base64,' + (await tour.screenshot({ type: 'jpeg', quality: 88 })).toString('base64') });
       }
     }
