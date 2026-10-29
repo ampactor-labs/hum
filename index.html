@@ -310,7 +310,7 @@ body:not(.dash) .help { display: none; }
 $ mentl why examples/grid/station.mn decide WASI
 <b>decide never uses WASI: nothing in decide, and nothing it calls, performs an operation of WASI</b></pre>
   <pre id="certRaw" style="display:none"></pre>
-  <div class="caption">The compiler proves these through every call the program makes. <code>mentl check</code> finds no claim in this controller that it could not prove. <span class="sim">Press A for the compiler's own words.</span></div>
+  <div class="caption">The compiler checks these through every call the program makes, and a version that breaks one does not build. <code>mentl check</code> finds no claim in this controller that it could not prove. <span class="sim">Press A for the compiler's own words.</span></div>
 </div></div>
 
 <div class="overlay" id="ovRefuse"><div class="card">

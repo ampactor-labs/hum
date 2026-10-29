@@ -13,7 +13,7 @@
   <h1 class="small">HUM hears the power grid through a guitar, and a model of a Torus Station answers it.</h1>
   <div class="two">
     <div>
-      <p class="lead">The software that decides is written in Mentl, a programming language I built. Its compiler proves that this software can't reach the internet while it decides.</p>
+      <p class="lead">The software that decides is written in Mentl, a language I built. Its rules are in the code, and the compiler checks them through every function the decision calls, so it can't reach the internet while it decides, and a version that breaks a rule does not build.</p>
       <p class="lead"><b>Morgan Espitia</b>, Salt Lake City. My company is Mentl. Its first market: the people who run batteries and flywheels.</p>
     </div>
     <div class="pic"><img src="hero.png" alt="The live screen during a replayed 2019 grid failure: the frequency falls and the flywheel pushes 100 kW"></div>
@@ -29,7 +29,7 @@
     <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The grid</b><span>The whole Western grid, from Alberta to Baja, runs at one frequency: 60 hertz. When demand outruns supply, the frequency falls.</span></div>
     <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The ear</b><span>Every power adapter hums at that frequency. A guitar pickup resting on one hears it, and my audio library, sonido, measures it to a thousandth of a hertz.</span></div>
     <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The Station</b><span>A model of a Torus Station: a flywheel for the first seconds (100 kW for six minutes) and a battery for the hours (300 kW for four hours). Simulated.</span></div>
-    <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The software</b><span>Decides what the Station does. It is written in Mentl, a language I built, whose compiler proves the decision can't reach the internet.</span></div>
+    <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>The software</b><span>Decides what the Station does. It is written in Mentl, a language I built: its rule, never reach the internet, is in the code, and the compiler checks it through every function the decision calls.</span></div>
     <div class="row" style="grid-template-columns:250px 1fr;font-size:34px"><b>Next</b><span>The grid's hum in a room's wiring. Then tomorrow's rush hour, a real grid failure from 2019, and a blackout.</span></div>
   </div>
   <div class="foot"><span>HUM</span><span>ampactor.dev/hum</span></div>
@@ -45,10 +45,10 @@
 
 <section class="slide">
   <div class="kick">The hard tech</div>
-  <h1>Mentl proves what software can never do.</h1>
+  <h1>The rule is part of the code, and the compiler checks it through every call.</h1>
   <div class="two">
     <div>
-      <p class="lead">You write a rule into the code, such as "this never touches the internet" or "this never writes a file".</p>
+      <p class="lead">You write the rule into the code: this never touches the internet, this never writes a file, this never allocates memory.</p>
       <p class="lead">The compiler checks the rule through every function the code calls. <b>Break it, and the program won't build.</b></p>
       <p class="note">Seven months and 2,600 commits since March. The compiler is written in Mentl and compiles itself. Open source: github.com/ampactor-labs/mentl</p>
     </div>
@@ -118,15 +118,15 @@
   <div class="kick">What Mentl code looks like</div>
   <h1 class="small">Five operators draw the shape of a program. The compiler checks each rule along that shape.</h1>
   <table class="verbs">
-    <tr><td class="code">fn read(hz) = hz <b class="v">|&gt;</b> fast</td><td class="verb">|&gt;</td><td>pipe: one stage feeds the next</td></tr>
-    <tr><td class="code">fn fork(hz) = (hz) <b class="v">&lt;|</b> (fast, slow)</td><td class="verb">&lt;|</td><td>split: one value goes to two branches</td></tr>
-    <tr><td class="code">fn pair(a, b) = (a |&gt; fast) <b class="v">&gt;&lt;</b> (b |&gt; slow)</td><td class="verb">&gt;&lt;</td><td>parallel: two branches run side by side</td></tr>
-    <tr><td class="code">fn trend(hz) = ((prev) =&gt; prev + hz) <b class="v">&lt;~</b> Delay(1)</td><td class="verb">&lt;~</td><td>feedback: each step sees the step before</td></tr>
-    <tr><td class="code">fn act(hz) <b class="r">with !Network</b> = spin(hz) <b class="v">~&gt;</b> flywheel</td><td class="verb">~&gt;</td><td>handler: names who answers the request</td></tr>
+    <tr><td class="code">let l = saw <b class="v">|&gt;</b> rig.dark(300.0) <b class="v">|&gt;</b> soft_clip</td><td class="verb">|&gt;</td><td>in sequence: the sawtooth, the filter, the clipper</td></tr>
+    <tr><td class="code">let (echoed, roomed) = dry <b class="v">&lt;|</b> (rig.echo, rig.room)</td><td class="verb">&lt;|</td><td>one sample to the echo and to the room; shared, so the two cannot race</td></tr>
+    <tr><td class="code">let l = ((echoed) <b class="v">&gt;&lt;</b> (dry)) |&gt; mix(0.35)</td><td class="verb">&gt;&lt;</td><td>two signals side by side, then mixed</td></tr>
+    <tr><td class="code">{ prev =&gt; a * x + (1.0 - a) * prev } <b class="v">&lt;~</b> delay(1)</td><td class="verb">&lt;~</td><td>feedback: this sample from the last one; the memory is allocated once</td></tr>
+    <tr><td class="code">handler rack = spectral_flux_distort <b class="v">~&gt;</b> limiter_at(0.6)</td><td class="verb">~&gt;</td><td>the handler: what the sound goes through, named once</td></tr>
   </table>
-  <p class="note" style="font-size:30px;color:var(--ink-2)">The last line carries a rule, <span class="mono">with !Network</span>: if anything <span class="mono">act</span> calls could reach the network, the compiler refuses to build it. Four of the operators come from Faust, the audio language; <span class="mono">~&gt;</span> is Mentl's own.</p>
+  <p class="note" style="font-size:30px;color:var(--ink-2)">The controller's rule is on its decision: <span class="mono">with !Alloc + !Network + !Filesystem + !WASI + !Trap</span>. The compiler checks it through every function the decision calls, and the copy that read a price online did not build.</p>
   <div class="foot"><span>The hard tech</span><span>ampactor.dev/hum</span></div>
-  <div class="src">These lines pass mentl check as written, 28 Oct 2026. The language: github.com/ampactor-labs/mentl</div>
+  <div class="src">Lines from lessons 2, 3 and 4 of the Mentl course and from examples/grid/station.mn, as they check clean on 29 Oct 2026. The language: github.com/ampactor-labs/mentl</div>
 </section>
 
 </div>

@@ -24,7 +24,7 @@
 </style>
 </head>
 <body>
-<h1>Mentl: a language whose compiler proves what software will never do</h1>
+<h1>Mentl: a machine's rules checked by the compiler, not by review</h1>
 <p class="sub">Hard Tech Week 2026 · Nucleus × Startup State open call · Morgan Espitia · sonofagoose@pm.me · github.com/ampactor-labs/mentl</p>
 
 <div class="two">
@@ -33,14 +33,14 @@
 <p>AI now helps write the software that runs machines: batteries, flywheels, flight controls. People test that code and review it, and then they trust it. C and C++, the languages most of that code is written in, give a team no way to write "this never touches the internet" or "this never writes a file" and have the compiler check it.</p>
 
 <h2>What exists</h2>
-<p><b>Mentl</b> is a programming language I have built since March 15, 2026: 2,610 commits before this week, open source. You write a rule into the code, and the compiler checks it through every function the code calls. Break the rule and the program won't build. The compiler is written in Mentl and compiles itself. It runs in a browser at space.ampactor.dev, and ampactor.dev/wasatch plays a piece of music, written from Salt Lake weather readings, whose per-sample code it proves never allocates memory or reaches the network.</p>
+<p><b>Mentl</b> is a programming language I have built since March 15, 2026: 2,610 commits before this week, open source. You write a rule into the code, and the compiler checks it through every function the code calls. Break the rule and the program won't build. The compiler is written in Mentl and compiles itself. It runs in a browser at space.ampactor.dev, and ampactor.dev/wasatch plays a piece of music, written from Salt Lake weather readings, whose per-sample code is checked never to allocate memory or reach the network.</p>
 <p><b>sonido</b> is my audio library, built since January 25, 2026: effects that run in plugins, in a browser and on a guitar pedal.</p>
 
 <h2>Built this week</h2>
 <ul>
   <li>A guitar pickup picks up the power grid's hum in a room's wiring, and sonido measures its frequency to a thousandth of a hertz and shows it on sonido's tuner.</li>
   <li>A model of a Torus Station decides, typically in under a millisecond, what its flywheel and battery should do: ride out tomorrow's rush hour, catch a real 2019 grid failure, keep the building on when the grid goes dark.</li>
-  <li>That decision is written in Mentl and proven unable to reach the internet. Add one line that reads a price online and the compiler refuses to build it.</li>
+  <li>That decision is written in Mentl and proven never to reach the internet, allocate memory or crash. One added line that reads a price online is refused.</li>
 </ul>
 <h2>What I need</h2>
 <ul>

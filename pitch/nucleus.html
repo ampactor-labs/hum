@@ -12,16 +12,16 @@
   <div class="kick">Morgan Espitia, Salt Lake City · Mentl · Nucleus × Startup State open call</div>
   <h1 class="small">AI now helps write the software that runs machines. C and C++, the languages most of it is written in, can't check what that software will never do.</h1>
   <p class="lead">Batteries, flywheels and flight controls run on code that people test and review, and then trust.</p>
-  <p class="lead"><b>Mentl is a programming language whose compiler proves it.</b></p>
+  <p class="lead"><b>In Mentl, a language I built, the rule is part of the code: the compiler checks it through every function the code calls, and a version that breaks it does not build.</b></p>
   <div class="foot"><span>The problem</span><span>1 / 5</span></div>
 </section>
 
 <section class="slide">
   <div class="kick">The hard tech</div>
-  <h1>Mentl proves what software can never do.</h1>
+  <h1>The rule is part of the code, and the compiler checks it through every call.</h1>
   <div class="two">
     <div>
-      <p class="lead">You write a rule into the code, such as "this never touches the internet" or "this never writes a file".</p>
+      <p class="lead">You write the rule into the code: this never touches the internet, this never writes a file, this never allocates memory.</p>
       <p class="lead">The compiler checks the rule through every function the code calls. <b>Break it, and the program won't build.</b></p>
       <p class="note">Seven months and 2,600 commits since March. The compiler is written in Mentl and compiles itself. Open source: github.com/ampactor-labs/mentl</p>
     </div>
@@ -37,7 +37,7 @@
     <ul class="plain">
       <li><b>A guitar pickup picks up the grid's hum</b> in any room, and my audio library, sonido, measures its frequency to a thousandth of a hertz.</li>
       <li><b>A model of a Torus Station decides</b> what to do, typically in under a millisecond, with software written in Mentl.</li>
-      <li><b>That software is proven</b> unable to reach the internet while it decides.</li>
+      <li><b>Its rules are in the code</b>, and the compiler checks them through every function it calls: it never reaches the internet, never allocates memory and never stops with an error.</li>
     </ul>
     <div class="pic"><img src="img/stage-trip.png" alt="The live screen while a replayed 2019 grid failure pulls the frequency down and the flywheel answers"></div>
   </div>
@@ -88,8 +88,8 @@
   <h1 class="small">From the laptop to the pedal: the engineering left</h1>
   <table>
     <tr><th>What stands in the way</th><th>Measured today</th><th>The fix</th></tr>
-    <tr><td>No WebAssembly engine on the pedal's chip</td><td>The controller is a 37 KB WebAssembly file</td><td>Embed an interpreter written in Rust, or compile the file to C</td></tr>
-    <tr><td>Built for threads</td><td>Shared memory and atomic instructions</td><td>A single-threaded build; the controller uses no threads</td></tr>
+    <tr><td>No WebAssembly engine on the pedal's chip</td><td>The controller is a 43 KB WebAssembly file</td><td>Embed an interpreter written in Rust, or compile the file to C</td></tr>
+    <tr><td>Declared for threads</td><td>The memory is declared shared; there is no atomic instruction and no thread import</td><td>Drop the word for a program that starts no thread, a one-line change in the compiler</td></tr>
     <tr><td>Memory</td><td>Fixed: the same peak after 300,000 readings as after one</td><td>Done; each reading runs in an arena that is reclaimed when it ends</td></tr>
     <tr><td>Speed</td><td>About 291,000 instructions per reading</td><td>Pass numbers instead of text</td></tr>
   </table>

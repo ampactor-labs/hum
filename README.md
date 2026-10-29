@@ -1,6 +1,6 @@
 # HUM
 
-HUM measures the power grid's frequency through a guitar pickup and shows a model of a Torus Station deciding what to do about it. The software that decides is written in Mentl, and Mentl's compiler proves that software can't reach the internet while it decides.
+HUM measures the power grid's frequency through a guitar pickup and shows a model of a Torus Station deciding what to do about it. The software that decides is written in Mentl, a language I built: its rules are written into the code, the compiler checks them through every function the decision calls, and a version that breaks one does not build. So the decision never reaches the internet, never allocates memory and never stops with an error.
 
 Hard Tech Week 2026, Salt Lake City. Entered for the Torus bounty ("software that knows when the grid is jammed and stays out of traffic") and the Nucleus × Startup State open call. Every commit here is from the hackathon week. What existed before lives in [sonido](https://github.com/ampactor-labs/sonido) and [Mentl](https://github.com/ampactor-labs/mentl).
 
@@ -14,7 +14,7 @@ A guitar pickup picks up the hum. The ear, a program built on my audio library s
 
 A model of a Torus Station decides what to do. Its flywheel handles fast changes and its battery carries load for hours. In rush hour, which EIA's hourly data marks, the battery runs the building. When the frequency falls fast, the flywheel pushes. When the hum disappears, the Station keeps the building on.
 
-The decision is written in Mentl. Its compiler proves the decision can't reach the network, a file or the clock, and that it allocates no memory. A copy of the program with one price lookup added is refused.
+The decision is written in Mentl. Its rules are in the code, and the compiler checks them through every function the decision calls: it never reaches the network, a file or the clock, never allocates memory and never stops with an error. A copy of the program with one price lookup added inside the decision does not build, and the refusal names the line. What is not proven is that the decisions are good; recordings test them.
 
 ## What is real and what is simulated
 

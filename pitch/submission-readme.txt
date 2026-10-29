@@ -7,10 +7,12 @@ WHAT HUM IS
 
 HUM hears the power grid's frequency through a guitar pickup resting on a
 power adapter. A model of a Torus Station decides what its flywheel and
-battery should do, using a controller written in Mentl, a programming
-language I built. Mentl's compiler proves that the decision can't reach
-the network, a file or the clock, and that it allocates no memory, through
-every function the decision calls.
+battery should do, using a controller written in Mentl, a language I
+built. The controller's rules are written into its code, and the compiler
+checks them through every function the decision calls on every build: the
+decision never reaches the network, a file or the clock, never allocates
+memory and never stops with an error. A version that breaks a rule does
+not build.
 
 
 THE FILES
@@ -60,8 +62,10 @@ WHAT IS REAL AND WHAT IS SIMULATED
 - The Station is a model built from Torus's published figures: a flywheel
   giving 100 kW for six minutes and a battery giving 300 kW for four
   hours. It is simulated, and every screen says so.
-- Proven by the compiler: the decision makes no network, file, clock or
-  other call outside the program, and allocates no memory.
+- Checked by the compiler through every call: the decision makes no
+  network, file, clock or other call outside the program, allocates no
+  memory and never stops with an error. Not proven: that its decisions
+  are good; recordings test them.
 
 
 BUILT THIS WEEK

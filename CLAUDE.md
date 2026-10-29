@@ -36,9 +36,15 @@ engineer opening the README. Write for them.
 - The Station is a model built from Torus's published figures. Say "a model
   of Torus's Station", and label it simulated on every screen.
 - "Proven" always names what is proven: the decision makes no network, file,
-  clock or other host call, and allocates no memory. Do not claim more. The
-  audit lists open claims, the program can trap, and the reading loop around
-  the decision allocates memory.
+  clock or other host call, allocates no memory and never stops the program
+  with an error, and each machine answers a command within its rating. Do not
+  claim more. One byte-range check inside the library's print routine is not
+  proven yet, the decisions are tested on recordings and not proven good, and
+  the memory is the same after 300,000 readings as after one.
+- Never open with "Mentl is a language that…". Open with the listener's
+  situation, then the rule in the code, then the check through every call,
+  then the refusal. Mentl's own CLAUDE.md, "How to talk about Mentl", is the
+  standard.
 - Measure a claim before writing it down. A number on a slide comes from a
   command you ran.
 
